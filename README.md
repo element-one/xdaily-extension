@@ -18,7 +18,8 @@ yarn dev
 
 Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
 
-- You can start editing the popup by modifying `popup/index.tsx`. It should auto-update as you make changes.
+- You can start editing the sidepanel by modifying `sidepanel/index.tsx`. It should auto-update as you make changes.
+- `background.ts` is for service_worker
 - Likewise to add a content page, add file inside `content`, importing some module and do some logic, then reload the extension on your browser.
 - [TailwindCss](https://tailwindcss.com/) is supported, just visit [Quickstart with TailwindCss](https://docs.plasmo.com/quickstarts/with-tailwindcss)
 

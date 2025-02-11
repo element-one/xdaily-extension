@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react"
 
-import "../styles/global.css"
-
-function IndexPopup() {
+function IndexSidePanel() {
   const [tweets, setTweets] = useState<{ content: string; link: string }[]>([])
 
   useEffect(() => {
-    try {
-      chrome.storage.local.get("tweets", (data) => {
-        console.log(data.tweets)
-        setTweets(data.tweets || [])
-      })
-    } catch (e) {
-      console.log(e)
+    chrome.storage.local.get("tweets", (data) => {
+      console.log(data.tweets)
+      setTweets(data.tweets || [])
+    })
+
+    const onStorageChange = (changes: any, areaName: string) => {
+      if (areaName === "local" && changes.tweets) {
+        setTweets(changes.tweets.newValue || [])
+      }
+    }
+
+    chrome.storage.onChanged.addListener(onStorageChange)
+
+    return () => {
+      chrome.storage.onChanged.removeListener(onStorageChange)
     }
   }, [])
+
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "sidepanel_close_self") {
+      window.close()
+    }
+  })
 
   return (
     <div className="p-4 w-64">
@@ -36,4 +48,4 @@ function IndexPopup() {
   )
 }
 
-export default IndexPopup
+export default IndexSidePanel

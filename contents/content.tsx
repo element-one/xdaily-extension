@@ -1,4 +1,10 @@
 import cssText from "data-text:~/styles/global.css"
+import type { PlasmoCSConfig } from "plasmo"
+
+export const config: PlasmoCSConfig = {
+  matches: ["<all_urls>"],
+  all_frames: true
+}
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -30,10 +36,10 @@ const injectButton = (tweet: Element) => {
     tweetHeader.appendChild(button)
   }
 
-  button.addEventListener("click", () => collectTweet(tweet))
+  button.addEventListener("click", () => collectTweet(tweet as HTMLElement))
 }
 
-const collectTweet = (tweet: Element) => {
+const collectTweet = (tweet: HTMLElement) => {
   const content = tweet.innerText
   const linkElement = tweet.querySelector("a[href*='/status/']")
   const link = linkElement
