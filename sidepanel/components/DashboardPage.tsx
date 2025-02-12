@@ -3,7 +3,7 @@ import { useMemo, useState, type ReactNode } from "react"
 
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
-import { BoardPanel } from "./panels/BoardPanel"
+import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 
@@ -99,13 +99,13 @@ export const DashboardPage = () => {
           {/* bottom buttons */}
           <div className="flex flex-col gap-4">
             {/* Settings */}
-            <MeNavbarItem
+            {/* <MeNavbarItem
               key={SettingNavbarItem.key}
               handleClick={() => toggleDrawer(SettingNavbarItem.key)}
               isTargeted={SettingNavbarItem.key === currentNavbarItem.key}
               content={SettingNavbarItem.icon}
               tooltip={SettingNavbarItem.tooltip}
-            />
+            /> */}
             <div className="w-8 h-8 bg-primary-brand rounded-full"></div>
           </div>
         </aside>
