@@ -40,14 +40,15 @@ const injectButton = (tweet: Element) => {
 }
 
 const collectTweet = (tweet: HTMLElement) => {
-  const content = tweet.innerText
   const linkElement = tweet.querySelector("a[href*='/status/']")
-  const link = linkElement
-    ? "https://x.com" + linkElement.getAttribute("href")
+  const tweetId = linkElement
+    ? linkElement.getAttribute("href")?.split("/status/")[1]
     : ""
-  console.log(content, link)
 
-  chrome.runtime.sendMessage({ type: "save_tweet", content, link })
+  chrome.runtime.sendMessage({
+    type: "save_tweet",
+    tweetId
+  })
 }
 
 observeTweets()
