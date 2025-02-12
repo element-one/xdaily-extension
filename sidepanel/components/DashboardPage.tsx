@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from "react"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel"
-import { SearchPanel } from "./panels/SearchPanel"
+import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 
 enum NavbarItemKey {
@@ -53,12 +53,6 @@ export const DashboardPage = () => {
   const [navbarItemKey, setNavbarItemKey] = useState<NavbarItemKey>(
     NavbarItemKey.SEARCH
   )
-
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "sidepanel_close_self") {
-      window.close()
-    }
-  })
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
