@@ -1,9 +1,9 @@
 {
-  "name": "xdaily-extension",
-  "displayName": "Xdaily extension",
+  "name": "mecoin-extension",
+  "displayName": "Mecoin extension",
   "version": "0.0.1",
-  "description": "xdaily extension",
-  "author": "xdaily",
+  "description": "mecoin extension",
+  "author": "mecoin",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
