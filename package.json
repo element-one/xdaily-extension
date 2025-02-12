@@ -10,6 +10,10 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
     "plasmo": "0.90.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -27,6 +31,9 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": [
+      "storage"
+    ],
     "host_permissions": [
       "https://*/*"
     ]
