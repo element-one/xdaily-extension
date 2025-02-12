@@ -25,6 +25,7 @@ chrome.action.onClicked.addListener(() => {
     .catch((error) => console.error(error))
 })
 
+// listen to message
 chrome.runtime.onMessage.addListener(async (message, sender) => {
   console.log(message)
   switch (message.type) {

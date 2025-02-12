@@ -1,5 +1,5 @@
 import { Bookmark, FolderOpenDot, Search, Settings } from "lucide-react"
-import { useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
@@ -66,6 +66,34 @@ export const DashboardPage = () => {
     setNavbarItemKey(itemKey)
   }
 
+  const checkTweetDetailPage = (url: string) => {
+    if (url.includes("/status/")) {
+      // go to suggestion panel if is tweet detail page
+      toggleDrawer(NavbarItemKey.SUGGESTION)
+    }
+  }
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        const currentTab = tabs[0]
+        checkTweetDetailPage(currentTab.url || "")
+      }
+    })
+
+    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
+      if (changeInfo.status === "complete" && tab.url) {
+        checkTweetDetailPage(tab.url)
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(handleTabUpdate)
+
+    return () => {
+      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+    }
+  }, [])
+
   return (
     // TODO fonts
     <div className="flex flex-row w-full h-screen overflow-hidden bg-muted">
@@ -99,13 +127,13 @@ export const DashboardPage = () => {
           {/* bottom buttons */}
           <div className="flex flex-col gap-4">
             {/* Settings */}
-            {/* <MeNavbarItem
+            <MeNavbarItem
               key={SettingNavbarItem.key}
               handleClick={() => toggleDrawer(SettingNavbarItem.key)}
               isTargeted={SettingNavbarItem.key === currentNavbarItem.key}
               content={SettingNavbarItem.icon}
               tooltip={SettingNavbarItem.tooltip}
-            /> */}
+            />
             <div className="w-8 h-8 bg-primary-brand rounded-full"></div>
           </div>
         </aside>
