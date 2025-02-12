@@ -2,7 +2,7 @@ import { Bookmark, FolderOpenDot, Search, Settings } from "lucide-react"
 import { useMemo, useState, type ReactNode } from "react"
 
 import { MeNavbarItem } from "./MeNavbarItem"
-import { AiSuggestionPanel } from "./panels/AiSuggestionPanel"
+import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel"
 import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"

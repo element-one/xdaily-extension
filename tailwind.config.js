@@ -8,12 +8,13 @@ module.exports = {
       colors: {
         muted: {
           DEFAULT: "#f5f5f4",
-          foreground: "78716c",
+          foreground: "#78716c",
           light: "#fafafa"
         },
         thinborder: "#e2e5e9",
         primary: {
-          brand: "#6200ff"
+          brand: "#6200ff",
+          foreground: "#fafaf9"
         }
       }
     }
