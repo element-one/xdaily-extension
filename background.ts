@@ -1,10 +1,9 @@
-import { apiFetch } from "~axios/axios"
+import client from "~libs/client"
+import { MessageType, USER_TOKEN } from "~types/enum"
 
 console.log(
   "Live now; make now always the most precious time. Now will never come again."
 )
-
-let isSidePanelOpen = false
 
 const showToastInWebPage = (message) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -17,7 +16,8 @@ const showToastInWebPage = (message) => {
   })
 }
 
-// src/background.ts
+// control side panel open state
+let isSidePanelOpen = false
 chrome.action.onClicked.addListener(() => {
   isSidePanelOpen = !isSidePanelOpen
   chrome.sidePanel
@@ -26,29 +26,22 @@ chrome.action.onClicked.addListener(() => {
 })
 
 // listen to message
-chrome.runtime.onMessage.addListener(async (message, sender) => {
-  console.log(message)
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {
-    case "save_tweet":
+    case MessageType.SAVE_TWEET:
       const tweetId = message.tweetId
       try {
-        // TODO mock api
-        const response = await apiFetch("/posts", {
-          method: "POST",
-          body: JSON.stringify({ tweetId })
-        })
-        if (response) {
-          showToastInWebPage("Tweet 已成功保存！")
-        }
-        // console.log("Server response:", response)
+        console.log("use this tweetId", tweetId)
       } catch (e) {
         console.log(e)
       }
       break
-    case "toggle_side_panel":
+    case MessageType.TOGGLE_PANEL:
       if (isSidePanelOpen) {
         // tell side bar to close itself
-        chrome.runtime.sendMessage({ type: "sidepanel_close_self" })
+        chrome.runtime.sendMessage({
+          type: MessageType.SIDE_PANEL_CLOSE_ITSELF
+        })
       } else {
         await chrome.sidePanel.open({ tabId: sender.tab.id })
       }
@@ -56,5 +49,15 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
       break
     default:
       break
+  }
+})
+
+chrome.cookies.onChanged.addListener((changeInfo) => {
+  if (
+    changeInfo.cookie.domain.includes(process.env.PLASMO_PUBLIC_COOKIE_SERVER)
+  ) {
+    chrome.runtime.sendMessage({
+      type: MessageType.CHECK_AUTH
+    })
   }
 })

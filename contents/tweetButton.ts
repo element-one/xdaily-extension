@@ -1,6 +1,8 @@
 import cssText from "data-text:~/styles/global.css"
 import type { PlasmoCSConfig } from "plasmo"
 
+import { MessageType } from "~types/enum"
+
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
   all_frames: true
@@ -46,7 +48,7 @@ const collectTweet = (tweet: HTMLElement) => {
     : ""
 
   chrome.runtime.sendMessage({
-    type: "save_tweet",
+    type: MessageType.SAVE_TWEET,
     tweetId
   })
 }
