@@ -2,6 +2,8 @@ import cssText from "data-text:~/styles/global.css"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useState } from "react"
 
+import { MessageType } from "~types/enum"
+
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
   all_frames: true
@@ -13,7 +15,7 @@ export const getStyle = () => {
   return style
 }
 
-interface ToastProps {
+export interface ToastProps {
   message: string
   type?: "success" | "error"
   duration?: number // 持续时间，默认为 3000 毫秒
@@ -49,18 +51,19 @@ const ToastContainer = () => {
   const [messages, setMessages] = useState<ToastProps[]>([])
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === "toast") {
+    chrome.runtime.onMessage.addListener((info) => {
+      if (info.type === MessageType.INPAGE_TOAST) {
+        const message = info.message as ToastProps
         setMessages((prevMessages) => {
           if (prevMessages.length >= MAX_COUNT) {
             return [
               ...prevMessages.slice(1),
-              { message: message.message, type: message.toastType || "success" }
+              { message: message.message, type: message.type || "success" }
             ]
           }
           return [
             ...prevMessages,
-            { message: message.message, type: message.toastType || "success" }
+            { message: message.message, type: message.type || "success" }
           ]
         })
       }

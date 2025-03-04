@@ -1,3 +1,4 @@
+import type { ToastProps } from "~contents/toast"
 import { collectTweet, subscribeTweetUser } from "~services/tweet"
 import { MessageType } from "~types/enum"
 
@@ -5,11 +6,11 @@ console.log(
   "Live now; make now always the most precious time. Now will never come again."
 )
 
-const showToastInWebPage = (message) => {
+const showToastInWebPage = (message: ToastProps) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0].id) {
       chrome.tabs.sendMessage(tabs[0].id, {
-        type: "toast",
+        type: MessageType.INPAGE_TOAST,
         message: message
       })
     }
@@ -32,13 +33,19 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       const tweetId = message.tweetId
       try {
         console.log("use this tweetId", tweetId)
-        showToastInWebPage(`get tweetId ${tweetId} success`)
         if (tweetId) {
           const res = await collectTweet({ tweetId })
           console.log("testing", res)
+          showToastInWebPage({
+            message: `save tweetId ${tweetId} success`
+          })
         }
       } catch (e) {
         console.log(e)
+        showToastInWebPage({
+          message: "Something wrong",
+          type: "error"
+        })
       }
       break
     case MessageType.SUBSCRIBE_USER:
@@ -46,10 +53,18 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       try {
         if (userId) {
           const res = await subscribeTweetUser({ tweetUserId: userId })
-          console.log("testing", res)
+          if (res) {
+            showToastInWebPage({
+              message: `Subscribe to @${userId} success`
+            })
+          }
         }
       } catch (e) {
         console.log(e)
+        showToastInWebPage({
+          message: "Something wrong",
+          type: "error"
+        })
       }
       break
     case MessageType.TOGGLE_PANEL:

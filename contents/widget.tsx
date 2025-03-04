@@ -1,4 +1,5 @@
 import cssText from "data-text:~/styles/global.css"
+import { BookmarkIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 
 import { MessageType } from "~types/enum"
@@ -23,7 +24,7 @@ const WidgetButton = () => {
   return (
     <div className="p-2 pr-0 fixed text-white left-auto right-0 top-20 z-[1000] flex flex-col gap-y-4">
       <div className={buttonClassname} onClick={toggleSidePanel}>
-        Toggle
+        <BookmarkIcon className="size-7 text-primary-brand" />
       </div>
     </div>
   )
