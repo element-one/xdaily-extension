@@ -1,5 +1,5 @@
-import client from "~libs/client"
-import { MessageType, USER_TOKEN } from "~types/enum"
+import { collectTweet, subscribeTweetUser } from "~services/tweet"
+import { MessageType } from "~types/enum"
 
 console.log(
   "Live now; make now always the most precious time. Now will never come again."
@@ -32,6 +32,22 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       const tweetId = message.tweetId
       try {
         console.log("use this tweetId", tweetId)
+        showToastInWebPage(`get tweetId ${tweetId} success`)
+        if (tweetId) {
+          const res = await collectTweet({ tweetId })
+          console.log("testing", res)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      break
+    case MessageType.SUBSCRIBE_USER:
+      const userId = message.userId
+      try {
+        if (userId) {
+          const res = await subscribeTweetUser({ tweetUserId: userId })
+          console.log("testing", res)
+        }
       } catch (e) {
         console.log(e)
       }

@@ -6,9 +6,7 @@ import client from "~libs/client"
 export const getUser = async (): Promise<UserInfo> => {
   const response = await client.get<{
     user: UserInfo
-  }>("/users/me", {
-    skipErrorHandler: true
-  })
+  }>("/users/me")
   return response.data.user
 }
 

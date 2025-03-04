@@ -27,18 +27,30 @@ const observeTweets = () => {
 }
 
 const injectButton = (tweet: Element) => {
+  // collect tweet id
   const button = document.createElement("button")
   button.innerText = "⭐ 收藏"
   button.className =
     "collect-button px-2 py-1 bg-blue-500 text-white rounded text-sm"
   button.style.marginLeft = "8px"
 
+  // subsribe tweet user
+  const userButton = document.createElement("button")
+  userButton.innerText = "⭐ 订阅"
+  userButton.className =
+    "collect-button px-2 py-1 bg-blue-500 text-white rounded text-sm"
+  userButton.style.marginLeft = "8px"
+
   const tweetHeader = tweet.querySelector("div[role='group']")
   if (tweetHeader) {
     tweetHeader.appendChild(button)
+    tweetHeader.appendChild(userButton)
   }
 
   button.addEventListener("click", () => collectTweet(tweet as HTMLElement))
+  userButton.addEventListener("click", () =>
+    subscribeUser(tweet as HTMLElement)
+  )
 }
 
 const collectTweet = (tweet: HTMLElement) => {
@@ -50,6 +62,16 @@ const collectTweet = (tweet: HTMLElement) => {
   chrome.runtime.sendMessage({
     type: MessageType.SAVE_TWEET,
     tweetId
+  })
+}
+
+const subscribeUser = (tweet: HTMLElement) => {
+  const userElement = tweet.querySelector("a[href*='/']")
+  const userId = userElement?.getAttribute("href")?.split("/")[1] ?? ""
+
+  chrome.runtime.sendMessage({
+    type: MessageType.SUBSCRIBE_USER,
+    userId
   })
 }
 
