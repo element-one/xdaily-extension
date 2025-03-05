@@ -6,6 +6,7 @@ import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"
+import { UserAvatar } from "./UserAvatar"
 
 enum NavbarItemKey {
   SEARCH = "search",
@@ -134,7 +135,7 @@ export const DashboardPage = () => {
               content={SettingNavbarItem.icon}
               tooltip={SettingNavbarItem.tooltip}
             />
-            <div className="w-8 h-8 bg-primary-brand rounded-full"></div>
+            <UserAvatar />
           </div>
         </aside>
       </div>
