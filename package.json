@@ -40,7 +40,9 @@
       "cookies"
     ],
     "host_permissions": [
-      "https://mecoin-api-dev.onrender.com/*"
+      "$PLASMO_PUBLIC_SERVER_URL/*",
+      "https://twitter.com/*",
+      "https://x.com/*"
     ]
   }
 }
