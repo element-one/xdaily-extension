@@ -1,13 +1,14 @@
 import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
-import { BookmarkIcon, UserPlus } from "lucide-react"
+import { BookmarkIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { MessageType } from "~types/enum"
 
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
+  // only show in these two sites
+  matches: ["https://twitter.com/*", "https://x.com/*"],
   all_frames: true
 }
 
@@ -17,11 +18,43 @@ export const getStyle = () => {
   return style
 }
 
+interface ToolbarButtonProps {
+  onClick?: () => void
+  isLoading: boolean
+  icon: React.ReactNode
+}
+const ToolbarButton: FC<ToolbarButtonProps> = ({
+  onClick,
+  isLoading,
+  icon
+}) => {
+  const handleClick = () => {
+    onClick?.()
+  }
+  return (
+    <div
+      onClick={handleClick}
+      className={clsx(
+        "flex justify-center items-center gap-2 flex-col p-2 cursor-pointer hover:bg-slate-200 text-primary-brand",
+        isLoading ? "cursor-not-allowed" : "cursor-pointer"
+      )}>
+      {isLoading ? (
+        <LoaderCircleIcon className="size-6 animate-spin" />
+      ) : (
+        <>{icon}</>
+      )}
+    </div>
+  )
+}
+
 const Toolbar = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [tweet, setTweet] = useState<HTMLElement | null>(null)
   const isMouseInside = useRef(false)
+
+  const [isCollecting, setIsCollecting] = useState(false)
+  const [isSubscribing, setIsSubscribing] = useState(false)
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -69,28 +102,41 @@ const Toolbar = () => {
     setIsVisible(false)
   }
 
+  const handleCollectTweet = () => {
+    if (!tweet || isCollecting) return
+    const linkElement = tweet.querySelector("a[href*='/status/']")
+    const href = linkElement?.getAttribute("href") || ""
+
+    const match = href.match(/\/status\/(\d+)/) // only keep number
+    const tweetId = match ? match[1] : ""
+
+    setIsCollecting(true)
+    chrome.runtime.sendMessage(
+      {
+        type: MessageType.SAVE_TWEET,
+        tweetId
+      },
+      (response) => {
+        setIsCollecting(false)
+      }
+    )
+  }
+
   const handleSubscribeUser = () => {
-    if (!tweet) return
+    if (!tweet || isSubscribing) return
     const userElement = tweet.querySelector("a[href*='/']")
     const userId = userElement?.getAttribute("href")?.split("/")[1] ?? ""
 
-    chrome.runtime.sendMessage({
-      type: MessageType.SUBSCRIBE_USER,
-      userId
-    })
-  }
-
-  const handleCollectTweet = () => {
-    if (!tweet) return
-    const linkElement = tweet.querySelector("a[href*='/status/']")
-    const tweetId = linkElement
-      ? linkElement.getAttribute("href")?.split("/status/")[1]
-      : ""
-
-    chrome.runtime.sendMessage({
-      type: MessageType.SAVE_TWEET,
-      tweetId
-    })
+    setIsSubscribing(true)
+    chrome.runtime.sendMessage(
+      {
+        type: MessageType.SUBSCRIBE_USER,
+        userId
+      },
+      (response) => {
+        setIsSubscribing(false)
+      }
+    )
   }
 
   const handleToolbarEnter = () => {
@@ -112,16 +158,16 @@ const Toolbar = () => {
       onMouseEnter={handleToolbarEnter}
       onMouseLeave={handleToolbarLeave}
       style={{ left: `${position.x}px`, top: `${position.y}px`, zIndex: 9999 }}>
-      <div
+      <ToolbarButton
         onClick={handleCollectTweet}
-        className="flex justify-center items-center gap-2 flex-col p-2 cursor-pointer hover:bg-slate-200">
-        <BookmarkIcon className="text-primary-brand size-6" />
-      </div>
-      <div
+        isLoading={isCollecting}
+        icon={<BookmarkIcon className=" size-6" />}
+      />
+      <ToolbarButton
         onClick={handleSubscribeUser}
-        className="flex justify-center items-center gap-2 flex-col p-2 cursor-pointer hover:bg-slate-200">
-        <UserPlus className="text-primary-brand size-6" />
-      </div>
+        isLoading={isSubscribing}
+        icon={<UserPlus className="size-6" />}
+      />
     </div>
   )
 }

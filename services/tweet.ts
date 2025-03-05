@@ -7,6 +7,6 @@ export const collectTweet = async (params: CollectTweetParams) => {
 }
 
 export const subscribeTweetUser = async (params: SubscribeTweetUserParams) => {
-  const response = await client.post(`/users/subscribe/${params.tweetUserId}`)
+  const response = await client.post(`/users/follow/${params.tweetUserId}`)
   return response.data
 }

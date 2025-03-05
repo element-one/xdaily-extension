@@ -47,6 +47,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
           type: "error"
         })
       }
+      sendResponse("complete")
       break
     case MessageType.SUBSCRIBE_USER:
       const userId = message.userId
@@ -66,6 +67,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
           type: "error"
         })
       }
+      sendResponse("complete")
       break
     case MessageType.TOGGLE_PANEL:
       if (isSidePanelOpen) {

@@ -18,7 +18,7 @@ export const getStyle = () => {
 export interface ToastProps {
   message: string
   type?: "success" | "error"
-  duration?: number // 持续时间，默认为 3000 毫秒
+  duration?: number
 }
 
 const Toast: React.FC<ToastProps> = ({
