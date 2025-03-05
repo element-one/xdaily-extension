@@ -39,6 +39,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
           showToastInWebPage({
             message: `save tweetId ${tweetId} success`
           })
+          // tell the search panel to refetch collection or add to top
+          // TODO
+          chrome.runtime.sendMessage({
+            type: MessageType.REFETCH_COLLECTION
+          })
         }
       } catch (e) {
         console.log(e)

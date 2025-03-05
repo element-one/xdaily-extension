@@ -1,21 +1,45 @@
 import { Search } from "lucide-react"
+import { useEffect, useRef } from "react"
+
+import { getTweetCollection, useTweetCollections } from "~services/collection"
+import { MessageType } from "~types/enum"
 
 import { SearchListItem } from "./SearchListItem"
-
-const MOCK_LIST = new Array(100).fill(0).map((item, index) => ({
-  name: `List Item ${index + 1}`,
-  description: `This is some description ${index + 1}`,
-  img: ""
-}))
 
 /**
  * TODO in Search Panel
  * 1. Search
- * 2. Infinite Scroll
- * 3. fetch lists
  * 4. operation for list: operation loading/drop down...etc.
  */
 export const SearchPanel = () => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useTweetCollections(15)
+
+  const bottomObserver = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!hasNextPage) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    if (bottomObserver.current) observer.observe(bottomObserver.current)
+
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === MessageType.REFETCH_COLLECTION) {
+      refetch()
+    }
+  })
+
   return (
     <>
       <div className="flex flex-col w-full">
@@ -27,15 +51,25 @@ export const SearchPanel = () => {
           />
         </div>
       </div>
-      <section className="flex-1 mt-3 min-h-0 flex flex-col gap-2 py-2">
-        {MOCK_LIST.map((item, index) => (
-          <SearchListItem
-            name={item.name}
-            description={item.description}
-            key={index}
-          />
-        ))}
-      </section>
+      {data?.pages?.length > 0 ? (
+        <section className="mt-3 flex flex-col gap-2 py-2">
+          {data.pages.map((item, index) => (
+            <SearchListItem
+              name={item.content}
+              description={item.content}
+              key={index}
+            />
+          ))}
+        </section>
+      ) : (
+        <section className="flex-1 min-h-0 flex items-center justify-center mt-3">
+          Collection is empty
+        </section>
+      )}
+
+      {/* load more */}
+      <div ref={bottomObserver} className="h-10" />
+      {isFetchingNextPage && <p className="text-center">loading...</p>}
     </>
   )
 }
