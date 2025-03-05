@@ -4,7 +4,7 @@ import { BookmarkIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useRef, useState, type FC } from "react"
 
-import { MessageType } from "~types/enum"
+import { BackgroundMessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -113,7 +113,7 @@ const Toolbar = () => {
     setIsCollecting(true)
     chrome.runtime.sendMessage(
       {
-        type: MessageType.SAVE_TWEET,
+        type: BackgroundMessageType.SAVE_TWEET,
         tweetId
       },
       (response) => {
@@ -130,7 +130,7 @@ const Toolbar = () => {
     setIsSubscribing(true)
     chrome.runtime.sendMessage(
       {
-        type: MessageType.SUBSCRIBE_USER,
+        type: BackgroundMessageType.SUBSCRIBE_USER,
         userId
       },
       (response) => {

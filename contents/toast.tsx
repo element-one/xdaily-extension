@@ -2,7 +2,7 @@ import cssText from "data-text:~/styles/global.css"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useState } from "react"
 
-import { MessageType } from "~types/enum"
+import { ContentMessageType, type InpageToastPayload } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -51,8 +51,8 @@ const ToastContainer = () => {
   const [messages, setMessages] = useState<ToastProps[]>([])
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((info) => {
-      if (info.type === MessageType.INPAGE_TOAST) {
+    chrome.runtime.onMessage.addListener((info: InpageToastPayload) => {
+      if (info.type === ContentMessageType.INPAGE_TOAST) {
         const message = info.message as ToastProps
         setMessages((prevMessages) => {
           if (prevMessages.length >= MAX_COUNT) {

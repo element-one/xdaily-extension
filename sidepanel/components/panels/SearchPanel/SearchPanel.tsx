@@ -1,8 +1,8 @@
 import { Search } from "lucide-react"
 import { useEffect, useRef } from "react"
 
-import { getTweetCollection, useTweetCollections } from "~services/collection"
-import { MessageType } from "~types/enum"
+import { useTweetCollections } from "~services/collection"
+import { ContentMessageType } from "~types/message"
 
 import { SearchListItem } from "./SearchListItem"
 
@@ -35,7 +35,7 @@ export const SearchPanel = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === MessageType.REFETCH_COLLECTION) {
+    if (message.type === ContentMessageType.REFETCH_COLLECTION) {
       refetch()
     }
   })

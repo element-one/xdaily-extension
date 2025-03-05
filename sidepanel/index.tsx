@@ -6,7 +6,7 @@ import { useEffect } from "react"
 
 import { useUser } from "~services/user"
 import { useStore } from "~store/store"
-import { MessageType } from "~types/enum"
+import { ContentMessageType } from "~types/message"
 
 import { DashboardPage } from "./components/DashboardPage"
 import { LoginPage } from "./components/LoginPage"
@@ -34,9 +34,9 @@ const IndexSidePanel = () => {
   }, [data, isAuthenticated])
 
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === MessageType.SIDE_PANEL_CLOSE_ITSELF) {
+    if (message.type === ContentMessageType.SIDE_PANEL_CLOSE_ITSELF) {
       window.close()
-    } else if (message.type === MessageType.CHECK_AUTH) {
+    } else if (message.type === ContentMessageType.CHECK_AUTH) {
       setIsAuthenticated(false)
       refetch()
     }
