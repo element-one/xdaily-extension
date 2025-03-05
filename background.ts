@@ -1,23 +1,24 @@
-import { apiFetch } from "~axios/axios"
+import type { ToastProps } from "~contents/toast"
+import { collectTweet, subscribeTweetUser } from "~services/tweet"
+import { MessageType } from "~types/enum"
 
 console.log(
   "Live now; make now always the most precious time. Now will never come again."
 )
 
-let isSidePanelOpen = false
-
-const showToastInWebPage = (message) => {
+const showToastInWebPage = (message: ToastProps) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0].id) {
       chrome.tabs.sendMessage(tabs[0].id, {
-        type: "toast",
+        type: MessageType.INPAGE_TOAST,
         message: message
       })
     }
   })
 }
 
-// src/background.ts
+// control side panel open state
+let isSidePanelOpen = false
 chrome.action.onClicked.addListener(() => {
   isSidePanelOpen = !isSidePanelOpen
   chrome.sidePanel
@@ -26,29 +27,52 @@ chrome.action.onClicked.addListener(() => {
 })
 
 // listen to message
-chrome.runtime.onMessage.addListener(async (message, sender) => {
-  console.log(message)
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {
-    case "save_tweet":
+    case MessageType.SAVE_TWEET:
       const tweetId = message.tweetId
       try {
-        // TODO mock api
-        const response = await apiFetch("/posts", {
-          method: "POST",
-          body: JSON.stringify({ tweetId })
-        })
-        if (response) {
-          showToastInWebPage("Tweet 已成功保存！")
+        console.log("use this tweetId", tweetId)
+        if (tweetId) {
+          const res = await collectTweet({ tweetId })
+          console.log("testing", res)
+          showToastInWebPage({
+            message: `save tweetId ${tweetId} success`
+          })
         }
-        // console.log("Server response:", response)
       } catch (e) {
         console.log(e)
+        showToastInWebPage({
+          message: "Something wrong",
+          type: "error"
+        })
       }
       break
-    case "toggle_side_panel":
+    case MessageType.SUBSCRIBE_USER:
+      const userId = message.userId
+      try {
+        if (userId) {
+          const res = await subscribeTweetUser({ tweetUserId: userId })
+          if (res) {
+            showToastInWebPage({
+              message: `Subscribe to @${userId} success`
+            })
+          }
+        }
+      } catch (e) {
+        console.log(e)
+        showToastInWebPage({
+          message: "Something wrong",
+          type: "error"
+        })
+      }
+      break
+    case MessageType.TOGGLE_PANEL:
       if (isSidePanelOpen) {
         // tell side bar to close itself
-        chrome.runtime.sendMessage({ type: "sidepanel_close_self" })
+        chrome.runtime.sendMessage({
+          type: MessageType.SIDE_PANEL_CLOSE_ITSELF
+        })
       } else {
         await chrome.sidePanel.open({ tabId: sender.tab.id })
       }
@@ -56,5 +80,15 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
       break
     default:
       break
+  }
+})
+
+chrome.cookies.onChanged.addListener((changeInfo) => {
+  if (
+    changeInfo.cookie.domain.includes(process.env.PLASMO_PUBLIC_COOKIE_SERVER)
+  ) {
+    chrome.runtime.sendMessage({
+      type: MessageType.CHECK_AUTH
+    })
   }
 })
