@@ -33,14 +33,16 @@ const IndexSidePanel = () => {
     }
   }, [data, isAuthenticated])
 
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === ContentMessageType.SIDE_PANEL_CLOSE_ITSELF) {
-      window.close()
-    } else if (message.type === ContentMessageType.CHECK_AUTH) {
-      setIsAuthenticated(false)
-      refetch()
-    }
-  })
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === ContentMessageType.SIDE_PANEL_CLOSE_ITSELF) {
+        window.close()
+      } else if (message.type === ContentMessageType.CHECK_AUTH) {
+        setIsAuthenticated(false)
+        refetch()
+      }
+    })
+  }, [])
 
   if (isLoading) {
     return (

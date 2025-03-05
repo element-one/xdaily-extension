@@ -1,15 +1,22 @@
 import type { ToastProps } from "~contents/toast"
 
+import type { TweetCollection } from "./collection"
+
 export enum ContentMessageType {
   CHECK_AUTH = "check_login",
   SIDE_PANEL_CLOSE_ITSELF = "sidepanel_close_self",
   INPAGE_TOAST = "show_toast_in_page",
-  REFETCH_COLLECTION = "refetch_tweet_collection"
+  ADD_COLLECTION = "add_tweet_collection"
 }
 
 export type InpageToastPayload = {
   type: ContentMessageType.INPAGE_TOAST
   message: ToastProps
+}
+
+export type AddTweetCollectionPayload = {
+  type: ContentMessageType.ADD_COLLECTION
+  data: TweetCollection
 }
 
 export enum BackgroundMessageType {

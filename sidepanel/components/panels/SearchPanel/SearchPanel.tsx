@@ -1,8 +1,12 @@
 import { Search } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useTweetCollections } from "~services/collection"
-import { ContentMessageType } from "~types/message"
+import { type TweetCollection } from "~types/collection"
+import {
+  ContentMessageType,
+  type AddTweetCollectionPayload
+} from "~types/message"
 
 import { SearchListItem } from "./SearchListItem"
 
@@ -14,8 +18,19 @@ import { SearchListItem } from "./SearchListItem"
 export const SearchPanel = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useTweetCollections(15)
-
   const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const [addedCollection, setAddedCollection] = useState<TweetCollection[]>([])
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener(
+      (message: AddTweetCollectionPayload) => {
+        if (message.type === ContentMessageType.ADD_COLLECTION) {
+          setAddedCollection((prev) => [message.data, ...prev])
+        }
+      }
+    )
+  }, [])
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -34,11 +49,9 @@ export const SearchPanel = () => {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === ContentMessageType.REFETCH_COLLECTION) {
-      refetch()
-    }
-  })
+  const collection = useMemo(() => {
+    return [...addedCollection, ...(data?.pages ? data.pages : [])]
+  }, [addedCollection, data])
 
   return (
     <>
@@ -51,9 +64,9 @@ export const SearchPanel = () => {
           />
         </div>
       </div>
-      {data?.pages?.length > 0 ? (
+      {collection?.length > 0 ? (
         <section className="mt-3 flex flex-col gap-2 py-2">
-          {data.pages.map((item, index) => (
+          {collection.map((item, index) => (
             <SearchListItem
               name={item.content}
               description={item.content}

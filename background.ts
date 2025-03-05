@@ -40,14 +40,12 @@ chrome.runtime.onMessage.addListener(
           console.log("use this tweetId", tweetId)
           if (tweetId) {
             const res = await collectTweet({ tweetId })
-            console.log("testing", res)
             showToastInWebPage({
-              message: `save tweetId ${tweetId} success`
+              message: `Save tweet ${tweetId} success`
             })
-            // tell the search panel to refetch collection or add to top
-            // TODO
             chrome.runtime.sendMessage({
-              type: ContentMessageType.REFETCH_COLLECTION
+              type: ContentMessageType.ADD_COLLECTION,
+              data: res
             })
           }
         } catch (e) {

@@ -33,7 +33,6 @@ const ListButton: FC<{
 interface SearchListItemProps {
   name: string
   description: string
-  // TODO deal with img
   img?: string
 }
 export const SearchListItem: FC<SearchListItemProps> = ({
@@ -43,10 +42,11 @@ export const SearchListItem: FC<SearchListItemProps> = ({
   return (
     <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-1 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
       <div className="flex items-center gap-3 max-w-[80%]">
-        <div className="w-5 h-5 bg-purple-200"></div>
         <div className="flex flex-col">
           <div className="text-sm  line-clamp-1">{name} </div>
-          <div className="text-xs text-muted-foreground ">{description} </div>
+          <div className="text-xs text-muted-foreground line-clamp-3">
+            {description}{" "}
+          </div>
         </div>
       </div>
       <div className="flex flex-row gap-3 items-center">

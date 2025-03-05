@@ -21,10 +21,12 @@ export const useTweetCollections = (take: number) => {
     Error,
     InfiniteData<TweetCollection>
   >({
-    queryKey: ["tweet-collections"],
+    queryKey: ["tweet-collections", take],
     queryFn: ({ pageParam = 1 }) =>
       getTweetCollection({ page: pageParam as number, take }),
     initialPageParam: 1,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     getNextPageParam: (lastPage) => {
       return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
     },
