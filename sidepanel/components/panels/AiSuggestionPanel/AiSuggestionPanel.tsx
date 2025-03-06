@@ -1,5 +1,8 @@
-import { Info, Save, SquareLibrary, Tags } from "lucide-react"
-import { useState } from "react"
+import { Save, SquareLibrary, Tags } from "lucide-react"
+import { useEffect, useState } from "react"
+
+import { ContentMessageType } from "~types/message"
+import type { TweetDetailPageData } from "~types/tweet"
 
 import { SuggestionSection } from "./SuggestionSection"
 
@@ -19,6 +22,43 @@ export const AiSuggestionPanel = () => {
     "collection4",
     "collection5"
   ])
+
+  const [tweetDetail, setTweetDetail] = useState<TweetDetailPageData | null>(
+    null
+  )
+
+  useEffect(() => {
+    const getDetail = () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.sendMessage(
+            tabs[0].id,
+            { type: ContentMessageType.REQUEST_TWEET_DETAILS },
+            (response: TweetDetailPageData | null) => {
+              setTweetDetail(response)
+            }
+          )
+        }
+      })
+    }
+    getDetail()
+
+    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
+      if (
+        changeInfo.status === "complete" &&
+        tab.url &&
+        tab.url.includes("/status/")
+      ) {
+        getDetail()
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(handleTabUpdate)
+
+    return () => {
+      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+    }
+  }, [])
 
   const handleTagEnter = (value) => {
     setSelectedTags((prevTags) => [...prevTags, value])
@@ -48,17 +88,23 @@ export const AiSuggestionPanel = () => {
     <div className="flex flex-col h-full relative overflow-hidden">
       <section className="flex-grow overflow-y-auto stylized-scroll scrollbar-thin hide-scrollbar pb-3">
         <div className="flex gap-3 bg-white mb-2 rounded-t-md relative items-center border-b pb-2">
-          <div className="h-14 w-14 rounded-md object-contain bg-purple-100 flex-shrink-0"></div>
+          <div className="h-14 w-14 rounded-md object-contain bg-purple-100 flex-shrink-0 overflow-hidden">
+            <img
+              v-if={tweetDetail?.avatar}
+              src={tweetDetail?.avatar}
+              className="object-contain size-full"
+            />
+          </div>
           <div className="w-full overflow-hidden">
             <p
               className="mt-2 text-sm font-semibold"
-              title="This is title of this tweet">
-              This is title of the tweet
+              title="This is the user of the tweet">
+              @{tweetDetail?.username ?? "mecoin"}
             </p>
             <p
               className="mt-1 w-[80%] truncate text-gray-600"
-              title="This is the description of this tweet">
-              This is the description of this tweet
+              title="This is the content of the tweet">
+              {tweetDetail?.content ?? "This is the content of the tweet"}
             </p>
           </div>
         </div>

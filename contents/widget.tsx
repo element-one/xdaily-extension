@@ -2,7 +2,7 @@ import cssText from "data-text:~/styles/global.css"
 import { BookmarkIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 
-import { MessageType } from "~types/enum"
+import { BackgroundMessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -19,7 +19,7 @@ const buttonClassname =
   "cursor-pointer bg-white px-4 rounded-l-full py-2 shadow-md border text-slate-900"
 const WidgetButton = () => {
   const toggleSidePanel = () => {
-    chrome.runtime.sendMessage({ type: MessageType.TOGGLE_PANEL })
+    chrome.runtime.sendMessage({ type: BackgroundMessageType.TOGGLE_PANEL })
   }
   return (
     <div className="p-2 pr-0 fixed text-white left-auto right-0 top-20 z-[1000] flex flex-col gap-y-4">

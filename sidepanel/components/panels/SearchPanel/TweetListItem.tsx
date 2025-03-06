@@ -1,0 +1,53 @@
+import { Bookmark, List, X } from "lucide-react"
+import { type FC } from "react"
+
+import type { TweetCollection } from "~types/collection"
+import { X_SITE } from "~types/enum"
+
+import { ListButton } from "./ListButton"
+
+type TweetListProps = TweetCollection
+export const TweetListItem: FC<TweetListProps> = (props) => {
+  const handleClickTweetItem = () => {
+    chrome.tabs.create({
+      url: `${X_SITE}/${props.screenName}`
+    })
+  }
+
+  return (
+    <div
+      onClick={handleClickTweetItem}
+      className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+      <div className="flex items-center gap-3 max-w-[80%]">
+        <div className="flex flex-col">
+          <div className="text-sm flex items-center gap-x-1">
+            <div className="font-semibold">@{props.screenName}</div>
+          </div>
+          <div className="text-xs text-muted-foreground line-clamp-4 px-1">
+            {props.content}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-row gap-3 items-center">
+        <ListButton
+          content={
+            <Bookmark className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          }
+          tooltip="Bookmark"
+        />
+        <ListButton
+          content={
+            <X className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          }
+          tooltip="Remove"
+        />
+        <ListButton
+          content={
+            <List className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          }
+          tooltip="More"
+        />
+      </div>
+    </div>
+  )
+}
