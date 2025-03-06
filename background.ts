@@ -66,6 +66,10 @@ chrome.runtime.onMessage.addListener(
               showToastInWebPage({
                 message: `Subscribe to @${userId} success`
               })
+              chrome.runtime.sendMessage({
+                type: ContentMessageType.ADD_USER_COLLECTION,
+                data: res
+              })
             }
           }
         } catch (e) {

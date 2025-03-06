@@ -11,8 +11,40 @@ export interface TweetCollection {
   timestamp: string
   hashtags: string[]
 }
-export interface GetCollectionResp {
+export interface GetTweetCollectionResp {
   data: TweetCollection[]
+  meta: {
+    page: number
+    take: number
+    itemCount: number
+    pageCount: number
+    hasPreviousPage: number
+    hasNextPage: number
+  }
+}
+
+export interface GetUserCollectionParams {
+  page: number
+  take: number
+}
+
+export interface UserCollection {
+  id: string
+  userId: string
+  name: string
+  bio: string
+  avatar: string
+  followers: number
+  following: number
+  tweets: number
+  location: string
+  website: string
+  joinedAt: Date
+  isVerified: boolean
+  updatedAt: Date
+}
+export interface GetUserCollectionResp {
+  data: UserCollection[]
   meta: {
     page: number
     take: number

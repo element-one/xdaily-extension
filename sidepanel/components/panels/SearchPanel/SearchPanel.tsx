@@ -1,88 +1,69 @@
-import { Search } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import clsx from "clsx"
+import { useMemo, useState, type ReactNode } from "react"
 
-import { useTweetCollections } from "~services/collection"
-import { type TweetCollection } from "~types/collection"
-import {
-  ContentMessageType,
-  type AddTweetCollectionPayload
-} from "~types/message"
+import { TweetListSection } from "./TweetListSection"
+import { UserSection } from "./UserSection"
 
-import { SearchListItem } from "./SearchListItem"
+enum SearchPanelItemKey {
+  TWEET = "tweet_collections",
+  USER = "user_collections"
+}
 
-/**
- * TODO in Search Panel
- * 1. Search
- * 4. operation for list: operation loading/drop down...etc.
- */
+type SearchItem = {
+  key: SearchPanelItemKey
+  content: string
+  component: ReactNode
+}
+
+const SearchItems: SearchItem[] = [
+  {
+    key: SearchPanelItemKey.TWEET,
+    content: "Tweets",
+    component: <TweetListSection />
+  },
+  {
+    key: SearchPanelItemKey.USER,
+    content: "Users",
+    component: <UserSection />
+  }
+] as const
 export const SearchPanel = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useTweetCollections(15)
-  const bottomObserver = useRef<HTMLDivElement>(null)
+  const [searchItemKey, setSearchItemKey] = useState<SearchPanelItemKey>(
+    SearchPanelItemKey.TWEET
+  )
 
-  const [addedCollection, setAddedCollection] = useState<TweetCollection[]>([])
+  const currentSearchItem = useMemo(() => {
+    if (searchItemKey) {
+      return SearchItems.find((item) => item.key === searchItemKey)
+    }
+    return undefined
+  }, [searchItemKey])
 
-  useEffect(() => {
-    chrome.runtime.onMessage.addListener(
-      (message: AddTweetCollectionPayload) => {
-        if (message.type === ContentMessageType.ADD_COLLECTION) {
-          setAddedCollection((prev) => [message.data, ...prev])
-        }
-      }
-    )
-  }, [])
-
-  useEffect(() => {
-    if (!hasNextPage) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isFetchingNextPage) {
-          fetchNextPage()
-        }
-      },
-      { threshold: 1.0 }
-    )
-
-    if (bottomObserver.current) observer.observe(bottomObserver.current)
-
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  const collection = useMemo(() => {
-    return [...addedCollection, ...(data?.pages ? data.pages : [])]
-  }, [addedCollection, data])
+  const toggleDrawer = (itemKey: SearchPanelItemKey) => {
+    setSearchItemKey(itemKey)
+  }
 
   return (
-    <>
-      <div className="flex flex-col w-full">
-        <div className="relative w-full">
-          <Search className="absolute h-4 w-4 text-muted-foreground left-2.5 top-1/2 -translate-y-1/2" />
-          <input
-            className="flex h-10 rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-active file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-8 w-full"
-            placeholder="Search your current collections"
-          />
-        </div>
+    <div className="flex flex-col w-full gap-y-4">
+      <div className="inline-flex rounded-md text-muted-foreground w-full bg-muted p-0 items-start justify-start overflow-x-auto overflow-y-hidden relative hide-scrollbar h-11">
+        {SearchItems.map((item) => {
+          return (
+            <div
+              className={clsx(
+                "relative cusor-pointer h-full flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all",
+                item.key === currentSearchItem.key && "text-primary-brand"
+              )}
+              key={item.key}
+              onClick={() => toggleDrawer(item.key)}>
+              {item.content}
+              {item.key === currentSearchItem.key && (
+                <div className="h-[2px] bg-primary-brand absolute top-auto bottom-[2px] left-2 right-2" />
+              )}
+            </div>
+          )
+        })}
       </div>
-      {collection?.length > 0 ? (
-        <section className="mt-3 flex flex-col gap-2 py-2">
-          {collection.map((item, index) => (
-            <SearchListItem
-              name={item.content}
-              description={item.content}
-              key={index}
-            />
-          ))}
-        </section>
-      ) : (
-        <section className="flex-1 min-h-0 flex items-center justify-center mt-3">
-          Collection is empty
-        </section>
-      )}
-
-      {/* load more */}
-      <div ref={bottomObserver} className="h-10" />
-      {isFetchingNextPage && <p className="text-center">loading...</p>}
-    </>
+      <div className="flex-1 min-h-0">{currentSearchItem.component}</div>
+    </div>
   )
 }
