@@ -8,7 +8,7 @@ import {
   type AddTweetCollectionPayload
 } from "~types/message"
 
-import { SearchListItem } from "./SearchListItem"
+import { TweetListItem } from "./TweetListItem"
 
 /**
  * TODO in Search Panel
@@ -67,11 +67,7 @@ export const TweetListSection = () => {
       {collection?.length > 0 ? (
         <section className="mt-3 flex flex-col gap-2 py-2">
           {collection.map((item, index) => (
-            <SearchListItem
-              name={item.content}
-              description={item.content}
-              key={index}
-            />
+            <TweetListItem key={index} {...item} />
           ))}
         </section>
       ) : (

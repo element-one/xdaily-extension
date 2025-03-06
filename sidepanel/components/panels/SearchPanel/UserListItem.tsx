@@ -2,13 +2,22 @@ import { Bookmark, List, X } from "lucide-react"
 import { type FC } from "react"
 
 import type { UserCollection } from "~types/collection"
+import { X_SITE } from "~types/enum"
 
 import { ListButton } from "./ListButton"
 
 type UserListProps = UserCollection
 export const UserListItem: FC<UserListProps> = (user) => {
+  const handleClickTweetItem = () => {
+    chrome.tabs.create({
+      url: `${X_SITE}/${user.screenName}`
+    })
+  }
+
   return (
-    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+    <div
+      onClick={handleClickTweetItem}
+      className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
       <div className="flex flex-col items-start gap-y-2 max-w-[80%]">
         <div className="flex flex-row gap-x-1 items-center">
           <div className="size-7 rounded-full overflow-hidden bg-primary-brand">
@@ -16,8 +25,7 @@ export const UserListItem: FC<UserListProps> = (user) => {
           </div>
           <div className="text-slate-900 text-xs">
             <div className="font-semibold text-slate-900">{user.name}</div>
-            {/* TODO */}
-            <div className="text-slate-600">@{user.name}</div>
+            <div className="text-slate-600">@{user.screenName}</div>
           </div>
         </div>
         <div className="line-clamp-3 text-sm">{user.bio}</div>

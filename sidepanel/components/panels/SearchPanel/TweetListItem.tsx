@@ -1,24 +1,30 @@
 import { Bookmark, List, X } from "lucide-react"
 import { type FC } from "react"
 
+import type { TweetCollection } from "~types/collection"
+import { X_SITE } from "~types/enum"
+
 import { ListButton } from "./ListButton"
 
-interface SearchListItemProps {
-  name: string
-  description: string
-  img?: string
-}
-export const SearchListItem: FC<SearchListItemProps> = ({
-  name,
-  description
-}) => {
+type TweetListProps = TweetCollection
+export const TweetListItem: FC<TweetListProps> = (props) => {
+  const handleClickTweetItem = () => {
+    chrome.tabs.create({
+      url: `${X_SITE}/${props.screenName}`
+    })
+  }
+
   return (
-    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-1 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+    <div
+      onClick={handleClickTweetItem}
+      className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
       <div className="flex items-center gap-3 max-w-[80%]">
         <div className="flex flex-col">
-          <div className="text-sm  line-clamp-1">{name} </div>
-          <div className="text-xs text-muted-foreground line-clamp-3">
-            {description}{" "}
+          <div className="text-sm flex items-center gap-x-1">
+            <div className="font-semibold">@{props.screenName}</div>
+          </div>
+          <div className="text-xs text-muted-foreground line-clamp-4 px-1">
+            {props.content}
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ export interface TweetCollection {
   userId: string
   timestamp: string
   hashtags: string[]
+  screenName: string
 }
 export interface GetTweetCollectionResp {
   data: TweetCollection[]
@@ -42,6 +43,7 @@ export interface UserCollection {
   joinedAt: Date
   isVerified: boolean
   updatedAt: Date
+  screenName: string
 }
 export interface GetUserCollectionResp {
   data: UserCollection[]
