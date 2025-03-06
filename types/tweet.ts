@@ -14,3 +14,11 @@ export interface SubscribeTweetUserResp {
   subscribedAt: Date
   tweetUserId: string
 }
+
+export interface TweetDetailPageData {
+  username: string
+  tweetId: string
+  content: string
+  avatar: string
+  url: string
+}
