@@ -1,15 +1,14 @@
 import { Search } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
-import { useTweetCollections, useUserCollections } from "~services/collection"
-import { type TweetCollection, type UserCollection } from "~types/collection"
+import { useUserCollections } from "~services/collection"
+import { type UserCollection } from "~types/collection"
 import {
   ContentMessageType,
-  type AddTweetCollectionPayload,
   type AddUserCollectionPayload
 } from "~types/message"
 
-import { SearchListItem } from "./SearchListItem"
+import { UserListItem } from "./UserListItem"
 
 /**
  * TODO in Search Panel
@@ -68,11 +67,7 @@ export const UserSection = () => {
       {collection?.length > 0 ? (
         <section className="mt-3 flex flex-col gap-2 py-2">
           {collection.map((item, index) => (
-            <SearchListItem
-              name={item.name}
-              description={item.bio}
-              key={index}
-            />
+            <UserListItem {...item} key={index} />
           ))}
         </section>
       ) : (
