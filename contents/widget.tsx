@@ -1,9 +1,11 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
 import { BookmarkIcon, XIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
+import { useStore } from "~store/store"
 import { Hide_Widget_Storage_Name } from "~types/enum"
 import { BackgroundMessageType } from "~types/message"
 
@@ -24,6 +26,13 @@ const buttonClassname =
   "cursor-pointer bg-white px-4 rounded-l-full py-2 shadow-md border text-slate-900"
 const WidgetButton = () => {
   const [isHidden, setIsHidden] = useState(false)
+  const { isHideGlobally, onHideGloballyChange } = useStore()
+
+  useEffect(() => {
+    if (isHideGlobally) {
+      setIsHidden(true)
+    }
+  }, [isHideGlobally])
 
   const toggleSidePanel = () => {
     chrome.runtime.sendMessage({ type: BackgroundMessageType.TOGGLE_PANEL })
@@ -32,6 +41,14 @@ const WidgetButton = () => {
   const hideWidget = () => {
     setIsHidden(true)
   }
+
+  const handleDisableSite = () => {}
+
+  const handleDisableGlobally = () => {
+    onHideGloballyChange(true)
+  }
+
+  const handleGoSetting = () => {}
 
   if (isHidden) {
     return null
@@ -49,12 +66,30 @@ const WidgetButton = () => {
               <XIcon className="size-2" />
             </div>
           </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="right-full absolute -translate-x-2 -translate-y-6 bottom-full z-50 min-w-[10rem] overflow-hidden rounded-md border border-thinborder bg-white p-1 text-slate-900 shadow-md">
+          <DropdownMenu.Content className="right-full absolute -translate-x-2 -translate-y-12 top-0 z-50 min-w-[10rem] overflow-hidden rounded-md border border-thinborder bg-white p-1 text-slate-900 shadow-md">
             <DropdownMenu.Item
               className={menuItemClassName}
               onSelect={hideWidget}>
-              <div className="w-full flex flex-row items-center justify-center gap-x-1">
-                <div>Hide until next visit</div>
+              <div>Hide until next visit</div>
+            </DropdownMenu.Item>
+            {/* <DropdownMenu.Item
+              className={menuItemClassName}
+              onSelect={handleDisableSite}>
+              <div>Disable for this site</div>
+            </DropdownMenu.Item> */}
+            <DropdownMenu.Item
+              className={menuItemClassName}
+              onSelect={handleDisableGlobally}>
+              <div>Disable globally</div>
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              className={clsx(
+                menuItemClassName,
+                "border-t-[1px] border-slate-600/30"
+              )}
+              onSelect={handleGoSetting}>
+              <div className="text-xs text-slate-700">
+                You can change later in settings
               </div>
             </DropdownMenu.Item>
           </DropdownMenu.Content>
