@@ -40,3 +40,16 @@ export const useStore = create<StoreState>()(
     }
   )
 )
+
+plasmoStorage.watch({
+  "mecoin-extension-storage": (change) => {
+    const { oldValue, newValue } = change
+    const newValueState = newValue ? JSON.parse(newValue)?.state ?? null : null
+    if (newValue !== oldValue) {
+      useStore.setState((state) => ({
+        ...state,
+        ...newValueState
+      }))
+    }
+  }
+})

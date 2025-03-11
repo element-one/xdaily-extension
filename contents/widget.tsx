@@ -25,14 +25,18 @@ const menuItemClassName =
 const buttonClassname =
   "cursor-pointer bg-white px-4 rounded-l-full py-2 shadow-md border text-slate-900"
 const WidgetButton = () => {
-  const [isHidden, setIsHidden] = useState(false)
-  const { isHideGlobally, onHideGloballyChange } = useStore()
+  const [isHidden, setIsHidden] = useState(true)
+  const { isHideGlobally, onHideGloballyChange, addDisableSite, disableSite } =
+    useStore()
 
   useEffect(() => {
     if (isHideGlobally) {
       setIsHidden(true)
+      return
     }
-  }, [isHideGlobally])
+    const isDisable = disableSite.includes(window.location.hostname)
+    setIsHidden(isDisable)
+  }, [isHideGlobally, disableSite])
 
   const toggleSidePanel = () => {
     chrome.runtime.sendMessage({ type: BackgroundMessageType.TOGGLE_PANEL })
@@ -42,10 +46,14 @@ const WidgetButton = () => {
     setIsHidden(true)
   }
 
-  const handleDisableSite = () => {}
-
   const handleDisableGlobally = () => {
     onHideGloballyChange(true)
+  }
+
+  const handleDisableSite = () => {
+    if (window.location.hostname) {
+      addDisableSite(window.location.hostname)
+    }
   }
 
   const handleGoSetting = () => {}
@@ -72,11 +80,11 @@ const WidgetButton = () => {
               onSelect={hideWidget}>
               <div>Hide until next visit</div>
             </DropdownMenu.Item>
-            {/* <DropdownMenu.Item
+            <DropdownMenu.Item
               className={menuItemClassName}
               onSelect={handleDisableSite}>
               <div>Disable for this site</div>
-            </DropdownMenu.Item> */}
+            </DropdownMenu.Item>
             <DropdownMenu.Item
               className={menuItemClassName}
               onSelect={handleDisableGlobally}>
