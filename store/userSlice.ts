@@ -20,7 +20,7 @@ const initialState: UserState = {
   userInfo: null
 }
 
-export const creatUserSlice: StateCreator<UserSlice> = (set) => ({
+export const createUserSlice: StateCreator<UserSlice> = (set) => ({
   ...initialState,
   updateUserInfo: (info?: UserInfo | null) => set({ userInfo: info }),
   setIsAuthenticated: (isAuthenticated: boolean) => set({ isAuthenticated }),

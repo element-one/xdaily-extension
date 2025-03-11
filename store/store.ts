@@ -7,7 +7,8 @@ import {
 
 import { Storage } from "@plasmohq/storage"
 
-import { creatUserSlice, type UserSlice } from "./userSlice"
+import { createUserSlice, type UserSlice } from "./userSlice"
+import { createWidgetSlice, type WidgetSlice } from "./widgetSlice"
 
 const plasmoStorage = new Storage({
   area: "local"
@@ -25,12 +26,13 @@ const customStorage: StateStorage = {
   }
 }
 
-type StoreState = UserSlice
+type StoreState = UserSlice & WidgetSlice
 
 export const useStore = create<StoreState>()(
   persist(
     (...a) => ({
-      ...creatUserSlice(...a)
+      ...createUserSlice(...a),
+      ...createWidgetSlice(...a)
     }),
     {
       name: "mecoin-extension-storage",
@@ -38,3 +40,16 @@ export const useStore = create<StoreState>()(
     }
   )
 )
+
+plasmoStorage.watch({
+  "mecoin-extension-storage": (change) => {
+    const { oldValue, newValue } = change
+    const newValueState = newValue ? JSON.parse(newValue)?.state ?? null : null
+    if (newValue !== oldValue) {
+      useStore.setState((state) => ({
+        ...state,
+        ...newValueState
+      }))
+    }
+  }
+})
