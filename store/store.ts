@@ -10,6 +10,8 @@ import { Storage } from "@plasmohq/storage"
 import { createUserSlice, type UserSlice } from "./userSlice"
 import { createWidgetSlice, type WidgetSlice } from "./widgetSlice"
 
+let isUpdatingFromStorage = false
+
 const plasmoStorage = new Storage({
   area: "local"
 })
@@ -19,7 +21,12 @@ const customStorage: StateStorage = {
     return (await plasmoStorage.get(name)) || null
   },
   setItem: async (name: string, value: string): Promise<void> => {
+    if (isUpdatingFromStorage) {
+      return
+    }
+    isUpdatingFromStorage = true
     await plasmoStorage.set(name, value)
+    isUpdatingFromStorage = false
   },
   removeItem: async (name: string): Promise<void> => {
     await plasmoStorage.remove(name)
@@ -46,6 +53,9 @@ plasmoStorage.watch({
     const { oldValue, newValue } = change
     const newValueState = newValue ? JSON.parse(newValue)?.state ?? null : null
     if (newValue !== oldValue) {
+      if (isUpdatingFromStorage) {
+        return
+      }
       useStore.setState((state) => ({
         ...state,
         ...newValueState
