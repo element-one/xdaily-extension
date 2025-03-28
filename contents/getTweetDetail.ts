@@ -1,4 +1,4 @@
-import { ContentMessageType } from "~types/message"
+import { MessageType } from "~types/message"
 import type { TweetDetailPageData } from "~types/tweet"
 
 const getTweetInfoFromURL = () => {
@@ -44,7 +44,7 @@ const getTweetContent = () => {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === ContentMessageType.REQUEST_TWEET_DETAILS) {
+  if (message.type === MessageType.REQUEST_TWEET_DETAILS) {
     const tweetInfo = getTweetInfoFromURL()
     if (!tweetInfo) return sendResponse(null)
 

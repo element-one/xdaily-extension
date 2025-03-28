@@ -3,10 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useUserCollections } from "~services/collection"
 import { type UserCollection } from "~types/collection"
-import {
-  ContentMessageType,
-  type AddUserCollectionPayload
-} from "~types/message"
+import { MessageType, type AddUserCollectionPayload } from "~types/message"
 
 import { UserListItem } from "./UserListItem"
 
@@ -25,7 +22,7 @@ export const UserSection = () => {
   useEffect(() => {
     chrome.runtime.onMessage.addListener(
       (message: AddUserCollectionPayload) => {
-        if (message.type === ContentMessageType.ADD_USER_COLLECTION) {
+        if (message.type === MessageType.ADD_USER_COLLECTION) {
           setAddedCollection((prev) => [message.data, ...prev])
         }
       }

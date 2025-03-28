@@ -1,7 +1,7 @@
 import { Save, SquareLibrary, Tags } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { ContentMessageType } from "~types/message"
+import { MessageType } from "~types/message"
 import type { TweetDetailPageData } from "~types/tweet"
 
 import { SuggestionSection } from "./SuggestionSection"
@@ -33,7 +33,7 @@ export const AiSuggestionPanel = () => {
         if (tabs.length > 0) {
           chrome.tabs.sendMessage(
             tabs[0].id,
-            { type: ContentMessageType.REQUEST_TWEET_DETAILS },
+            { type: MessageType.REQUEST_TWEET_DETAILS },
             (response: TweetDetailPageData | null) => {
               setTweetDetail(response)
             }

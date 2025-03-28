@@ -18,7 +18,7 @@ type SearchItem = {
 const SearchItems: SearchItem[] = [
   {
     key: SearchPanelItemKey.TWEET,
-    content: "Tweets",
+    content: "Posts",
     component: <TweetListSection />
   },
   {
@@ -50,7 +50,7 @@ export const SearchPanel = () => {
           return (
             <div
               className={clsx(
-                "relative cusor-pointer h-full flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all",
+                "relative cursor-pointer h-full flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all",
                 item.key === currentSearchItem.key && "text-primary-brand"
               )}
               key={item.key}

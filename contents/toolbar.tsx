@@ -4,7 +4,7 @@ import { BookmarkIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useRef, useState, type FC } from "react"
 
-import { BackgroundMessageType } from "~types/message"
+import { sendToBackground } from "@plasmohq/messaging"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -102,7 +102,7 @@ const Toolbar = () => {
     setIsVisible(false)
   }
 
-  const handleCollectTweet = () => {
+  const handleCollectTweet = async () => {
     if (!tweet || isCollecting) return
     const linkElement = tweet.querySelector("a[href*='/status/']")
     const href = linkElement?.getAttribute("href") || ""
@@ -111,32 +111,32 @@ const Toolbar = () => {
     const tweetId = match ? match[1] : ""
 
     setIsCollecting(true)
-    chrome.runtime.sendMessage(
-      {
-        type: BackgroundMessageType.SAVE_TWEET,
+    const resp = await sendToBackground({
+      name: "save-tweet",
+      body: {
         tweetId
-      },
-      (response) => {
-        setIsCollecting(false)
       }
-    )
+    })
+    if (resp) {
+      setIsCollecting(false)
+    }
   }
 
-  const handleSubscribeUser = () => {
+  const handleSubscribeUser = async () => {
     if (!tweet || isSubscribing) return
     const userElement = tweet.querySelector("a[href*='/']")
     const userId = userElement?.getAttribute("href")?.split("/")[1] ?? ""
 
     setIsSubscribing(true)
-    chrome.runtime.sendMessage(
-      {
-        type: BackgroundMessageType.SUBSCRIBE_USER,
+    const resp = await sendToBackground({
+      name: "subscribe-user",
+      body: {
         userId
-      },
-      (response) => {
-        setIsSubscribing(false)
       }
-    )
+    })
+    if (resp) {
+      setIsSubscribing(false)
+    }
   }
 
   const handleToolbarEnter = () => {
