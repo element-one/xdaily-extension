@@ -3,10 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useTweetCollections } from "~services/collection"
 import { type TweetCollection } from "~types/collection"
-import {
-  ContentMessageType,
-  type AddTweetCollectionPayload
-} from "~types/message"
+import { MessageType, type AddTweetCollectionPayload } from "~types/message"
 
 import { TweetListItem } from "./TweetListItem"
 
@@ -25,7 +22,7 @@ export const TweetListSection = () => {
   useEffect(() => {
     chrome.runtime.onMessage.addListener(
       (message: AddTweetCollectionPayload) => {
-        if (message.type === ContentMessageType.ADD_COLLECTION) {
+        if (message.type === MessageType.ADD_COLLECTION) {
           setAddedCollection((prev) => [message.data, ...prev])
         }
       }

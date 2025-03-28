@@ -3,11 +3,11 @@ import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
 import { BookmarkIcon, XIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
+
+import { sendToBackground } from "@plasmohq/messaging"
 
 import { useStore } from "~store/store"
-import { Hide_Widget_Storage_Name } from "~types/enum"
-import { BackgroundMessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -39,7 +39,9 @@ const WidgetButton = () => {
   }, [isHideGlobally, disableSite])
 
   const toggleSidePanel = () => {
-    chrome.runtime.sendMessage({ type: BackgroundMessageType.TOGGLE_PANEL })
+    sendToBackground({
+      name: "toggle-panel"
+    })
   }
 
   const hideWidget = () => {
