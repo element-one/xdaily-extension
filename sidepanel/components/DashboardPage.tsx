@@ -1,4 +1,4 @@
-import { Bookmark, FolderOpenDot, Search, Settings } from "lucide-react"
+import { Bookmark, FolderOpenDot, Lightbulb, Settings } from "lucide-react"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { MeNavbarItem } from "./MeNavbarItem"
@@ -25,20 +25,20 @@ type NavbarItem = {
 const NavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.SEARCH,
-    icon: <Search className="w-5 h-5" />,
-    tooltip: "Search",
+    icon: <Bookmark className="w-5 h-5" />,
+    tooltip: "Bookmarks",
     component: <SearchPanel />
   },
   {
     key: NavbarItemKey.SUGGESTION,
-    icon: <Bookmark className="w-5 h-5" />,
+    icon: <Lightbulb className="w-5 h-5" />,
     tooltip: "AI Suggestions",
     component: <AiSuggestionPanel />
   },
   {
     key: NavbarItemKey.BOARD,
     icon: <FolderOpenDot className="w-5 h-5" />,
-    tooltip: "Board",
+    tooltip: "Collections",
     component: <BoardPanel />
   }
 ] as const

@@ -2,7 +2,6 @@ import { Bookmark, List, X } from "lucide-react"
 import { type FC } from "react"
 
 import type { TweetCollection } from "~types/collection"
-import { X_SITE } from "~types/enum"
 
 import { ListButton } from "./ListButton"
 
@@ -10,7 +9,7 @@ type TweetListProps = TweetCollection
 export const TweetListItem: FC<TweetListProps> = (props) => {
   const handleClickTweetItem = () => {
     chrome.tabs.create({
-      url: `${X_SITE}/${props.screenName}`
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/library/bookmarks/posts`
     })
   }
 
