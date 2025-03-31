@@ -81,10 +81,18 @@ export const DashboardPage = () => {
     setNavbarItemKey(itemKey)
   }
 
-  const checkTweetPage = (url: string) => {
-    const isUserProfile = /https?:\/\/(x\.com|twitter\.com)\/[^/]+$/.test(url)
+  const checkTweetPage = (urlString: string) => {
+    const url = new URL(urlString)
+    const pathSegments = url.pathname.split("/").filter(Boolean)
+
     const isTweetDetail =
-      /https?:\/\/(x\.com|twitter\.com)\/[^/]+\/status\/\d+/.test(url)
+      pathSegments.length >= 3 &&
+      pathSegments[1] === "status" &&
+      /^\d+$/.test(pathSegments[2])
+
+    const RESERVED_PATHS = ["search", "settings", "notifications"]
+    const isUserProfile =
+      pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
 
     if (isUserProfile) {
       // go to chat panel if is tweet detail page
