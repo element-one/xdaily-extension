@@ -1,9 +1,16 @@
-import { Bookmark, FolderOpenDot, Lightbulb, Settings } from "lucide-react"
+import {
+  Bookmark,
+  BotMessageSquare,
+  FolderOpenDot,
+  Lightbulb,
+  Settings
+} from "lucide-react"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
+import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 import { UserAvatar } from "./UserAvatar"
@@ -12,7 +19,8 @@ enum NavbarItemKey {
   SEARCH = "search",
   SUGGESTION = "ai suggestions",
   BOARD = "board",
-  SETTING = "setting"
+  SETTING = "setting",
+  CHAT = "chat"
 }
 
 type NavbarItem = {
@@ -34,6 +42,12 @@ const NavbarItems: NavbarItem[] = [
     icon: <Lightbulb className="w-5 h-5" />,
     tooltip: "AI Suggestions",
     component: <AiSuggestionPanel />
+  },
+  {
+    key: NavbarItemKey.CHAT,
+    icon: <BotMessageSquare className="w-5 h-5" />,
+    tooltip: "Chat",
+    component: <ChatPanel />
   },
   {
     key: NavbarItemKey.BOARD,
@@ -67,31 +81,51 @@ export const DashboardPage = () => {
     setNavbarItemKey(itemKey)
   }
 
-  const checkTweetDetailPage = (url: string) => {
-    if (url.includes("/status/")) {
+  const checkTweetPage = (urlString: string) => {
+    const url = new URL(urlString)
+    const pathSegments = url.pathname.split("/").filter(Boolean)
+
+    const isTweetDetail =
+      pathSegments.length >= 3 &&
+      pathSegments[1] === "status" &&
+      /^\d+$/.test(pathSegments[2])
+
+    const RESERVED_PATHS = ["search", "settings", "notifications"]
+    const isUserProfile =
+      pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
+
+    if (isUserProfile) {
+      // go to chat panel if is tweet detail page
+      toggleDrawer(NavbarItemKey.CHAT)
+    } else if (isTweetDetail) {
       // go to suggestion panel if is tweet detail page
       toggleDrawer(NavbarItemKey.SUGGESTION)
     }
   }
 
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        const currentTab = tabs[0]
-        checkTweetDetailPage(currentTab.url || "")
-      }
-    })
+    const checkCurrentTab = () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.url) checkTweetPage(tabs[0].url)
+      })
+    }
+
+    checkCurrentTab()
 
     const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
       if (changeInfo.status === "complete" && tab.url) {
-        checkTweetDetailPage(tab.url)
+        checkTweetPage(tab.url)
       }
+    }
+    const handleTabActivated = () => {
+      checkCurrentTab()
     }
 
     chrome.tabs.onUpdated.addListener(handleTabUpdate)
-
+    chrome.tabs.onActivated.addListener(handleTabActivated)
     return () => {
       chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+      chrome.tabs.onActivated.removeListener(handleTabActivated)
     }
   }, [])
 
