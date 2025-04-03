@@ -1,5 +1,4 @@
 import clsx from "clsx"
-import { useState } from "react"
 
 import { useApplyKol, useCheckKolStatus } from "~services/chat"
 import { KolStatus } from "~types/enum"
@@ -7,7 +6,7 @@ import { KolStatus } from "~types/enum"
 import { ChatWindow } from "./ChatWindow"
 
 export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
-  const { data, refetch } = useCheckKolStatus(screenName)
+  const { data, refetch, isLoading } = useCheckKolStatus(screenName)
 
   const { mutate: apply, isPending } = useApplyKol()
 
@@ -19,6 +18,14 @@ export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
       },
       onError() {}
     })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col w-full h-full items-center justify-center gap-4">
+        loading...
+      </div>
+    )
   }
 
   if (data && data?.kolStatus === KolStatus.APPROVED) {
