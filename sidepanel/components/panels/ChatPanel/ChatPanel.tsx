@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
+import { useStore } from "~store/store"
+import { BookmarkItemKey, NavbarItemKey, X_SITE } from "~types/enum"
+
 enum MessageSender {
   user = "user",
   ai = "ai"
@@ -14,6 +17,7 @@ type Message = {
 }
 
 export const ChatPanel = () => {
+  const { setNavbarItemKey, setBookmarkKey } = useStore()
   const [agentId, setAgentId] = useState<string>("")
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -113,6 +117,37 @@ export const ChatPanel = () => {
     //   }
     //   setMessages((prev) => [...prev, newAiMessage])
     // }, 1000)
+  }
+
+  const handleGoCollection = () => {
+    setBookmarkKey(BookmarkItemKey.USER)
+    setNavbarItemKey(NavbarItemKey.BOOKMARK)
+  }
+
+  const handleGoX = () => {
+    chrome.tabs.create({
+      url: X_SITE
+    })
+  }
+
+  if (!agentId) {
+    return (
+      <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50 items-center justify-center">
+        <div className="text-base font-semibold">Choose a user...</div>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={handleGoX}
+            className="rounded-md bg-primary-brand text-white  px-4 py-2 hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-primary-brand">
+            From web
+          </button>
+          <button
+            onClick={handleGoCollection}
+            className="rounded-md border-2 border-primary-brand text-primary-brand  hover:bg-slate-100  px-4 py-2  focus:outline-none focus:ring-2 focus:ring-primary-brand">
+            From bookmarks
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

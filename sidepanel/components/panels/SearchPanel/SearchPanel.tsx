@@ -1,46 +1,42 @@
 import clsx from "clsx"
 import { useMemo, useState, type ReactNode } from "react"
 
+import { useStore } from "~store/store"
+import { BookmarkItemKey } from "~types/enum"
+
 import { TweetListSection } from "./TweetListSection"
 import { UserSection } from "./UserSection"
 
-enum SearchPanelItemKey {
-  TWEET = "tweet_collections",
-  USER = "user_collections"
-}
-
 type SearchItem = {
-  key: SearchPanelItemKey
+  key: BookmarkItemKey
   content: string
   component: ReactNode
 }
 
 const SearchItems: SearchItem[] = [
   {
-    key: SearchPanelItemKey.TWEET,
+    key: BookmarkItemKey.TWEET,
     content: "Posts",
     component: <TweetListSection />
   },
   {
-    key: SearchPanelItemKey.USER,
+    key: BookmarkItemKey.USER,
     content: "Users",
     component: <UserSection />
   }
 ] as const
 export const SearchPanel = () => {
-  const [searchItemKey, setSearchItemKey] = useState<SearchPanelItemKey>(
-    SearchPanelItemKey.TWEET
-  )
+  const { bookmarkKey, setBookmarkKey } = useStore()
 
   const currentSearchItem = useMemo(() => {
-    if (searchItemKey) {
-      return SearchItems.find((item) => item.key === searchItemKey)
+    if (bookmarkKey) {
+      return SearchItems.find((item) => item.key === bookmarkKey)
     }
     return undefined
-  }, [searchItemKey])
+  }, [bookmarkKey])
 
-  const toggleDrawer = (itemKey: SearchPanelItemKey) => {
-    setSearchItemKey(itemKey)
+  const toggleDrawer = (itemKey: BookmarkItemKey) => {
+    setBookmarkKey(itemKey)
   }
 
   return (

@@ -1,3 +1,14 @@
 export const X_SITE = "https://x.com"
 
-export const Hide_Widget_Storage_Name = "hideUntilNextVisit"
+export enum NavbarItemKey {
+  BOOKMARK = "bookmark",
+  SUGGESTION = "ai suggestions",
+  COLLECTION = "collection",
+  SETTING = "setting",
+  CHAT = "chat"
+}
+
+export enum BookmarkItemKey {
+  TWEET = "tweet_collections",
+  USER = "user_collections"
+}
