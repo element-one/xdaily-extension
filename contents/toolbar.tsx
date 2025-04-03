@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
+import { getTweetIdFromTweet, getUserIdFromTweet } from "~libs/tweet"
 import { X_SITE } from "~types/enum"
 
 export const config: PlasmoCSConfig = {
@@ -57,6 +58,7 @@ const Toolbar = () => {
 
   const [isCollecting, setIsCollecting] = useState(false)
   const [isSubscribing, setIsSubscribing] = useState(false)
+  const [isChatVisible, setIsChatVisible] = useState(false)
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -106,33 +108,38 @@ const Toolbar = () => {
 
   const handleCollectTweet = async () => {
     if (!tweet || isCollecting) return
-    const linkElement = tweet.querySelector("a[href*='/status/']")
-    const href = linkElement?.getAttribute("href") || ""
+    const tweetId = getTweetIdFromTweet(tweet)
 
-    const match = href.match(/\/status\/(\d+)/) // only keep number
-    const tweetId = match ? match[1] : ""
+    if (!tweetId) {
+      return
+    }
 
     setIsCollecting(true)
-    const resp = await sendToBackground({
-      name: "save-tweet",
-      body: {
-        tweetId
-      }
-    })
-    if (resp) {
+    try {
+      await sendToBackground({
+        name: "save-tweet",
+        body: { tweetId }
+      })
+    } catch (error) {
+      console.error("Error saving tweet:", error)
+    } finally {
       setIsCollecting(false)
     }
   }
 
-  const getUserIdFromTweet = () => {
-    const userElement = tweet.querySelector("a[href*='/']")
-    const userId = userElement?.getAttribute("href")?.split("/")[1] ?? ""
-    return userId
+  const extractTweetIdFromUrl = (url: string): string => {
+    const statusMatch = url.match(/\/status\/(\d+)/)
+    if (statusMatch) return statusMatch[1]
+
+    const mediaMatch = url.match(/\/status\/(\d+)\//)
+    if (mediaMatch) return mediaMatch[1]
+
+    return ""
   }
 
   const handleSubscribeUser = async () => {
     if (!tweet || isSubscribing) return
-    const userId = getUserIdFromTweet()
+    const userId = getUserIdFromTweet(tweet)
 
     setIsSubscribing(true)
     const resp = await sendToBackground({
@@ -148,7 +155,7 @@ const Toolbar = () => {
 
   const handleChatWithUser = async () => {
     if (!tweet) return
-    const userId = getUserIdFromTweet()
+    const userId = getUserIdFromTweet(tweet)
     const userProfileUrl = `${X_SITE}/${userId}`
     if (window.location.href !== userProfileUrl) {
       window.location.href = `${X_SITE}/${userId}`
@@ -161,6 +168,27 @@ const Toolbar = () => {
       }
     })
   }
+
+  useEffect(() => {
+    const checkIsKOL = async () => {
+      if (!tweet) {
+        setIsChatVisible(false)
+        return
+      }
+      const userId = getUserIdFromTweet(tweet)
+      const res = await sendToBackground({
+        name: "is-user-kol",
+        body: {
+          userId
+        }
+      })
+      console.log("testing", res)
+      setIsChatVisible(res)
+    }
+    if (tweet) {
+      checkIsKOL()
+    }
+  }, [tweet])
 
   const handleToolbarEnter = () => {
     isMouseInside.current = true
@@ -191,11 +219,13 @@ const Toolbar = () => {
         isLoading={isSubscribing}
         icon={<UserPlus className="size-6" />}
       />
-      <ToolbarButton
-        onClick={handleChatWithUser}
-        isLoading={false}
-        icon={<BotIcon className="size-6" />}
-      />
+      {isChatVisible && (
+        <ToolbarButton
+          onClick={handleChatWithUser}
+          isLoading={false}
+          icon={<BotIcon className="size-6" />}
+        />
+      )}
     </div>
   )
 }

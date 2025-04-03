@@ -3,7 +3,7 @@ import { useState } from "react"
 import { ChatWindow } from "./ChatWindow"
 
 export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
-  const [isKOL, setIsKOL] = useState(false)
+  const [isKOL, setIsKOL] = useState(true)
 
   const handleApply = () => {}
 
