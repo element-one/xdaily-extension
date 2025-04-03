@@ -1,4 +1,7 @@
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
+
+import { sendToBackground } from "@plasmohq/messaging"
 
 enum MessageSender {
   user = "user",
@@ -21,6 +24,7 @@ export const ChatPanel = () => {
   ])
   const [inputText, setInputText] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isSending, setIsSending] = useState(false)
 
   //   get user agent id from the current active tab url
   useEffect(() => {
@@ -74,9 +78,10 @@ export const ChatPanel = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  const handleSend = () => {
-    if (!inputText.trim()) return
+  const handleSend = async () => {
+    if (!inputText.trim() || isSending) return
 
+    setIsSending(true)
     //  user
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -86,15 +91,28 @@ export const ChatPanel = () => {
     setMessages((prev) => [...prev, newUserMessage])
     setInputText("")
 
-    // mock
-    setTimeout(() => {
-      const newAiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "I'm an AI assistant. This is a simulated response.",
-        sender: MessageSender.ai
+    const resp = await sendToBackground({
+      name: "send-message",
+      body: {
+        message: inputText,
+        userId: "612865855"
       }
-      setMessages((prev) => [...prev, newAiMessage])
-    }, 1000)
+    })
+    if (resp) {
+      console.log(resp)
+    } else {
+      console.log("error")
+    }
+    setIsSending(false)
+    // TODO result
+    // setTimeout(() => {
+    //   const newAiMessage: Message = {
+    //     id: (Date.now() + 1).toString(),
+    //     text: "I'm an AI assistant. This is a simulated response.",
+    //     sender: MessageSender.ai
+    //   }
+    //   setMessages((prev) => [...prev, newAiMessage])
+    // }, 1000)
   }
 
   return (
@@ -133,7 +151,11 @@ export const ChatPanel = () => {
           />
           <button
             onClick={handleSend}
-            className="bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand">
+            className={clsx(
+              "bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand",
+              (isSending || !inputText.trim()) &&
+                "opacity-70 cursor-not-allowed"
+            )}>
             Send
           </button>
         </div>
