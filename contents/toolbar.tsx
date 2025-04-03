@@ -1,10 +1,12 @@
 import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
-import { BookmarkIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
+import { BookmarkIcon, BotIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
+
+import { X_SITE } from "~types/enum"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -122,10 +124,15 @@ const Toolbar = () => {
     }
   }
 
-  const handleSubscribeUser = async () => {
-    if (!tweet || isSubscribing) return
+  const getUserIdFromTweet = () => {
     const userElement = tweet.querySelector("a[href*='/']")
     const userId = userElement?.getAttribute("href")?.split("/")[1] ?? ""
+    return userId
+  }
+
+  const handleSubscribeUser = async () => {
+    if (!tweet || isSubscribing) return
+    const userId = getUserIdFromTweet()
 
     setIsSubscribing(true)
     const resp = await sendToBackground({
@@ -137,6 +144,22 @@ const Toolbar = () => {
     if (resp) {
       setIsSubscribing(false)
     }
+  }
+
+  const handleChatWithUser = async () => {
+    if (!tweet) return
+    const userId = getUserIdFromTweet()
+    const userProfileUrl = `${X_SITE}/${userId}`
+    if (window.location.href !== userProfileUrl) {
+      window.location.href = `${X_SITE}/${userId}`
+    }
+    // open panel
+    sendToBackground({
+      name: "toggle-panel",
+      body: {
+        open: true
+      }
+    })
   }
 
   const handleToolbarEnter = () => {
@@ -167,6 +190,11 @@ const Toolbar = () => {
         onClick={handleSubscribeUser}
         isLoading={isSubscribing}
         icon={<UserPlus className="size-6" />}
+      />
+      <ToolbarButton
+        onClick={handleChatWithUser}
+        isLoading={false}
+        icon={<BotIcon className="size-6" />}
       />
     </div>
   )

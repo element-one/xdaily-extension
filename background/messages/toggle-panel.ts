@@ -12,17 +12,22 @@ chrome.action.onClicked.addListener(() => {
     .catch((error) => console.error(error))
 })
 
-const handler: PlasmoMessaging.MessageHandler = async (req) => {
-  if (isSidePanelOpen) {
-    // tell side bar to close itself
+const handler: PlasmoMessaging.MessageHandler<{ open?: boolean }> = async (
+  req
+) => {
+  const shouldOpen =
+    typeof req.body?.open === "boolean" ? req.body.open : !isSidePanelOpen
+
+  if (shouldOpen) {
+    const tabId = req?.sender?.tab?.id
+    await chrome.sidePanel.open({ tabId: tabId })
+    isSidePanelOpen = true
+  } else {
     chrome.runtime.sendMessage({
       type: MessageType.SIDE_PANEL_CLOSE_ITSELF
     })
-  } else {
-    const tabId = req?.sender?.tab?.id
-    await chrome.sidePanel.open({ tabId: tabId })
+    isSidePanelOpen = false
   }
-  isSidePanelOpen = !isSidePanelOpen
 }
 
 export default handler

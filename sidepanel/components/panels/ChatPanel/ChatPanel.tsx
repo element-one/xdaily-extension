@@ -3,17 +3,7 @@ import { useEffect, useState } from "react"
 import { useStore } from "~store/store"
 import { BookmarkItemKey, NavbarItemKey, X_SITE } from "~types/enum"
 
-import { ChatWindow } from "./ChatWindow"
-
-enum MessageSender {
-  user = "user",
-  ai = "ai"
-}
-type Message = {
-  id: string
-  text: string
-  sender: MessageSender
-}
+import { ChatStatusSection } from "./ChatStatusSection"
 
 export const ChatPanel = () => {
   const { setNavbarItemKey, setBookmarkKey } = useStore()
@@ -115,5 +105,5 @@ export const ChatPanel = () => {
     )
   }
 
-  return <ChatWindow screenName={screenName} key={screenName} />
+  return <ChatStatusSection screenName={screenName} key={screenName} />
 }
