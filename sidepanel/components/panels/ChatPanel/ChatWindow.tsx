@@ -34,7 +34,9 @@ export const ChatWindow = ({ screenName }: { screenName: string }) => {
   }, [currentConversation])
 
   const isDisable = useMemo(() => {
-    return !currentScreenName || !inputText.trim()
+    return (
+      !currentScreenName || !inputText.trim() || status === ChatStatus.STREAMING
+    )
   }, [currentScreenName, inputText, status])
 
   const handleSend = async () => {
@@ -62,6 +64,11 @@ export const ChatWindow = ({ screenName }: { screenName: string }) => {
             </div>
           </div>
         ))}
+        {status === ChatStatus.STREAMING && (
+          <div className="w-fit px-4 py-2 rounded-lg bg-gray-200 text-gray-800">
+            Thinking...
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -69,6 +76,7 @@ export const ChatWindow = ({ screenName }: { screenName: string }) => {
       <div className="bg-white py-2 ">
         <div className="flex rounded-md overflow-hidden border border-primary-brand]">
           <input
+            disabled={status === ChatStatus.STREAMING || !currentScreenName}
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
