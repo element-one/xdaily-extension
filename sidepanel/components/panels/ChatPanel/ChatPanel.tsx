@@ -32,7 +32,19 @@ export const ChatPanel = () => {
 
   //   get user agent id from the current active tab url
   useEffect(() => {
+    const isTwitterDomain = (urlStr: string) => {
+      try {
+        const url = new URL(urlStr)
+        return (
+          url.hostname.endsWith("twitter.com") || url.hostname.endsWith("x.com")
+        )
+      } catch (e) {
+        return false
+      }
+    }
+
     const extractTwitterUsername = (url: string): string | null => {
+      if (!isTwitterDomain(url)) return ""
       const RESERVED_PATHS = new Set([
         "home",
         "explore",
@@ -55,7 +67,10 @@ export const ChatPanel = () => {
         currentWindow: true
       })
       const username = tab?.url ? extractTwitterUsername(tab.url) : null
-      setAgentId(username || "")
+      if (username) {
+        // avoid change when it is empty
+        setAgentId(username)
+      }
     }
 
     init()
@@ -63,7 +78,10 @@ export const ChatPanel = () => {
     const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
       if (changeInfo.status === "complete" && tab.url) {
         const username = extractTwitterUsername(tab.url)
-        setAgentId(username || "")
+        // avoid change when it is empty
+        if (username) {
+          setAgentId(username)
+        }
       }
     }
     const handleTabActivated = () => {
