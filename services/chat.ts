@@ -1,7 +1,9 @@
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery,
   type InfiniteData,
+  type UseMutationOptions,
   type UseQueryOptions
 } from "@tanstack/react-query"
 
@@ -58,7 +60,22 @@ export const checkKolStatus = async (
 
 export const useCheckKolStatus = (screenName: string) => {
   return useQuery({
+    retry: 0,
     queryKey: ["kol-status", screenName],
     queryFn: () => checkKolStatus(screenName)
+  })
+}
+
+export const applyKol = async (screenName: string): Promise<KolStatusResp> => {
+  const response = await client.post(`/users/apply/kol/${screenName}`)
+  return response.data
+}
+
+export const useApplyKol = (
+  options?: Partial<UseMutationOptions<KolStatusResp, Error, string>>
+) => {
+  return useMutation({
+    ...options,
+    mutationFn: applyKol
   })
 }
