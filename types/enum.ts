@@ -18,3 +18,9 @@ export enum ChatStatus {
   STREAMING = "streaming",
   ERROR = "error"
 }
+
+export enum KolStatus {
+  NONE = "none",
+  APPLYING = "applying",
+  APPROVED = "approved"
+}

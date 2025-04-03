@@ -1,3 +1,5 @@
+import type { KolStatus } from "./enum"
+
 export interface ChatMessage {
   // id: string
   message: string
@@ -28,4 +30,8 @@ export interface GetChatHistoryResp {
     hasPreviousPage: number
     hasNextPage: number
   }
+}
+
+export interface KolStatusResp {
+  kolStatus: KolStatus
 }

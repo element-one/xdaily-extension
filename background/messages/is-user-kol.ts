@@ -1,17 +1,19 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-// TODO: add api to check if user is kol
+import { checkKolStatus } from "~services/chat"
+import { KolStatus } from "~types/enum"
+
 const handler: PlasmoMessaging.MessageHandler<{ userId: string }> = async (
   req,
   res
 ) => {
-  //   const userId = req.body.userId
-  //   try {
-  //     console.log("use this tweetId", userId)
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  res.send(true)
+  const screenName = req.body.userId
+  try {
+    const response = await checkKolStatus(screenName)
+    res.send(response.kolStatus === KolStatus.APPROVED)
+  } catch (e) {
+    res.send(false)
+  }
 }
 
 export default handler

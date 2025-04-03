@@ -1,10 +1,16 @@
-import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query"
+import {
+  useInfiniteQuery,
+  useQuery,
+  type InfiniteData,
+  type UseQueryOptions
+} from "@tanstack/react-query"
 
 import client from "~libs/client"
 import type {
   ChatMessage,
   GetChatHistoryParams,
-  GetChatHistoryResp
+  GetChatHistoryResp,
+  KolStatusResp
 } from "~types/chat"
 
 export const getChatHistory = async ({
@@ -41,4 +47,18 @@ export const useChatHistory = (screenName: string, take: number) => {
       }
     }
   )
+}
+
+export const checkKolStatus = async (
+  screenName: string
+): Promise<KolStatusResp> => {
+  const response = await client.get(`/users/check/kol/${screenName}`)
+  return response.data
+}
+
+export const useCheckKolStatus = (screenName: string) => {
+  return useQuery({
+    queryKey: ["kol-status", screenName],
+    queryFn: () => checkKolStatus(screenName)
+  })
 }
