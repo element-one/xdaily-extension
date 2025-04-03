@@ -7,6 +7,9 @@ import {
 } from "lucide-react"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 
+import { useStore } from "~store/store"
+import { NavbarItemKey } from "~types/enum"
+
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
@@ -14,14 +17,6 @@ import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 import { UserAvatar } from "./UserAvatar"
-
-enum NavbarItemKey {
-  SEARCH = "search",
-  SUGGESTION = "ai suggestions",
-  BOARD = "board",
-  SETTING = "setting",
-  CHAT = "chat"
-}
 
 type NavbarItem = {
   key: NavbarItemKey
@@ -32,7 +27,7 @@ type NavbarItem = {
 
 const NavbarItems: NavbarItem[] = [
   {
-    key: NavbarItemKey.SEARCH,
+    key: NavbarItemKey.BOOKMARK,
     icon: <Bookmark className="w-5 h-5" />,
     tooltip: "Bookmarks",
     component: <SearchPanel />
@@ -50,7 +45,7 @@ const NavbarItems: NavbarItem[] = [
     component: <ChatPanel />
   },
   {
-    key: NavbarItemKey.BOARD,
+    key: NavbarItemKey.COLLECTION,
     icon: <FolderOpenDot className="w-5 h-5" />,
     tooltip: "Collections",
     component: <BoardPanel />
@@ -65,9 +60,7 @@ const SettingNavbarItem: NavbarItem = {
 }
 
 export const DashboardPage = () => {
-  const [navbarItemKey, setNavbarItemKey] = useState<NavbarItemKey>(
-    NavbarItemKey.SEARCH
-  )
+  const { navbarItemKey, setNavbarItemKey, clearNavbar } = useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -104,6 +97,8 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => {
+    clearNavbar()
+
     const checkCurrentTab = () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.url) checkTweetPage(tabs[0].url)
