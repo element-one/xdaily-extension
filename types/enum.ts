@@ -12,3 +12,9 @@ export enum BookmarkItemKey {
   TWEET = "tweet_collections",
   USER = "user_collections"
 }
+
+export enum ChatStatus {
+  IDLE = "idle",
+  STREAMING = "streaming",
+  ERROR = "error"
+}

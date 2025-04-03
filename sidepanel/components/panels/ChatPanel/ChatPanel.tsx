@@ -1,10 +1,9 @@
-import clsx from "clsx"
-import { useEffect, useRef, useState } from "react"
-
-import { sendToBackground } from "@plasmohq/messaging"
+import { useEffect, useState } from "react"
 
 import { useStore } from "~store/store"
 import { BookmarkItemKey, NavbarItemKey, X_SITE } from "~types/enum"
+
+import { ChatWindow } from "./ChatWindow"
 
 enum MessageSender {
   user = "user",
@@ -18,17 +17,7 @@ type Message = {
 
 export const ChatPanel = () => {
   const { setNavbarItemKey, setBookmarkKey } = useStore()
-  const [agentId, setAgentId] = useState<string>("")
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! How can I help you with Twitter/X today?",
-      sender: MessageSender.ai
-    }
-  ])
-  const [inputText, setInputText] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [isSending, setIsSending] = useState(false)
+  const [screenName, setScreenName] = useState<string>("")
 
   //   get user agent id from the current active tab url
   useEffect(() => {
@@ -69,7 +58,7 @@ export const ChatPanel = () => {
       const username = tab?.url ? extractTwitterUsername(tab.url) : null
       if (username) {
         // avoid change when it is empty
-        setAgentId(username)
+        setScreenName(username)
       }
     }
 
@@ -80,7 +69,7 @@ export const ChatPanel = () => {
         const username = extractTwitterUsername(tab.url)
         // avoid change when it is empty
         if (username) {
-          setAgentId(username)
+          setScreenName(username)
         }
       }
     }
@@ -95,48 +84,6 @@ export const ChatPanel = () => {
     }
   }, [])
 
-  //   scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
-
-  const handleSend = async () => {
-    if (!inputText.trim() || isSending) return
-
-    setIsSending(true)
-    //  user
-    const newUserMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: MessageSender.user
-    }
-    setMessages((prev) => [...prev, newUserMessage])
-    setInputText("")
-
-    const resp = await sendToBackground({
-      name: "send-message",
-      body: {
-        message: inputText,
-        userId: "612865855"
-      }
-    })
-    if (resp) {
-      console.log(resp)
-    } else {
-      console.log("error")
-    }
-    setIsSending(false)
-    // TODO result
-    // setTimeout(() => {
-    //   const newAiMessage: Message = {
-    //     id: (Date.now() + 1).toString(),
-    //     text: "I'm an AI assistant. This is a simulated response.",
-    //     sender: MessageSender.ai
-    //   }
-    //   setMessages((prev) => [...prev, newAiMessage])
-    // }, 1000)
-  }
-
   const handleGoCollection = () => {
     setBookmarkKey(BookmarkItemKey.USER)
     setNavbarItemKey(NavbarItemKey.BOOKMARK)
@@ -148,7 +95,7 @@ export const ChatPanel = () => {
     })
   }
 
-  if (!agentId) {
+  if (!screenName) {
     return (
       <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50 items-center justify-center">
         <div className="text-base font-semibold">Choose a user...</div>
@@ -168,51 +115,5 @@ export const ChatPanel = () => {
     )
   }
 
-  return (
-    <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
-      <div className="bg-white py-2 text-base font-semibold">
-        {agentId ? agentId : "Anonymous User"}
-      </div>
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.sender === MessageSender.user ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                message.sender === MessageSender.user
-                  ? "bg-primary-brand text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}>
-              {message.text}
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* input and send message button */}
-      <div className="bg-white py-2 ">
-        <div className="flex rounded-md overflow-hidden border border-primary-brand]">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Type your message..."
-            className="flex-1  px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-brand"
-          />
-          <button
-            onClick={handleSend}
-            className={clsx(
-              "bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand",
-              (isSending || !inputText.trim()) &&
-                "opacity-70 cursor-not-allowed"
-            )}>
-            Send
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+  return <ChatWindow screenName={screenName} />
 }
