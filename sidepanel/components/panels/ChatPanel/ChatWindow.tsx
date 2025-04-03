@@ -1,66 +1,172 @@
 import clsx from "clsx"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-import { useStore } from "~store/store"
+import { useChatHistory } from "~services/chat"
+import type { ChatMessage } from "~types/chat"
 import { ChatStatus } from "~types/enum"
 
 export const ChatWindow = ({ screenName }: { screenName: string }) => {
-  const {
-    conversations,
-    sendGreeting,
-    setCurrentScreenName,
-    currentScreenName,
-    sendMessage,
-    status
-  } = useStore()
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useChatHistory(screenName, 20)
+
   const [inputText, setInputText] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messageListContRef = useRef<HTMLDivElement>(null)
+  const isScrollLocked = useRef(false)
 
-  const currentConversation =
-    conversations.find((c) => c.screenName === currentScreenName)?.messages ??
-    []
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [status, setStatus] = useState<ChatStatus>(ChatStatus.IDLE)
 
   useEffect(() => {
-    setCurrentScreenName(screenName)
-    const hasHistory = conversations.some((c) => c.screenName === screenName)
-    if (!hasHistory) {
-      sendGreeting(screenName)
-    }
+    setMessages([])
+    setStatus(ChatStatus.IDLE)
+    setInputText("")
+    scrollToBottom()
   }, [screenName])
 
-  //   scroll to bottom
+  const currentConversation = useMemo(() => {
+    return [...(data?.pages ? data.pages : []), ...messages]
+  }, [messages, data])
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [currentConversation])
+    if (data?.pageParams?.length === 1) {
+      // has fetched first page
+      if (currentConversation.length === 0) {
+        addMessage("Hello! How can I help you today?", true)
+      }
+      scrollToBottom()
+    }
+  }, [data, currentConversation])
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, 10)
+  }
 
   const isDisable = useMemo(() => {
-    return (
-      !currentScreenName || !inputText.trim() || status === ChatStatus.STREAMING
-    )
-  }, [currentScreenName, inputText, status])
+    return !inputText.trim() || status === ChatStatus.STREAMING
+  }, [inputText, status])
+
+  const addMessage = (message: string, isBot: boolean) => {
+    const newMessage: ChatMessage = {
+      message,
+      isBot,
+      chatAt: Date.now()
+    }
+
+    setMessages((prev) => {
+      return [...prev, newMessage]
+    })
+    scrollToBottom()
+  }
+
+  const sendMessage = async (text: string) => {
+    // add user message
+    addMessage(text, false)
+    setStatus(ChatStatus.STREAMING)
+
+    try {
+      const response = await fetch(
+        `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ message: text })
+        }
+      )
+
+      if (!response.body) {
+        throw new Error("Response body is null")
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ""
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+      }
+      if (buffer) {
+        addMessage(buffer, true)
+      } else {
+        throw new Error("no response")
+      }
+    } catch (error) {
+      addMessage("An error occurred. Please try again", true)
+      setStatus(ChatStatus.ERROR)
+    } finally {
+      setStatus(ChatStatus.IDLE)
+    }
+  }
 
   const handleSend = async () => {
     if (isDisable) return
     const text = inputText.trim()
     setInputText("")
-    await sendMessage(currentScreenName, text)
+    await sendMessage(text)
   }
+
+  const loadMore = async () => {
+    if (!messageListContRef.current || isScrollLocked.current) return
+
+    const container = messageListContRef.current
+    const firstMessage = container.querySelector(".message-item")
+    if (!firstMessage) return
+
+    const prevScrollTop = container.scrollTop
+    const prevScrollHeight = container.scrollHeight
+
+    isScrollLocked.current = true
+
+    await fetchNextPage()
+
+    requestAnimationFrame(() => {
+      const newScrollHeight = container.scrollHeight
+      const heightDiff = newScrollHeight - prevScrollHeight
+
+      container.scrollTop = prevScrollTop + heightDiff
+
+      isScrollLocked.current = false
+    })
+  }
+
+  const handleScroll = useCallback(() => {
+    if (isScrollLocked.current) return
+
+    const container = messageListContRef.current
+    if (!container || !hasNextPage || isFetchingNextPage || isFetching) return
+
+    if (container.scrollTop < 100) {
+      loadMore()
+    }
+  }, [hasNextPage, isFetchingNextPage, isFetching])
 
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
       <div className="bg-white py-2 text-base font-semibold">{screenName}</div>
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
+        ref={messageListContRef}
+        onScroll={handleScroll}>
+        {isFetchingNextPage && (
+          <div className="w-full h-4 flex items-center justify-center">
+            Loading...
+          </div>
+        )}
         {currentConversation.map((message) => (
           <div
-            key={message.id}
-            className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
+            key={message.chatAt}
+            className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                message.isUser
-                  ? "bg-primary-brand text-white"
-                  : "bg-gray-200 text-gray-800"
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
+                message.isBot
+                  ? "bg-gray-200 text-gray-800"
+                  : "bg-primary-brand text-white"
               }`}>
-              {message.text}
+              {message.message}
             </div>
           </div>
         ))}
@@ -76,7 +182,7 @@ export const ChatWindow = ({ screenName }: { screenName: string }) => {
       <div className="bg-white py-2 ">
         <div className="flex rounded-md overflow-hidden border border-primary-brand]">
           <input
-            disabled={status === ChatStatus.STREAMING || !currentScreenName}
+            disabled={status === ChatStatus.STREAMING}
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}

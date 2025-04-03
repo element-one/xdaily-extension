@@ -7,7 +7,6 @@ import {
 
 import { Storage } from "@plasmohq/storage"
 
-import { createChatSlice, type ChatSlice } from "./chatSlice"
 import { createNavigationSlice, type NavigationSlice } from "./navigationSlice"
 import { createUserSlice, type UserSlice } from "./userSlice"
 import { createWidgetSlice, type WidgetSlice } from "./widgetSlice"
@@ -35,15 +34,14 @@ const customStorage: StateStorage = {
   }
 }
 
-type StoreState = UserSlice & WidgetSlice & NavigationSlice & ChatSlice
+type StoreState = UserSlice & WidgetSlice & NavigationSlice
 
 export const useStore = create<StoreState>()(
   persist(
     (...a) => ({
       ...createUserSlice(...a),
       ...createWidgetSlice(...a),
-      ...createNavigationSlice(...a),
-      ...createChatSlice(...a)
+      ...createNavigationSlice(...a)
     }),
     {
       name: "mecoin-extension-storage",

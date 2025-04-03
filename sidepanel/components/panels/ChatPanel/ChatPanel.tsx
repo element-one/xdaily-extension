@@ -115,5 +115,5 @@ export const ChatPanel = () => {
     )
   }
 
-  return <ChatWindow screenName={screenName} />
+  return <ChatWindow screenName={screenName} key={screenName} />
 }
