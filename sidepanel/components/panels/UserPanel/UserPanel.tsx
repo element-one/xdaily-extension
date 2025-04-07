@@ -20,7 +20,9 @@ export const UserPanel = () => {
             onClick={handleBack}
           />
         )}
-        <div className=" text-base font-semibold">Users</div>
+        <div className=" text-base font-semibold">
+          {userPanelItemKey === UserPanelItemKey.LIST ? "Users" : "Chat"}
+        </div>
       </div>
       <div className="flex-1 min-h-0 flex flex-col">
         {userPanelItemKey === UserPanelItemKey.LIST && <UserSection />}
