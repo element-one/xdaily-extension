@@ -13,9 +13,7 @@ export const TweetListItem: FC<TweetListProps> = (props) => {
   }
 
   return (
-    <div
-      onClick={handleClickTweetItem}
-      className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
       <div className="flex items-center gap-3 max-w-[80%]">
         <div className="flex flex-col">
           <div className="text-sm flex items-center gap-x-1">
@@ -31,6 +29,7 @@ export const TweetListItem: FC<TweetListProps> = (props) => {
           content={
             <EyeIcon className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           }
+          handleClick={handleClickTweetItem}
           tooltip="See Details"
         />
       </div>
