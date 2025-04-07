@@ -1,9 +1,8 @@
 import { Bookmark, List, X } from "lucide-react"
 import { type FC } from "react"
 
+import { ListButton } from "~sidepanel/components/ListButton"
 import type { TweetCollection } from "~types/collection"
-
-import { ListButton } from "./ListButton"
 
 type TweetListProps = TweetCollection
 export const TweetListItem: FC<TweetListProps> = (props) => {

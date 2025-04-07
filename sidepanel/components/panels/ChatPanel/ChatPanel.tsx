@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 
 import { useStore } from "~store/store"
-import { BookmarkItemKey, NavbarItemKey, X_SITE } from "~types/enum"
+import { NavbarItemKey, X_SITE } from "~types/enum"
 
 import { ChatStatusSection } from "./ChatStatusSection"
 
 export const ChatPanel = () => {
-  const { setNavbarItemKey, setBookmarkKey } = useStore()
+  const { setNavbarItemKey } = useStore()
   const [screenName, setScreenName] = useState<string>("")
 
   //   get user agent id from the current active tab url
@@ -75,8 +75,8 @@ export const ChatPanel = () => {
   }, [])
 
   const handleGoCollection = () => {
-    setBookmarkKey(BookmarkItemKey.USER)
-    setNavbarItemKey(NavbarItemKey.BOOKMARK)
+    // setBookmarkKey(BookmarkItemKey.USER)
+    setNavbarItemKey(NavbarItemKey.POST)
   }
 
   const handleGoX = () => {

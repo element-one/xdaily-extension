@@ -1,10 +1,9 @@
 import { Bookmark, List, X } from "lucide-react"
 import { type FC } from "react"
 
+import { ListButton } from "~sidepanel/components/ListButton"
 import type { UserCollection } from "~types/collection"
 import { X_SITE } from "~types/enum"
-
-import { ListButton } from "./ListButton"
 
 type UserListProps = UserCollection
 export const UserListItem: FC<UserListProps> = (user) => {
