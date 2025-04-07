@@ -1,4 +1,4 @@
-import { Bookmark, List, X } from "lucide-react"
+import { EyeIcon } from "lucide-react"
 import { type FC } from "react"
 
 import { ListButton } from "~sidepanel/components/ListButton"
@@ -29,21 +29,9 @@ export const TweetListItem: FC<TweetListProps> = (props) => {
       <div className="flex flex-row gap-3 items-center">
         <ListButton
           content={
-            <Bookmark className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <EyeIcon className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           }
-          tooltip="Bookmark"
-        />
-        <ListButton
-          content={
-            <X className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-          }
-          tooltip="Remove"
-        />
-        <ListButton
-          content={
-            <List className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-          }
-          tooltip="More"
+          tooltip="See Details"
         />
       </div>
     </div>
