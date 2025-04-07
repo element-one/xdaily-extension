@@ -1,9 +1,8 @@
-import { Bookmark, List, X } from "lucide-react"
+import { EyeIcon } from "lucide-react"
 import { type FC } from "react"
 
+import { ListButton } from "~sidepanel/components/ListButton"
 import type { TweetCollection } from "~types/collection"
-
-import { ListButton } from "./ListButton"
 
 type TweetListProps = TweetCollection
 export const TweetListItem: FC<TweetListProps> = (props) => {
@@ -14,9 +13,7 @@ export const TweetListItem: FC<TweetListProps> = (props) => {
   }
 
   return (
-    <div
-      onClick={handleClickTweetItem}
-      className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
       <div className="flex items-center gap-3 max-w-[80%]">
         <div className="flex flex-col">
           <div className="text-sm flex items-center gap-x-1">
@@ -30,21 +27,10 @@ export const TweetListItem: FC<TweetListProps> = (props) => {
       <div className="flex flex-row gap-3 items-center">
         <ListButton
           content={
-            <Bookmark className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <EyeIcon className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           }
-          tooltip="Bookmark"
-        />
-        <ListButton
-          content={
-            <X className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-          }
-          tooltip="Remove"
-        />
-        <ListButton
-          content={
-            <List className=" w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-          }
-          tooltip="More"
+          handleClick={handleClickTweetItem}
+          tooltip="See Details"
         />
       </div>
     </div>

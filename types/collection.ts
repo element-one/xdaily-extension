@@ -1,3 +1,5 @@
+import type { KolStatus } from "./enum"
+
 export interface GetCollectionParams {
   page: number
   take: number
@@ -44,6 +46,8 @@ export interface UserCollection {
   isVerified: boolean
   updatedAt: Date
   screenName: string
+  isClaimed: boolean
+  kolStatus: KolStatus
 }
 export interface GetUserCollectionResp {
   data: UserCollection[]

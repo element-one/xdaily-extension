@@ -1,109 +1,124 @@
-import { useEffect, useState } from "react"
+import clsx from "clsx"
+import { useEffect, useMemo, useRef, useState } from "react"
 
-import { useStore } from "~store/store"
-import { BookmarkItemKey, NavbarItemKey, X_SITE } from "~types/enum"
-
-import { ChatStatusSection } from "./ChatStatusSection"
+import type { ChatMessage } from "~types/chat"
+import { ChatStatus } from "~types/enum"
 
 export const ChatPanel = () => {
-  const { setNavbarItemKey, setBookmarkKey } = useStore()
-  const [screenName, setScreenName] = useState<string>("")
+  const [inputText, setInputText] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messageListContRef = useRef<HTMLDivElement>(null)
 
-  //   get user agent id from the current active tab url
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [status, setStatus] = useState<ChatStatus>(ChatStatus.IDLE)
+
+  const currentConversation = useMemo(() => {
+    return [...messages]
+  }, [messages])
+
   useEffect(() => {
-    const isTwitterDomain = (urlStr: string) => {
-      try {
-        const url = new URL(urlStr)
-        return (
-          url.hostname.endsWith("twitter.com") || url.hostname.endsWith("x.com")
-        )
-      } catch (e) {
-        return false
-      }
+    if (currentConversation.length === 0) {
+      addMessage("Hello! How can I help you today?", true)
     }
+    scrollToBottom()
+  }, [currentConversation])
 
-    const extractTwitterUsername = (url: string): string | null => {
-      if (!isTwitterDomain(url)) return ""
-      const RESERVED_PATHS = new Set([
-        "home",
-        "explore",
-        "search",
-        "settings",
-        "notifications"
-      ])
-      const match = url.match(
-        /https?:\/\/(x\.com|twitter\.com)\/([^/?#]+)(?:\/|$|\?|#)/
-      )
-      if (!match) return null
-
-      const username = match[2]
-      return RESERVED_PATHS.has(username) ? null : username
-    }
-
-    const init = async () => {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      })
-      const username = tab?.url ? extractTwitterUsername(tab.url) : null
-      if (username) {
-        // avoid change when it is empty
-        setScreenName(username)
-      }
-    }
-
-    init()
-
-    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
-      if (changeInfo.status === "complete" && tab.url) {
-        const username = extractTwitterUsername(tab.url)
-        // avoid change when it is empty
-        if (username) {
-          setScreenName(username)
-        }
-      }
-    }
-    const handleTabActivated = () => {
-      init()
-    }
-    chrome.tabs.onUpdated.addListener(handleTabUpdate)
-    chrome.tabs.onActivated.addListener(handleTabActivated)
-    return () => {
-      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-      chrome.tabs.onActivated.removeListener(handleTabActivated)
-    }
-  }, [])
-
-  const handleGoCollection = () => {
-    setBookmarkKey(BookmarkItemKey.USER)
-    setNavbarItemKey(NavbarItemKey.BOOKMARK)
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, 10)
   }
 
-  const handleGoX = () => {
-    chrome.tabs.create({
-      url: X_SITE
+  const isDisable = useMemo(() => {
+    return !inputText.trim() || status === ChatStatus.STREAMING
+  }, [inputText, status])
+
+  const addMessage = (message: string, isBot: boolean) => {
+    const newMessage: ChatMessage = {
+      message,
+      isBot,
+      chatAt: Date.now()
+    }
+
+    setMessages((prev) => {
+      return [...prev, newMessage]
     })
+    scrollToBottom()
   }
 
-  if (!screenName) {
-    return (
-      <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50 items-center justify-center">
-        <div className="text-base font-semibold">Choose a user...</div>
-        <div className="flex flex-col gap-2">
+  const sendMessage = async (text: string) => {
+    // add user message
+    addMessage(text, false)
+    setStatus(ChatStatus.STREAMING)
+
+    try {
+      // TODO: mock robot message
+      addMessage("What can I do for you?", true)
+    } catch (error) {
+      addMessage("An error occurred. Please try again", true)
+      setStatus(ChatStatus.ERROR)
+    } finally {
+      setStatus(ChatStatus.IDLE)
+    }
+  }
+
+  const handleSend = async () => {
+    if (isDisable) return
+    const text = inputText.trim()
+    setInputText("")
+    await sendMessage(text)
+  }
+
+  return (
+    <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
+      <div className="bg-white py-2 text-base font-semibold">Bot</div>
+      <div
+        className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
+        ref={messageListContRef}>
+        {currentConversation.map((message) => (
+          <div
+            key={message.chatAt}
+            className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
+            <div
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
+                message.isBot
+                  ? "bg-gray-200 text-gray-800"
+                  : "bg-primary-brand text-white"
+              }`}>
+              {message.message}
+            </div>
+          </div>
+        ))}
+        {status === ChatStatus.STREAMING && (
+          <div className="w-fit px-4 py-2 rounded-lg bg-gray-200 text-gray-800">
+            Thinking...
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* input and send message button */}
+      <div className="bg-white py-2 ">
+        <div className="flex rounded-md overflow-hidden border border-primary-brand]">
+          <input
+            disabled={status === ChatStatus.STREAMING}
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Type your message..."
+            className="flex-1  px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-brand"
+          />
           <button
-            onClick={handleGoX}
-            className="rounded-md bg-primary-brand text-white  px-4 py-2 hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-primary-brand">
-            From web
-          </button>
-          <button
-            onClick={handleGoCollection}
-            className="rounded-md border-2 border-primary-brand text-primary-brand  hover:bg-slate-100  px-4 py-2  focus:outline-none focus:ring-2 focus:ring-primary-brand">
-            From bookmarks
+            onClick={handleSend}
+            className={clsx(
+              "bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand",
+              isDisable && "opacity-70 cursor-not-allowed"
+            )}>
+            Send
           </button>
         </div>
       </div>
-    )
-  }
-
-  return <ChatStatusSection screenName={screenName} key={screenName} />
+    </div>
+  )
 }

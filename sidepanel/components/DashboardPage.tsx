@@ -3,19 +3,21 @@ import {
   BotMessageSquare,
   FolderOpenDot,
   Lightbulb,
-  Settings
+  Settings,
+  UserIcon
 } from "lucide-react"
-import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, type ReactNode } from "react"
 
 import { useStore } from "~store/store"
-import { NavbarItemKey } from "~types/enum"
+import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
 
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
-import { SearchPanel } from "./panels/SearchPanel/SearchPanel"
+import { PostPanel } from "./panels/PostPanel/PostPanel"
 import { SettingPanel } from "./panels/SettingPanel"
+import { UserPanel } from "./panels/UserPanel/UserPanel"
 import { UserAvatar } from "./UserAvatar"
 
 type NavbarItem = {
@@ -27,10 +29,16 @@ type NavbarItem = {
 
 const NavbarItems: NavbarItem[] = [
   {
-    key: NavbarItemKey.BOOKMARK,
+    key: NavbarItemKey.POST,
     icon: <Bookmark className="w-5 h-5" />,
-    tooltip: "Bookmarks",
-    component: <SearchPanel />
+    tooltip: "Posts",
+    component: <PostPanel />
+  },
+  {
+    key: NavbarItemKey.USER,
+    icon: <UserIcon className="w-5 h-5" />,
+    tooltip: "Users",
+    component: <UserPanel />
   },
   {
     key: NavbarItemKey.SUGGESTION,
@@ -60,7 +68,8 @@ const SettingNavbarItem: NavbarItem = {
 }
 
 export const DashboardPage = () => {
-  const { navbarItemKey, setNavbarItemKey, clearNavbar } = useStore()
+  const { navbarItemKey, setNavbarItemKey, clearNavbar, setUserPanelItemKey } =
+    useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -88,8 +97,11 @@ export const DashboardPage = () => {
       pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
 
     if (isUserProfile) {
-      // go to chat panel if is tweet detail page
-      toggleDrawer(NavbarItemKey.CHAT)
+      // go to chat panel if is tweet profile page
+      if (navbarItemKey !== NavbarItemKey.USER) {
+        toggleDrawer(NavbarItemKey.USER)
+      }
+      setUserPanelItemKey(UserPanelItemKey.CHAT)
     } else if (isTweetDetail) {
       // go to suggestion panel if is tweet detail page
       toggleDrawer(NavbarItemKey.SUGGESTION)
