@@ -9,7 +9,7 @@ import {
 import { useEffect, useMemo, type ReactNode } from "react"
 
 import { useStore } from "~store/store"
-import { NavbarItemKey } from "~types/enum"
+import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
 
 import { MeNavbarItem } from "./MeNavbarItem"
 import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
@@ -68,7 +68,8 @@ const SettingNavbarItem: NavbarItem = {
 }
 
 export const DashboardPage = () => {
-  const { navbarItemKey, setNavbarItemKey, clearNavbar } = useStore()
+  const { navbarItemKey, setNavbarItemKey, clearNavbar, setUserPanelItemKey } =
+    useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -96,8 +97,10 @@ export const DashboardPage = () => {
       pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
 
     if (isUserProfile) {
-      // go to chat panel if is tweet detail page
-      toggleDrawer(NavbarItemKey.CHAT)
+      // go to chat panel if is tweet profile page
+      // toggleDrawer(NavbarItemKey.CHAT)
+      toggleDrawer(NavbarItemKey.USER)
+      setUserPanelItemKey(UserPanelItemKey.CHAT)
     } else if (isTweetDetail) {
       // go to suggestion panel if is tweet detail page
       toggleDrawer(NavbarItemKey.SUGGESTION)

@@ -51,7 +51,7 @@ export const TweetListSection = () => {
   }, [addedCollection, data])
 
   return (
-    <>
+    <div className="flex-1 min-h-0 flex flex-col">
       <div className="flex flex-col w-full">
         <div className="relative w-full">
           <Search className="absolute h-4 w-4 text-muted-foreground left-2.5 top-1/2 -translate-y-1/2" />
@@ -62,7 +62,7 @@ export const TweetListSection = () => {
         </div>
       </div>
       {collection?.length > 0 ? (
-        <section className="mt-3 flex flex-col gap-2 py-2">
+        <section className="mt-3 flex flex-col gap-2 py-2 overflow-y-scroll  stylized-scroll">
           {collection.map((item, index) => (
             <TweetListItem key={index} {...item} />
           ))}
@@ -76,6 +76,6 @@ export const TweetListSection = () => {
       {/* load more */}
       <div ref={bottomObserver} className="h-10" />
       {isFetchingNextPage && <p className="text-center">loading...</p>}
-    </>
+    </div>
   )
 }
