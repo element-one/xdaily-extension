@@ -98,10 +98,10 @@ export const DashboardPage = () => {
 
     if (isUserProfile) {
       // go to chat panel if is tweet profile page
-      if (navbarItemKey !== NavbarItemKey.USER) {
-        toggleDrawer(NavbarItemKey.USER)
-      }
-      setUserPanelItemKey(UserPanelItemKey.CHAT)
+      toggleDrawer(NavbarItemKey.USER)
+      setTimeout(() => {
+        setUserPanelItemKey(UserPanelItemKey.CHAT)
+      }, 10)
     } else if (isTweetDetail) {
       // go to suggestion panel if is tweet detail page
       toggleDrawer(NavbarItemKey.SUGGESTION)

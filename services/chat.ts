@@ -61,6 +61,7 @@ export const checkKolStatus = async (
 export const useCheckKolStatus = (screenName: string) => {
   return useQuery({
     retry: 0,
+    refetchOnWindowFocus: false,
     queryKey: ["kol-status", screenName],
     queryFn: () => checkKolStatus(screenName)
   })
