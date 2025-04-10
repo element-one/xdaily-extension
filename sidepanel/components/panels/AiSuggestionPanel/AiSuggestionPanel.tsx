@@ -88,7 +88,7 @@ export const AiSuggestionPanel = () => {
     <div className="flex flex-col h-full relative overflow-hidden">
       <section className="flex-grow overflow-y-auto stylized-scroll scrollbar-thin hide-scrollbar pb-3">
         <div className="flex gap-3 bg-white mb-2 rounded-t-md relative items-center border-b pb-2">
-          <div className="h-14 w-14 rounded-md object-contain bg-purple-100 flex-shrink-0 overflow-hidden">
+          <div className="h-14 w-14 rounded-md object-contain bg-blue-100 flex-shrink-0 overflow-hidden">
             <img
               v-if={tweetDetail?.avatar}
               src={tweetDetail?.avatar}

@@ -14,7 +14,7 @@ export const UserListItem: FC<UserListProps> = (user) => {
   }
 
   return (
-    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-purple-100 hover:border-purple-500 relative">
+    <div className="group flex flex-row items-center justify-between cursor-pointer border rounded-md bg-muted-light p-2 border-l-2 border-grey-500 hover:bg-blue-100 hover:border-blue-500 relative">
       <div className="flex flex-col items-start gap-y-2 max-w-[80%]">
         <div className="flex flex-row gap-x-1 items-center">
           <div className="size-7 rounded-full overflow-hidden bg-primary-brand">

@@ -23,7 +23,7 @@ export const MeNavbarItem: FC<MeNavbarItemProps> = ({
         <Tooltip.Trigger
           onClick={handleItemClick}
           className={clsx(
-            "cursor-pointer p-2 bg-white hover:bg-purple-100 rounded-lg transition-colors duration-200",
+            "cursor-pointer p-2 bg-white hover:bg-blue-100 rounded-lg transition-colors duration-200",
             isTargeted ? "text-primary-brand" : "text-gray-500"
           )}>
           {content}
