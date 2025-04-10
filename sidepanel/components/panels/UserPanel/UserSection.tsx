@@ -50,6 +50,8 @@ export const UserSection = () => {
     return [...addedCollection, ...(data?.pages ? data.pages : [])]
   }, [addedCollection, data])
 
+  console.log("testing", collection)
+
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <div className="flex flex-col w-full">

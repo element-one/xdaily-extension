@@ -1,9 +1,9 @@
 import {
-  Bookmark,
   BotMessageSquare,
   FolderOpenDot,
   Lightbulb,
   Settings,
+  TwitterIcon,
   UserIcon
 } from "lucide-react"
 import { useEffect, useMemo, type ReactNode } from "react"
@@ -30,7 +30,7 @@ type NavbarItem = {
 const NavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.POST,
-    icon: <Bookmark className="w-5 h-5" />,
+    icon: <TwitterIcon className="w-5 h-5" />,
     tooltip: "Posts",
     component: <PostPanel />
   },
