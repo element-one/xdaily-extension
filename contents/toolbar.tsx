@@ -182,7 +182,6 @@ const Toolbar = () => {
           userId
         }
       })
-      console.log("testing", res)
       setIsChatVisible(res)
     }
     if (tweet) {
