@@ -13,7 +13,7 @@ module.exports = {
         },
         thinborder: "#e2e5e9",
         primary: {
-          brand: "#6200ff",
+          brand: "#3b82f6",
           foreground: "#fafaf9"
         }
       }

@@ -1,9 +1,9 @@
 import {
-  Bookmark,
   BotMessageSquare,
   FolderOpenDot,
   Lightbulb,
   Settings,
+  TwitterIcon,
   UserIcon
 } from "lucide-react"
 import { useEffect, useMemo, type ReactNode } from "react"
@@ -30,7 +30,7 @@ type NavbarItem = {
 const NavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.POST,
-    icon: <Bookmark className="w-5 h-5" />,
+    icon: <TwitterIcon className="w-5 h-5" />,
     tooltip: "Posts",
     component: <PostPanel />
   },
@@ -98,10 +98,10 @@ export const DashboardPage = () => {
 
     if (isUserProfile) {
       // go to chat panel if is tweet profile page
-      if (navbarItemKey !== NavbarItemKey.USER) {
-        toggleDrawer(NavbarItemKey.USER)
-      }
-      setUserPanelItemKey(UserPanelItemKey.CHAT)
+      toggleDrawer(NavbarItemKey.USER)
+      setTimeout(() => {
+        setUserPanelItemKey(UserPanelItemKey.CHAT)
+      }, 10)
     } else if (isTweetDetail) {
       // go to suggestion panel if is tweet detail page
       toggleDrawer(NavbarItemKey.SUGGESTION)

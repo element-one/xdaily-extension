@@ -14,14 +14,15 @@ import { LoginPage } from "./components/LoginPage"
 const queryClient = new QueryClient()
 
 const IndexSidePanel = () => {
-  const { isAuthenticated, setIsAuthenticated, updateUserInfo } = useStore()
+  const { isAuthenticated, setIsAuthenticated, updateUserInfo, userInfo } =
+    useStore()
   const { data, isLoading, refetch } = useUser({
     retry: 0,
-    enabled: !isAuthenticated
+    enabled: !isAuthenticated || !userInfo
   })
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && userInfo) {
       return
     }
     if (data && data.id) {

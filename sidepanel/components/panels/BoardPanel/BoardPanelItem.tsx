@@ -85,7 +85,7 @@ export const BoardPanelItem: FC<BoardPanelItemProps> = ({
             return (
               <li className="group/item m-1 ml-5 flex w-full cursor-pointer items-center gap-3 rounded-md p-2 transition-all duration-200 hover:bg-muted">
                 <div className="shrink-0">
-                  <div className="w-8 h-8 bg-purple-100" />
+                  <div className="w-8 h-8 bg-blue-100" />
                 </div>
                 <div className="flex-1 flex-col">
                   <div className="line-clamp-2 text-sm font-normal">

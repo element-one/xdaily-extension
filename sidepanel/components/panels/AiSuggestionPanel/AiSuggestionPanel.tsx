@@ -1,5 +1,8 @@
+import clsx from "clsx"
 import { Save, SquareLibrary, Tags } from "lucide-react"
 import { useEffect, useState } from "react"
+
+import { sendToBackground } from "@plasmohq/messaging"
 
 import { MessageType } from "~types/message"
 import type { TweetDetailPageData } from "~types/tweet"
@@ -7,6 +10,7 @@ import type { TweetDetailPageData } from "~types/tweet"
 import { SuggestionSection } from "./SuggestionSection"
 
 export const AiSuggestionPanel = () => {
+  const [isSaving, setSaving] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [suggestTags, setSuggestTags] = useState<string[]>([
     "tag1",
@@ -84,11 +88,25 @@ export const AiSuggestionPanel = () => {
     setselectedCollections((prevTags) => [...prevTags, value])
   }
 
+  const handleSave = async () => {
+    if (!tweetDetail.tweetId || isSaving) return
+    setSaving(true)
+    try {
+      await sendToBackground({
+        name: "save-tweet",
+        body: { tweetId: tweetDetail.tweetId }
+      })
+    } catch (error) {
+      console.error("Error saving tweet:", error)
+    } finally {
+      setSaving(false)
+    }
+  }
   return (
     <div className="flex flex-col h-full relative overflow-hidden">
       <section className="flex-grow overflow-y-auto stylized-scroll scrollbar-thin hide-scrollbar pb-3">
         <div className="flex gap-3 bg-white mb-2 rounded-t-md relative items-center border-b pb-2">
-          <div className="h-14 w-14 rounded-md object-contain bg-purple-100 flex-shrink-0 overflow-hidden">
+          <div className="h-14 w-14 rounded-md object-contain bg-blue-100 flex-shrink-0 overflow-hidden">
             <img
               v-if={tweetDetail?.avatar}
               src={tweetDetail?.avatar}
@@ -98,12 +116,14 @@ export const AiSuggestionPanel = () => {
           <div className="w-full overflow-hidden">
             <p
               className="mt-2 text-sm font-semibold"
-              title="This is the user of the tweet">
+              title={tweetDetail?.username ?? "This is the user of the tweet"}>
               @{tweetDetail?.username ?? "mecoin"}
             </p>
             <p
-              className="mt-1 w-[80%] truncate text-gray-600"
-              title="This is the content of the tweet">
+              className="mt-1 w-[80%] line-clamp-3 text-gray-600"
+              title={
+                tweetDetail?.content ?? "This is the content of the tweet"
+              }>
               {tweetDetail?.content ?? "This is the content of the tweet"}
             </p>
           </div>
@@ -160,7 +180,14 @@ export const AiSuggestionPanel = () => {
       <footer className="shrink-0 bg-white shadow-md py-2">
         <div className="flex flex-row items-center justify-between">
           <section className="flex items-center">
-            <button className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-primary-foreground h-8 px-4 py-1 flex items-center gap-2">
+            <button
+              className={clsx(
+                "justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-primary-foreground h-8 px-4 py-1 flex items-center gap-2",
+                !tweetDetail?.tweetId || isSaving
+                  ? "cursor-not-allowed opacity-80"
+                  : "cursor-pointer"
+              )}
+              onClick={handleSave}>
               <Save className="w-4 h-4" /> Save
             </button>
           </section>
