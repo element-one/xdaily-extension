@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "../styles/global.css"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 import { useUser } from "~services/user"
 import { useStore } from "~store/store"
@@ -14,32 +14,44 @@ import { LoginPage } from "./components/LoginPage"
 const queryClient = new QueryClient()
 
 const IndexSidePanel = () => {
-  const { isAuthenticated, setIsAuthenticated, updateUserInfo, userInfo } =
-    useStore()
-  const { data, isLoading, refetch } = useUser({
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    updateUserInfo,
+    userInfo,
+    clearUserInfo
+  } = useStore()
+
+  const { data, isLoading, isError, refetch } = useUser({
     retry: 0,
-    enabled: !isAuthenticated || !userInfo
+    enabled: !isAuthenticated,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
   })
 
+  const localData = isError ? undefined : data
+
   useEffect(() => {
+    // clear user info if not authenticated
+    if (!isAuthenticated) {
+      updateUserInfo(null)
+    }
     if (isAuthenticated && userInfo) {
       return
     }
-    if (data && data.id) {
+    if (localData && localData.id) {
       setIsAuthenticated(true)
-      updateUserInfo(data)
+      updateUserInfo(localData)
     } else {
-      setIsAuthenticated(false)
-      updateUserInfo(null)
+      clearUserInfo()
     }
-  }, [data, isAuthenticated])
+  }, [localData, isAuthenticated, isError])
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
       if (message.type === MessageType.SIDE_PANEL_CLOSE_ITSELF) {
         window.close()
       } else if (message.type === MessageType.CHECK_AUTH) {
-        setIsAuthenticated(false)
         refetch()
       }
     })
