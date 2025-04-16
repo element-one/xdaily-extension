@@ -1,27 +1,37 @@
+import { useChat } from "@ai-sdk/react"
 import clsx from "clsx"
-import { useEffect, useMemo, useRef, useState } from "react"
-
-import type { ChatMessage } from "~types/chat"
-import { ChatStatus } from "~types/enum"
+import { useEffect, useMemo, useRef } from "react"
 
 export const ChatPanel = () => {
-  const [inputText, setInputText] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messageListContRef = useRef<HTMLDivElement>(null)
+  const { messages, input, handleSubmit, handleInputChange, status } = useChat({
+    // TODO
+    // id: screenName, // as different session
+    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`,
+    streamProtocol: "text",
+    initialMessages: [
+      {
+        role: "assistant",
+        content: "What can I do for you?",
+        id: `${+new Date()}`
+      }
+    ],
+    fetch: async (url, options) => {
+      const userMessage = JSON.parse(options.body as string).messages.pop()
+        .content
 
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [status, setStatus] = useState<ChatStatus>(ChatStatus.IDLE)
-
-  const currentConversation = useMemo(() => {
-    return [...messages]
-  }, [messages])
-
-  useEffect(() => {
-    if (currentConversation.length === 0) {
-      addMessage("Hello! How can I help you today?", true)
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", // 携带 Cookie
+        body: JSON.stringify({ message: userMessage })
+      })
+      return response
     }
-    scrollToBottom()
-  }, [currentConversation])
+  })
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -29,45 +39,13 @@ export const ChatPanel = () => {
     }, 10)
   }
 
-  const isDisable = useMemo(() => {
-    return !inputText.trim() || status === ChatStatus.STREAMING
-  }, [inputText, status])
-
-  const addMessage = (message: string, isBot: boolean) => {
-    const newMessage: ChatMessage = {
-      message,
-      isBot,
-      chatAt: Date.now()
-    }
-
-    setMessages((prev) => {
-      return [...prev, newMessage]
-    })
+  useEffect(() => {
     scrollToBottom()
-  }
+  }, [messages])
 
-  const sendMessage = async (text: string) => {
-    // add user message
-    addMessage(text, false)
-    setStatus(ChatStatus.STREAMING)
-
-    try {
-      // TODO: mock robot message
-      addMessage("What can I do for you?", true)
-    } catch (error) {
-      addMessage("An error occurred. Please try again", true)
-      setStatus(ChatStatus.ERROR)
-    } finally {
-      setStatus(ChatStatus.IDLE)
-    }
-  }
-
-  const handleSend = async () => {
-    if (isDisable) return
-    const text = inputText.trim()
-    setInputText("")
-    await sendMessage(text)
-  }
+  const isDisable = useMemo(() => {
+    return status !== "ready"
+  }, [status])
 
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
@@ -75,49 +53,52 @@ export const ChatPanel = () => {
       <div
         className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
         ref={messageListContRef}>
-        {currentConversation.map((message) => (
+        {messages.map((m, i) => (
           <div
-            key={message.chatAt}
-            className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
+            key={i}
+            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
-                message.isBot
-                  ? "bg-gray-200 text-gray-800"
-                  : "bg-primary-brand text-white"
+                m.role === "user"
+                  ? "bg-primary-brand text-white"
+                  : "bg-gray-200 text-gray-800"
               }`}>
-              {message.message}
+              {m.content}
             </div>
           </div>
         ))}
-        {status === ChatStatus.STREAMING && (
-          <div className="w-fit px-4 py-2 rounded-lg bg-gray-200 text-gray-800">
-            Thinking...
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* input and send message button */}
       <div className="bg-white py-2 ">
-        <div className="flex rounded-md overflow-hidden border border-primary-brand]">
+        <form
+          className="flex rounded-md overflow-hidden border border-primary-brand]"
+          onSubmit={(event) => {
+            if (isDisable) {
+              return
+            }
+            handleSubmit(event, {
+              allowEmptySubmit: false
+            })
+          }}>
           <input
-            disabled={status === ChatStatus.STREAMING}
+            disabled={status !== "ready"}
             type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            value={input}
+            onChange={handleInputChange}
             placeholder="Type your message..."
             className="flex-1  px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-brand"
           />
           <button
-            onClick={handleSend}
+            type="submit"
             className={clsx(
               "bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand",
               isDisable && "opacity-70 cursor-not-allowed"
             )}>
             Send
           </button>
-        </div>
+        </form>
       </div>
     </div>
   )
