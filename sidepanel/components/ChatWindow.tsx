@@ -1,5 +1,6 @@
-import { useChat, type Message } from "@ai-sdk/react"
+import { useChat } from "@ai-sdk/react"
 import clsx from "clsx"
+import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { useChatHistory } from "~services/chat"
@@ -15,7 +16,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
     hasNextPage,
     isFetching,
     isFetchingNextPage
-  } = useChatHistory(screenName, 20, false)
+  } = useChatHistory(screenName, 20)
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
@@ -89,12 +90,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
             key={i}
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
+              className={`prose prose-sm break-words max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
                 m.role === "user"
                   ? "bg-primary-brand text-white"
                   : "bg-gray-200 text-gray-800"
               }`}>
-              {m.content}
+              <Markdown>{m.content}</Markdown>
             </div>
           </div>
         ))}

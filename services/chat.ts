@@ -3,8 +3,7 @@ import {
   useMutation,
   useQuery,
   type InfiniteData,
-  type UseMutationOptions,
-  type UseQueryOptions
+  type UseMutationOptions
 } from "@tanstack/react-query"
 
 import client from "~libs/client"
@@ -26,11 +25,7 @@ export const getChatHistory = async ({
   return response.data
 }
 
-export const useChatHistory = (
-  screenName: string,
-  take: number,
-  enabled = false
-) => {
+export const useChatHistory = (screenName: string, take: number) => {
   return useInfiniteQuery<GetChatHistoryResp, Error, InfiniteData<ChatMessage>>(
     {
       queryKey: ["user-chat-history", screenName, take],
@@ -42,7 +37,6 @@ export const useChatHistory = (
       getNextPageParam: (lastPage) => {
         return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
       },
-      enabled,
       select: (data) => {
         return {
           pages: data.pages
