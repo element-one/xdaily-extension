@@ -1,59 +1,71 @@
-import { useChat } from "@ai-sdk/react"
+import { useChat, type Message } from "@ai-sdk/react"
 import clsx from "clsx"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 export const ChatPanel = () => {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const messageListContRef = useRef<HTMLDivElement>(null)
-  const { messages, input, handleSubmit, handleInputChange, status } = useChat({
-    // TODO
-    // id: screenName, // as different session
-    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`,
-    streamProtocol: "text",
-    initialMessages: [
-      {
-        role: "assistant",
-        content: "What can I do for you?",
-        id: `${+new Date()}`
+  const chatRef = useRef<HTMLDivElement>(null)
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+  const [history, setHistory] = useState<Message[]>([])
+
+  const { messages, input, handleSubmit, handleInputChange, status, append } =
+    useChat({
+      // TODO
+      // id: screenName, // as different session
+      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`,
+      streamProtocol: "text",
+      fetch: async (url, options) => {
+        const userMessage = JSON.parse(options.body as string).messages.pop()
+          .content
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include", // 携带 Cookie
+          body: JSON.stringify({ message: userMessage })
+        })
+        return response
       }
-    ],
-    fetch: async (url, options) => {
-      const userMessage = JSON.parse(options.body as string).messages.pop()
-        .content
+    })
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include", // 携带 Cookie
-        body: JSON.stringify({ message: userMessage })
-      })
-      return response
-    }
-  })
+  const allMessages = [...history, ...messages]
+  const showGreeting = allMessages.length === 0
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, 10)
-  }
-
+  // scroll to bottom when come new message
   useEffect(() => {
-    scrollToBottom()
+    chatRef.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth"
+    })
   }, [messages])
 
   const isDisable = useMemo(() => {
     return status !== "ready"
   }, [status])
 
+  const loadMoreHistory = async () => {
+    if (isLoadingHistory) return
+    setIsLoadingHistory(true)
+    // const older = await loadHistory()
+    const older = []
+    setHistory((prev) => [...older, ...prev])
+    setIsLoadingHistory(false)
+  }
+
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
       <div className="bg-white py-2 text-base font-semibold">Bot</div>
       <div
         className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
-        ref={messageListContRef}>
-        {messages.map((m, i) => (
+        ref={chatRef}
+        onScroll={(e) => {
+          if ((e.currentTarget.scrollTop ?? 0) === 0) {
+            loadMoreHistory()
+          }
+        }}>
+        {isLoadingHistory && <div>is loading history</div>}
+        {allMessages.map((m, i) => (
           <div
             key={i}
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -67,7 +79,11 @@ export const ChatPanel = () => {
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
+        {showGreeting && (
+          <div className="text-primary-brand w-full h-full flex items-center justify-center font-semibold text-lg">
+            Hi, How can I help you?
+          </div>
+        )}
       </div>
 
       {/* input and send message button */}
