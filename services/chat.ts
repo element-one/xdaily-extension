@@ -25,7 +25,11 @@ export const getChatHistory = async ({
   return response.data
 }
 
-export const useChatHistory = (screenName: string, take: number) => {
+export const useChatHistory = (
+  screenName: string,
+  take: number,
+  enabled = false
+) => {
   return useInfiniteQuery<GetChatHistoryResp, Error, InfiniteData<ChatMessage>>(
     {
       queryKey: ["user-chat-history", screenName, take],
@@ -34,6 +38,7 @@ export const useChatHistory = (screenName: string, take: number) => {
       initialPageParam: 1,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      enabled,
       getNextPageParam: (lastPage) => {
         return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
       },

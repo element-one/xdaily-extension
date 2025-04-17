@@ -54,13 +54,28 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
   }, [messages, history])
   const showGreeting = allMessages.length === 0
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      chatRef.current?.scrollTo({
+        top: chatRef.current.scrollHeight,
+        behavior: "smooth"
+      })
+    }, 0)
+  }
+
   // scroll to bottom when come new message
   useEffect(() => {
-    chatRef.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth"
-    })
+    scrollToBottom()
   }, [messages])
+
+  // scroll to bottom after init history
+  useEffect(() => {
+    const initHistory = async () => {
+      await fetchNextPage()
+      scrollToBottom()
+    }
+    initHistory()
+  }, [])
 
   const isDisable = useMemo(() => {
     return status !== "ready" || isLoadingHistory
