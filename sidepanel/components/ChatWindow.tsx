@@ -47,7 +47,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
         id: chatMessage.chatAt,
         content: chatMessage.message,
         createdAt: new Date(chatMessage.chatAt),
-        role: chatMessage.isBot ? "user" : "assistant"
+        role: chatMessage.isBot ? "assistant" : "user"
       })
     )
     return [...historyMessages, ...messages]
