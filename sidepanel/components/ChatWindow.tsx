@@ -99,7 +99,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
             loadMoreHistory()
           }
         }}>
-        {isLoadingHistory && <div>is loading history</div>}
+        {isLoadingHistory && (
+          <div className="w-full text-center text-muted-foreground">
+            Loading history...
+          </div>
+        )}
+
         {allMessages.map((m, i) => (
           <div
             key={i}
@@ -114,6 +119,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
             </div>
           </div>
         ))}
+
+        {(status === "submitted" || status === "streaming") && (
+          <div className="self-start bg-gray-200 text-gray-500 px-4 py-2 rounded-lg w-fit animate-pulse">
+            Thinking...
+          </div>
+        )}
         {showGreeting && (
           <div className="text-primary-brand w-full h-full flex items-center justify-center text-lg">
             Hi, How can I help you?
