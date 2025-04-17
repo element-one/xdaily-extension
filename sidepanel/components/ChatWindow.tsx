@@ -99,7 +99,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
             loadMoreHistory()
           }
         }}>
-        {isLoadingHistory && (
+        {isLoadingHistory && !showGreeting && (
           <div className="w-full text-center text-muted-foreground">
             Loading history...
           </div>

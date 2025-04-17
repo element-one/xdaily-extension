@@ -1,5 +1,7 @@
 import { ChatWindow } from "~sidepanel/components/ChatWindow"
+import { useStore } from "~store/store"
 
 export const ChatPanel = () => {
-  return <ChatWindow screenName="" />
+  const { userInfo } = useStore()
+  return <ChatWindow screenName={userInfo.username} />
 }

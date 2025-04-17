@@ -47,8 +47,7 @@ export const UserAvatar = () => {
           </div>
           <div className="text-slate-900 text-sm">
             <div className="font-semibold flex flex-row gap-x-1">
-              <span>{userInfo?.firstName}</span>
-              <span>{userInfo?.lastName}</span>
+              <span>@{userInfo?.username}</span>
             </div>
             <div className="text-xs">{userInfo?.email}</div>
           </div>
