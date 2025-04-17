@@ -1,9 +1,8 @@
 import clsx from "clsx"
 
 import { useApplyKol, useCheckKolStatus } from "~services/chat"
+import { ChatWindow } from "~sidepanel/components/ChatWindow"
 import { KolStatus } from "~types/enum"
-
-import { ChatWindow } from "./ChatWindow"
 
 export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
   const { data, refetch, isLoading } = useCheckKolStatus(screenName)
@@ -29,7 +28,7 @@ export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
   }
 
   if (data && data?.kolStatus === KolStatus.APPROVED) {
-    return <ChatWindow screenName={screenName} key={screenName} />
+    return <ChatWindow screenName={screenName} />
   }
 
   //   apply

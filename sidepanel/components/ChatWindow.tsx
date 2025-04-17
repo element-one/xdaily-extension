@@ -1,19 +1,28 @@
 import { useChat, type Message } from "@ai-sdk/react"
 import clsx from "clsx"
-import { useEffect, useMemo, useRef, useState, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC } from "react"
+
+import { useChatHistory } from "~services/chat"
 
 interface ChatWindowProps {
   screenName: string
 }
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
   const chatRef = useRef<HTMLDivElement>(null)
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
-  const [history, setHistory] = useState<Message[]>([])
+  const {
+    data: history,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage
+  } = useChatHistory(screenName, 20, false)
+
+  const isLoadingHistory = isFetching || isFetchingNextPage
 
   const { messages, input, handleSubmit, handleInputChange, status } = useChat({
     id: screenName, // as different session
     // TODO real api request
-    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`,
+    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
     streamProtocol: "text",
     fetch: async (url, options) => {
       const userMessage = JSON.parse(options.body as string).messages.pop()
@@ -31,7 +40,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
     }
   })
 
-  const allMessages = [...history, ...messages]
+  const allMessages = useMemo(() => {
+    const historyMessages = (history?.pages ? history.pages : []).map(
+      (chatMessage) => ({
+        id: chatMessage.chatAt,
+        content: chatMessage.message,
+        createdAt: new Date(chatMessage.chatAt),
+        role: chatMessage.isBot ? "user" : "assistant"
+      })
+    )
+    return [...historyMessages, ...messages]
+  }, [messages, history])
   const showGreeting = allMessages.length === 0
 
   // scroll to bottom when come new message
@@ -47,12 +66,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
   }, [status])
 
   const loadMoreHistory = async () => {
-    if (isLoadingHistory) return
-    setIsLoadingHistory(true)
-    // const older = await loadHistory()
-    const older = []
-    setHistory((prev) => [...older, ...prev])
-    setIsLoadingHistory(false)
+    if (isLoadingHistory || !hasNextPage) return
+    await fetchNextPage()
   }
 
   return (
