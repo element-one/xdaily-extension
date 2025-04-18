@@ -172,10 +172,6 @@ const Toolbar = () => {
     if (!tweetId) {
       return
     }
-    // sendToBackground({
-    //   name: "quote-tweet",
-    //   body: { tweetId }
-    // })
     sendToBackground({
       name: "toggle-panel",
       body: {

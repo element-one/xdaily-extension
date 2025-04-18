@@ -4,11 +4,15 @@ import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
 import { useChatHistory } from "~services/chat"
+import { useStore } from "~store/store"
 
 interface ChatWindowProps {
   screenName: string
+  // NOTE: currently only chat panel need this prop
+  tweetId?: string
 }
-export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
+export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
+  const { clearChatTweetId } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -20,30 +24,31 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
-  const { messages, input, handleSubmit, handleInputChange, status } = useChat({
-    id: screenName, // as different session
-    // TODO real api request
-    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
-    streamProtocol: "text",
-    fetch: async (url, options) => {
-      const data = JSON.parse(options.body as string)
-      const userMessage = data.messages.pop().content
-      const tweetId = data.tweetId ?? ""
+  const { messages, input, handleSubmit, handleInputChange, status, append } =
+    useChat({
+      id: screenName, // as different session
+      // TODO real api request
+      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+      streamProtocol: "text",
+      fetch: async (url, options) => {
+        const data = JSON.parse(options.body as string)
+        const userMessage = data.messages.pop().content
+        const tweetId = data.tweetId ?? ""
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include", // cookie
-        body: JSON.stringify({
-          message: userMessage,
-          tweetId
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include", // cookie
+          body: JSON.stringify({
+            message: userMessage,
+            tweetId
+          })
         })
-      })
-      return response
-    }
-  })
+        return response
+      }
+    })
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
@@ -90,21 +95,33 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
     await fetchNextPage()
   }
 
-  const sendTweetId = () => {
-    // TODO
-  }
+  useEffect(() => {
+    if (tweetId) {
+      const currentTweetId = tweetId
+      clearChatTweetId() // in case repeatedly sent and make sure user can retry
+      if (isDisable) {
+        return
+      }
+      append(
+        {
+          role: "user",
+          content: "Help me analyze this post."
+        },
+        {
+          body: {
+            tweetId: currentTweetId
+          }
+        }
+      )
+    }
+  }, [tweetId])
 
-  const handleFormSubmit = (event: FormEvent, tweetId?: string) => {
+  const handleFormSubmit = (event: FormEvent) => {
     if (isDisable) {
       return
     }
-
-    // Prepare the request body
-    const additionalBody = tweetId ? { tweetId } : {}
-
     handleSubmit(event, {
-      allowEmptySubmit: false,
-      body: additionalBody
+      allowEmptySubmit: false
     })
   }
 
@@ -158,7 +175,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
       <div className="bg-white py-2 ">
         <form
           className="flex rounded-md overflow-hidden border border-primary-brand]"
-          onSubmit={(event) => handleFormSubmit(event, "1763843467858284614")}>
+          onSubmit={(event) => handleFormSubmit(event)}>
           <input
             disabled={status !== "ready"}
             type="text"

@@ -14,7 +14,6 @@ import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
 import { MeNavbarItem } from "./MeNavbarItem"
-import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { PostPanel } from "./panels/PostPanel/PostPanel"
@@ -70,8 +69,13 @@ const SettingNavbarItem: NavbarItem = {
 }
 
 export const DashboardPage = () => {
-  const { navbarItemKey, setNavbarItemKey, clearNavbar, setUserPanelItemKey } =
-    useStore()
+  const {
+    navbarItemKey,
+    setNavbarItemKey,
+    clearNavbar,
+    setUserPanelItemKey,
+    setChatTweetId
+  } = useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -82,7 +86,9 @@ export const DashboardPage = () => {
   }, [navbarItemKey])
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
-    setNavbarItemKey(itemKey)
+    if (itemKey !== navbarItemKey) {
+      setNavbarItemKey(itemKey)
+    }
   }
 
   const checkTweetPage = (urlString: string) => {
@@ -130,8 +136,9 @@ export const DashboardPage = () => {
       checkCurrentTab()
     }
 
-    const messageListener = (message) => {
+    const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
+        setChatTweetId(message.data?.tweetId)
         toggleDrawer(NavbarItemKey.CHAT)
       }
     }
