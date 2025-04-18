@@ -74,7 +74,7 @@ export const DashboardPage = () => {
     setNavbarItemKey,
     clearNavbar,
     setUserPanelItemKey,
-    setChatTweetId
+    setQuoteTweet
   } = useStore()
 
   const currentNavbarItem = useMemo(() => {
@@ -138,7 +138,7 @@ export const DashboardPage = () => {
 
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
-        setChatTweetId(message.data?.tweetId)
+        setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)
       }
     }

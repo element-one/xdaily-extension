@@ -1,18 +1,21 @@
 import { useChat } from "@ai-sdk/react"
 import clsx from "clsx"
+import { XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
+import { formatRelativeTime } from "~libs/date"
 import { useChatHistory } from "~services/chat"
 import { useStore } from "~store/store"
+import type { TweetData } from "~types/tweet"
 
 interface ChatWindowProps {
   screenName: string
   // NOTE: currently only chat panel need this prop
-  tweetId?: string
+  quoteTweet?: TweetData | null
 }
-export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
-  const { clearChatTweetId } = useStore()
+export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
+  const { removeQuoteTweet } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -95,34 +98,28 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
     await fetchNextPage()
   }
 
-  useEffect(() => {
-    if (tweetId) {
-      const currentTweetId = tweetId
-      clearChatTweetId() // in case repeatedly sent and make sure user can retry
-      if (isDisable) {
-        return
-      }
-      append(
-        {
-          role: "user",
-          content: "Help me analyze this post."
-        },
-        {
-          body: {
-            tweetId: currentTweetId
-          }
-        }
-      )
-    }
-  }, [tweetId, isDisable])
-
   const handleFormSubmit = (event: FormEvent) => {
     if (isDisable) {
       return
     }
+
+    const currentTweetId = quoteTweet?.tweetId
+    removeQuoteTweet() // in case repeatedly sent and make sure user can retry
+    const moreBody = currentTweetId
+      ? {
+          body: {
+            tweetId: currentTweetId
+          }
+        }
+      : {}
     handleSubmit(event, {
-      allowEmptySubmit: false
+      allowEmptySubmit: false,
+      ...moreBody
     })
+  }
+
+  const handleCancelQuoteTweet = () => {
+    removeQuoteTweet()
   }
 
   return (
@@ -172,7 +169,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
       </div>
 
       {/* input and send message button */}
-      <div className="bg-white py-2 ">
+      <div className="bg-white py-2 flex flex-col gap-1">
+        {/* quote post info */}
+        {quoteTweet && (
+          <div className="bg-slate-100 p-2 rounded-md relative">
+            <div className="flex flex-row gap-1 overflow-hidden whitespace-nowrap text-ellipsis">
+              <div className="font-semibold  truncate">
+                {quoteTweet.displayName}
+              </div>
+              <div className="text-slate-400 truncate">
+                @{quoteTweet.username}
+              </div>
+              <div className="text-slate-400">
+                · {formatRelativeTime(quoteTweet.timestamp)}
+              </div>
+            </div>
+            <div className="mt-1 line-clamp-3">{quoteTweet.tweetText}</div>
+            <div
+              onClick={handleCancelQuoteTweet}
+              className="absolute right-0 -top-2 w-4 h-4 bg-white hover:bg-red-50 rounded-full flex items-center justify-center cursor-pointer">
+              <XIcon className="w-4 h-4 text-red-800" />
+            </div>
+          </div>
+        )}
         <form
           className="flex rounded-md overflow-hidden border border-primary-brand]"
           onSubmit={(event) => handleFormSubmit(event)}>

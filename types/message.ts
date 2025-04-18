@@ -1,6 +1,7 @@
 import type { ToastProps } from "~contents/toast"
 
 import type { TweetCollection, UserCollection } from "./collection"
+import type { TweetData } from "./tweet"
 
 export enum MessageType {
   CHECK_AUTH = "check_login",
@@ -29,7 +30,5 @@ export type AddUserCollectionPayload = {
 
 export type QuoteTweetPayload = {
   type: MessageType.QUOTE_TWEET
-  data: {
-    tweetId: string
-  }
+  data: TweetData
 }

@@ -12,7 +12,11 @@ import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import { getTweetIdFromTweet, getUserIdFromTweet } from "~libs/tweet"
+import {
+  extractTweetDataFromTweet,
+  getTweetIdFromTweet,
+  getUserIdFromTweet
+} from "~libs/tweet"
 import { X_SITE } from "~types/enum"
 import { MessageType } from "~types/message"
 
@@ -168,8 +172,10 @@ const Toolbar = () => {
 
   const handleQuoteTweet = async () => {
     if (!tweet) return
-    const tweetId = getTweetIdFromTweet(tweet)
-    if (!tweetId) {
+    const tweetInfo = extractTweetDataFromTweet(tweet)
+    console.log("testing", tweetInfo)
+    if (!tweetInfo) {
+      // TODO maybe a toast
       return
     }
     sendToBackground({
@@ -181,9 +187,7 @@ const Toolbar = () => {
     setTimeout(() => {
       chrome.runtime.sendMessage({
         type: MessageType.QUOTE_TWEET,
-        data: {
-          tweetId
-        }
+        data: tweetInfo
       })
     }, 500)
   }
