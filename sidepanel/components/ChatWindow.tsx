@@ -114,7 +114,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
         }
       )
     }
-  }, [tweetId])
+  }, [tweetId, isDisable])
 
   const handleFormSubmit = (event: FormEvent) => {
     if (isDisable) {
