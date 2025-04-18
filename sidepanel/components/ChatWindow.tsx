@@ -128,7 +128,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
       <div className="bg-white py-2 text-base font-semibold">
-        {screenName ? screenName : "Bot"}
+        {screenName ? `@${screenName}` : "Bot"}
       </div>
       <div
         className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
