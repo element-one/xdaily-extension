@@ -40,12 +40,12 @@ const NavbarItems: NavbarItem[] = [
     tooltip: "Users",
     component: <UserPanel />
   },
-  {
-    key: NavbarItemKey.SUGGESTION,
-    icon: <Lightbulb className="w-5 h-5" />,
-    tooltip: "AI Suggestions",
-    component: <AiSuggestionPanel />
-  },
+  // {
+  //   key: NavbarItemKey.SUGGESTION,
+  //   icon: <Lightbulb className="w-5 h-5" />,
+  //   tooltip: "AI Suggestions",
+  //   component: <AiSuggestionPanel />
+  // },
   {
     key: NavbarItemKey.CHAT,
     icon: <BotMessageSquare className="w-5 h-5" />,
@@ -87,10 +87,10 @@ export const DashboardPage = () => {
     const url = new URL(urlString)
     const pathSegments = url.pathname.split("/").filter(Boolean)
 
-    const isTweetDetail =
-      pathSegments.length >= 3 &&
-      pathSegments[1] === "status" &&
-      /^\d+$/.test(pathSegments[2])
+    // const isTweetDetail =
+    //   pathSegments.length >= 3 &&
+    //   pathSegments[1] === "status" &&
+    //   /^\d+$/.test(pathSegments[2])
 
     const RESERVED_PATHS = ["search", "settings", "notifications"]
     const isUserProfile =
@@ -102,10 +102,11 @@ export const DashboardPage = () => {
       setTimeout(() => {
         setUserPanelItemKey(UserPanelItemKey.CHAT)
       }, 10)
-    } else if (isTweetDetail) {
-      // go to suggestion panel if is tweet detail page
-      toggleDrawer(NavbarItemKey.SUGGESTION)
     }
+    // else if (isTweetDetail) {
+    //   // go to suggestion panel if is tweet detail page
+    //   toggleDrawer(NavbarItemKey.SUGGESTION)
+    // }
   }
 
   useEffect(() => {
