@@ -1,6 +1,12 @@
 import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
-import { BookmarkIcon, BotIcon, LoaderCircleIcon, UserPlus } from "lucide-react"
+import {
+  BookmarkIcon,
+  BotIcon,
+  LoaderCircleIcon,
+  MessageSquareQuoteIcon,
+  UserPlus
+} from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
 import React, { useEffect, useRef, useState, type FC } from "react"
 
@@ -8,6 +14,7 @@ import { sendToBackground } from "@plasmohq/messaging"
 
 import { getTweetIdFromTweet, getUserIdFromTweet } from "~libs/tweet"
 import { X_SITE } from "~types/enum"
+import { MessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -127,16 +134,6 @@ const Toolbar = () => {
     }
   }
 
-  const extractTweetIdFromUrl = (url: string): string => {
-    const statusMatch = url.match(/\/status\/(\d+)/)
-    if (statusMatch) return statusMatch[1]
-
-    const mediaMatch = url.match(/\/status\/(\d+)\//)
-    if (mediaMatch) return mediaMatch[1]
-
-    return ""
-  }
-
   const handleSubscribeUser = async () => {
     if (!tweet || isSubscribing) return
     const userId = getUserIdFromTweet(tweet)
@@ -167,6 +164,32 @@ const Toolbar = () => {
         open: true
       }
     })
+  }
+
+  const handleQuoteTweet = async () => {
+    if (!tweet) return
+    const tweetId = getTweetIdFromTweet(tweet)
+    if (!tweetId) {
+      return
+    }
+    // sendToBackground({
+    //   name: "quote-tweet",
+    //   body: { tweetId }
+    // })
+    sendToBackground({
+      name: "toggle-panel",
+      body: {
+        open: true
+      }
+    })
+    setTimeout(() => {
+      chrome.runtime.sendMessage({
+        type: MessageType.QUOTE_TWEET,
+        data: {
+          tweetId
+        }
+      })
+    }, 500)
   }
 
   useEffect(() => {
@@ -217,6 +240,11 @@ const Toolbar = () => {
         onClick={handleSubscribeUser}
         isLoading={isSubscribing}
         icon={<UserPlus className="size-6" />}
+      />
+      <ToolbarButton
+        onClick={handleQuoteTweet}
+        isLoading={false}
+        icon={<MessageSquareQuoteIcon className="size-6" />}
       />
       {isChatVisible && (
         <ToolbarButton

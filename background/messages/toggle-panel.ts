@@ -13,7 +13,8 @@ chrome.action.onClicked.addListener(() => {
 })
 
 const handler: PlasmoMessaging.MessageHandler<{ open?: boolean }> = async (
-  req
+  req,
+  res
 ) => {
   const shouldOpen =
     typeof req.body?.open === "boolean" ? req.body.open : !isSidePanelOpen
@@ -28,6 +29,7 @@ const handler: PlasmoMessaging.MessageHandler<{ open?: boolean }> = async (
     })
     isSidePanelOpen = false
   }
+  res.send("complete")
 }
 
 export default handler
