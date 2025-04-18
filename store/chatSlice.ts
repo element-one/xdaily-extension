@@ -1,7 +1,7 @@
 import type { StateCreator } from "zustand"
 
 type ChatState = {
-  chatTweetId?: string
+  chatTweetId: string
 }
 
 type ChatActions = {
@@ -12,7 +12,7 @@ type ChatActions = {
 export type ChatSlice = ChatState & ChatActions
 
 const initialState: ChatState = {
-  chatTweetId: undefined
+  chatTweetId: ""
 }
 
 export const createChatSlice: StateCreator<ChatSlice> = (set) => ({

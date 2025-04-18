@@ -60,6 +60,7 @@ plasmoStorage.watch({
       if (isUpdatingFromStorage) {
         return
       }
+      // NOTE: do not set state as undefined, or it would not change anymore
       useStore.setState((state) => ({
         ...state,
         ...newValueState
