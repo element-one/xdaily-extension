@@ -1,18 +1,19 @@
 import {
   BotMessageSquare,
   FolderOpenDot,
-  Lightbulb,
   Settings,
   TwitterIcon,
   UserIcon
 } from "lucide-react"
 import { useEffect, useMemo, type ReactNode } from "react"
 
+import { sendToBackground } from "@plasmohq/messaging"
+
 import { useStore } from "~store/store"
 import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
+import { MessageType, type QuoteTweetPayload } from "~types/message"
 
 import { MeNavbarItem } from "./MeNavbarItem"
-import { AiSuggestionPanel } from "./panels/AiSuggestionPanel/AiSuggestionPanel"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { PostPanel } from "./panels/PostPanel/PostPanel"
@@ -68,8 +69,13 @@ const SettingNavbarItem: NavbarItem = {
 }
 
 export const DashboardPage = () => {
-  const { navbarItemKey, setNavbarItemKey, clearNavbar, setUserPanelItemKey } =
-    useStore()
+  const {
+    navbarItemKey,
+    setNavbarItemKey,
+    clearNavbar,
+    setUserPanelItemKey,
+    setChatTweetId
+  } = useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -80,7 +86,9 @@ export const DashboardPage = () => {
   }, [navbarItemKey])
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
-    setNavbarItemKey(itemKey)
+    if (itemKey !== navbarItemKey) {
+      setNavbarItemKey(itemKey)
+    }
   }
 
   const checkTweetPage = (urlString: string) => {
@@ -117,7 +125,6 @@ export const DashboardPage = () => {
         if (tabs[0]?.url) checkTweetPage(tabs[0].url)
       })
     }
-
     checkCurrentTab()
 
     const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
@@ -129,9 +136,18 @@ export const DashboardPage = () => {
       checkCurrentTab()
     }
 
+    const messageListener = (message: QuoteTweetPayload) => {
+      if (message.type === MessageType.QUOTE_TWEET) {
+        setChatTweetId(message.data?.tweetId)
+        toggleDrawer(NavbarItemKey.CHAT)
+      }
+    }
+
+    chrome.runtime.onMessage.addListener(messageListener)
     chrome.tabs.onUpdated.addListener(handleTabUpdate)
     chrome.tabs.onActivated.addListener(handleTabActivated)
     return () => {
+      chrome.runtime.onMessage.removeListener(messageListener)
       chrome.tabs.onUpdated.removeListener(handleTabUpdate)
       chrome.tabs.onActivated.removeListener(handleTabActivated)
     }

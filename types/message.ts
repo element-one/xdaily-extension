@@ -8,7 +8,8 @@ export enum MessageType {
   INPAGE_TOAST = "show_toast_in_page",
   ADD_COLLECTION = "add_tweet_collection",
   ADD_USER_COLLECTION = "add_user_collection",
-  REQUEST_TWEET_DETAILS = "request_tweet_detail_from_page"
+  REQUEST_TWEET_DETAILS = "request_tweet_detail_from_page",
+  QUOTE_TWEET = "quote_tweet_to_chat_with_bot"
 }
 
 export type InpageToastPayload = {
@@ -24,4 +25,11 @@ export type AddTweetCollectionPayload = {
 export type AddUserCollectionPayload = {
   type: MessageType.ADD_USER_COLLECTION
   data: UserCollection
+}
+
+export type QuoteTweetPayload = {
+  type: MessageType.QUOTE_TWEET
+  data: {
+    tweetId: string
+  }
 }

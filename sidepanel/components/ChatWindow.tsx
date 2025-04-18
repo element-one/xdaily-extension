@@ -1,14 +1,18 @@
 import { useChat } from "@ai-sdk/react"
 import clsx from "clsx"
 import Markdown from "markdown-to-jsx"
-import { useEffect, useMemo, useRef, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
 import { useChatHistory } from "~services/chat"
+import { useStore } from "~store/store"
 
 interface ChatWindowProps {
   screenName: string
+  // NOTE: currently only chat panel need this prop
+  tweetId?: string
 }
-export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
+export const ChatWindow: FC<ChatWindowProps> = ({ screenName, tweetId }) => {
+  const { clearChatTweetId } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -20,26 +24,31 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
-  const { messages, input, handleSubmit, handleInputChange, status } = useChat({
-    id: screenName, // as different session
-    // TODO real api request
-    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
-    streamProtocol: "text",
-    fetch: async (url, options) => {
-      const userMessage = JSON.parse(options.body as string).messages.pop()
-        .content
+  const { messages, input, handleSubmit, handleInputChange, status, append } =
+    useChat({
+      id: screenName, // as different session
+      // TODO real api request
+      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+      streamProtocol: "text",
+      fetch: async (url, options) => {
+        const data = JSON.parse(options.body as string)
+        const userMessage = data.messages.pop().content
+        const tweetId = data.tweetId ?? ""
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include", // cookie
-        body: JSON.stringify({ message: userMessage })
-      })
-      return response
-    }
-  })
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include", // cookie
+          body: JSON.stringify({
+            message: userMessage,
+            tweetId
+          })
+        })
+        return response
+      }
+    })
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
@@ -86,10 +95,40 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
     await fetchNextPage()
   }
 
+  useEffect(() => {
+    if (tweetId) {
+      const currentTweetId = tweetId
+      clearChatTweetId() // in case repeatedly sent and make sure user can retry
+      if (isDisable) {
+        return
+      }
+      append(
+        {
+          role: "user",
+          content: "Help me analyze this post."
+        },
+        {
+          body: {
+            tweetId: currentTweetId
+          }
+        }
+      )
+    }
+  }, [tweetId, isDisable])
+
+  const handleFormSubmit = (event: FormEvent) => {
+    if (isDisable) {
+      return
+    }
+    handleSubmit(event, {
+      allowEmptySubmit: false
+    })
+  }
+
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
       <div className="bg-white py-2 text-base font-semibold">
-        {screenName ? screenName : "Bot"}
+        {screenName ? `@${screenName}` : "Bot"}
       </div>
       <div
         className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
@@ -110,7 +149,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
             key={i}
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`prose prose-sm break-words max-w-xs lg:max-w-md px-4 py-2 rounded-lg message-item ${
+              className={`prose prose-sm break-words wrap w-fit max-w-full px-4 py-2 rounded-lg message-item ${
                 m.role === "user"
                   ? "bg-primary-brand text-white"
                   : "bg-gray-200 text-gray-800"
@@ -136,14 +175,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName }) => {
       <div className="bg-white py-2 ">
         <form
           className="flex rounded-md overflow-hidden border border-primary-brand]"
-          onSubmit={(event) => {
-            if (isDisable) {
-              return
-            }
-            handleSubmit(event, {
-              allowEmptySubmit: false
-            })
-          }}>
+          onSubmit={(event) => handleFormSubmit(event)}>
           <input
             disabled={status !== "ready"}
             type="text"

@@ -7,6 +7,7 @@ import {
 
 import { Storage } from "@plasmohq/storage"
 
+import { createChatSlice, type ChatSlice } from "./chatSlice"
 import { createNavigationSlice, type NavigationSlice } from "./navigationSlice"
 import { createUserSlice, type UserSlice } from "./userSlice"
 import { createWidgetSlice, type WidgetSlice } from "./widgetSlice"
@@ -34,14 +35,15 @@ const customStorage: StateStorage = {
   }
 }
 
-type StoreState = UserSlice & WidgetSlice & NavigationSlice
+type StoreState = UserSlice & WidgetSlice & NavigationSlice & ChatSlice
 
 export const useStore = create<StoreState>()(
   persist(
     (...a) => ({
       ...createUserSlice(...a),
       ...createWidgetSlice(...a),
-      ...createNavigationSlice(...a)
+      ...createNavigationSlice(...a),
+      ...createChatSlice(...a)
     }),
     {
       name: "mecoin-extension-storage",
@@ -58,6 +60,7 @@ plasmoStorage.watch({
       if (isUpdatingFromStorage) {
         return
       }
+      // NOTE: do not set state as undefined, or it would not change anymore
       useStore.setState((state) => ({
         ...state,
         ...newValueState
