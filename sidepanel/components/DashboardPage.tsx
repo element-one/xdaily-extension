@@ -101,7 +101,7 @@ export const DashboardPage = () => {
       toggleDrawer(NavbarItemKey.USER)
       setTimeout(() => {
         setUserPanelItemKey(UserPanelItemKey.CHAT)
-      }, 10)
+      }, 50)
     }
     // else if (isTweetDetail) {
     //   // go to suggestion panel if is tweet detail page
