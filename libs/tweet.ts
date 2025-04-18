@@ -1,3 +1,5 @@
+import type { TweetData } from "~types/tweet"
+
 export const getUserIdFromTweet = (tweet: HTMLElement) => {
   try {
     if (!tweet) return ""
@@ -51,4 +53,35 @@ export const getTweetIdFromTweet = (tweet: HTMLElement) => {
   const href = linkElement?.getAttribute("href") || ""
   const tweetId = extractTweetIdFromUrl(href)
   return tweetId || ""
+}
+
+export function extractTweetDataFromTweet(tweetElement: HTMLElement) {
+  if (!tweetElement) return null
+  const avatarImg = tweetElement.querySelector(
+    '[data-testid="Tweet-User-Avatar"] img'
+  ) as HTMLImageElement
+  const displayName = tweetElement.querySelector(
+    '[data-testid="User-Name"] > div > div > a > div > div span'
+  )?.textContent
+  const username = tweetElement
+    .querySelector('[data-testid="User-Name"] > div > div > a')
+    ?.getAttribute("href")
+    ?.replace("/", "")
+  const tweetText = Array.from(
+    tweetElement.querySelectorAll('[data-testid="tweetText"]')
+  )
+    .map((node) => node.textContent)
+    .join(" ")
+  const timestamp = tweetElement.querySelector("time")?.getAttribute("datetime")
+
+  const tweetId = getTweetIdFromTweet(tweetElement)
+
+  return {
+    tweetId,
+    avatarUrl: avatarImg?.src,
+    displayName,
+    username,
+    tweetText,
+    timestamp
+  } as TweetData
 }

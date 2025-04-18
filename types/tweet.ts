@@ -22,3 +22,12 @@ export interface TweetDetailPageData {
   avatar: string
   url: string
 }
+
+export interface TweetData {
+  tweetId: string
+  avatarUrl?: string
+  displayName: string
+  username: string
+  tweetText: string
+  timestamp: string
+}

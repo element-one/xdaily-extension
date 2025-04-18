@@ -1,22 +1,24 @@
 import type { StateCreator } from "zustand"
 
+import type { TweetData } from "~types/tweet"
+
 type ChatState = {
-  chatTweetId: string
+  quoteTweet: TweetData | null
 }
 
 type ChatActions = {
-  setChatTweetId: (id: string) => void
-  clearChatTweetId: () => void
+  setQuoteTweet: (tweetData: TweetData) => void
+  removeQuoteTweet: () => void
 }
 
 export type ChatSlice = ChatState & ChatActions
 
 const initialState: ChatState = {
-  chatTweetId: ""
+  quoteTweet: null
 }
 
 export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
   ...initialState,
-  setChatTweetId: (id: string) => set({ chatTweetId: id }),
-  clearChatTweetId: () => set(initialState)
+  setQuoteTweet: (tweetData: TweetData) => set({ quoteTweet: tweetData }),
+  removeQuoteTweet: () => set(initialState)
 })
