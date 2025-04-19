@@ -77,9 +77,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           data = {
             tweet: {
               tweetId: chatMessage.tweet.tweetId,
-              avatarUrl: "",
-              displayName: "",
-              userName: "",
+              avatarUrl: chatMessage.tweet.twitterUser?.avatar ?? "",
+              displayName: chatMessage.tweet.twitterUser?.name ?? "",
+              username: chatMessage.tweet.twitterUser?.screenName ?? "",
               tweetText: chatMessage.tweet.content,
               timestamp: chatMessage.tweet.timestamp
             }
