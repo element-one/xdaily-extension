@@ -12,6 +12,18 @@ export interface ChatMessage {
     tweetId: string
     userId: string
     id: string
+    twitterUser: {
+      id: string
+      userId: string
+      screenName: string
+      name: string
+      bio: string
+      avatar: string
+      followers: number
+      following: number
+      tweets: number
+      location: string
+    }
   }
   // other is not important, so just omit
 }
