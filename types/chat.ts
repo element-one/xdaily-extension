@@ -5,6 +5,14 @@ export interface ChatMessage {
   message: string
   isBot: boolean
   chatAt: number
+  tweet?: {
+    content: string
+    hashtags: string[]
+    timestamp: string
+    tweetId: string
+    userId: string
+    id: string
+  }
   // other is not important, so just omit
 }
 

@@ -71,13 +71,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
-      (chatMessage) =>
-        ({
+      (chatMessage) => {
+        let data = undefined
+        if (chatMessage.tweet) {
+          data = {
+            tweet: {
+              tweetId: chatMessage.tweet.tweetId,
+              avatarUrl: "",
+              displayName: "",
+              userName: "",
+              tweetText: chatMessage.tweet.content,
+              timestamp: chatMessage.tweet.timestamp
+            }
+          }
+        }
+
+        return {
           id: `${chatMessage.chatAt}`,
           content: chatMessage.message,
           createdAt: new Date(chatMessage.chatAt),
-          role: chatMessage.isBot ? "assistant" : "user"
-        }) as CustomMessage
+          role: chatMessage.isBot ? "assistant" : "user",
+          data
+        } as CustomMessage
+      }
     )
     return [...historyMessages, ...messages]
   }, [messages, history])
@@ -235,10 +251,14 @@ const ChatTweetSection: FC<{
     <div className="bg-slate-100 p-2 rounded-md relative">
       <div className="items-center flex flex-row gap-1 overflow-hidden whitespace-nowrap text-ellipsis">
         <div className="w-5 h-5 rounded-full overflow-hidden bg-primary-brand">
-          <img src={tweet.avatarUrl} className="object-contain" />
+          {tweet.avatarUrl && (
+            <img src={tweet.avatarUrl} className="object-contain" />
+          )}
         </div>
         <div className="font-semibold  truncate">{tweet.displayName}</div>
-        <div className="text-slate-400 truncate">@{tweet.username}</div>
+        <div className="text-slate-400 truncate">
+          @{tweet.username ? tweet.username : "user"}
+        </div>
         <div className="text-slate-400">
           · {formatRelativeTime(tweet.timestamp)}
         </div>
