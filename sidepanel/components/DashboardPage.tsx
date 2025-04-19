@@ -7,8 +7,6 @@ import {
 } from "lucide-react"
 import { useEffect, useMemo, type ReactNode } from "react"
 
-import { sendToBackground } from "@plasmohq/messaging"
-
 import { useStore } from "~store/store"
 import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
@@ -137,6 +135,7 @@ export const DashboardPage = () => {
     }
 
     const messageListener = (message: QuoteTweetPayload) => {
+      console.log("testing", message)
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)

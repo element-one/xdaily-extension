@@ -1,4 +1,8 @@
-import { useChat } from "@ai-sdk/react"
+import {
+  useChat,
+  type UseChatHelpers,
+  type Message as VercelMessage
+} from "@ai-sdk/react"
 import clsx from "clsx"
 import { XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
@@ -14,6 +18,17 @@ interface ChatWindowProps {
   // NOTE: currently only chat panel need this prop
   quoteTweet?: TweetData | null
 }
+
+type CustomMessage = VercelMessage & {
+  data?: {
+    tweet?: TweetData
+  }
+}
+
+type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
+  messages: CustomMessage[]
+}
+
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { removeQuoteTweet } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
@@ -27,7 +42,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
-  const { messages, input, handleSubmit, handleInputChange, status, append } =
+  const { messages, input, handleInputChange, status, append, setInput } =
     useChat({
       id: screenName, // as different session
       // TODO real api request
@@ -35,8 +50,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       streamProtocol: "text",
       fetch: async (url, options) => {
         const data = JSON.parse(options.body as string)
-        const userMessage = data.messages.pop().content
-        const tweetId = data.tweetId ?? ""
+        const msg = data.messages.pop()
+        const userMessage = msg.content
+        const tweetId = msg.data?.tweet?.tweetId
 
         const response = await fetch(url, {
           method: "POST",
@@ -51,16 +67,33 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         })
         return response
       }
-    })
+    }) as CustomUseChat
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
-      (chatMessage) => ({
-        id: chatMessage.chatAt,
-        content: chatMessage.message,
-        createdAt: new Date(chatMessage.chatAt),
-        role: chatMessage.isBot ? "assistant" : "user"
-      })
+      (chatMessage) => {
+        let data = undefined
+        if (chatMessage.tweet) {
+          data = {
+            tweet: {
+              tweetId: chatMessage.tweet.tweetId,
+              avatarUrl: "",
+              displayName: "",
+              userName: "",
+              tweetText: chatMessage.tweet.content,
+              timestamp: chatMessage.tweet.timestamp
+            }
+          }
+        }
+
+        return {
+          id: `${chatMessage.chatAt}`,
+          content: chatMessage.message,
+          createdAt: new Date(chatMessage.chatAt),
+          role: chatMessage.isBot ? "assistant" : "user",
+          data
+        } as CustomMessage
+      }
     )
     return [...historyMessages, ...messages]
   }, [messages, history])
@@ -98,23 +131,22 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     await fetchNextPage()
   }
 
-  const handleFormSubmit = (event: FormEvent) => {
-    if (isDisable) {
-      return
-    }
+  const handleFormSubmit = async (event: FormEvent) => {
+    event.preventDefault()
 
-    const currentTweetId = quoteTweet?.tweetId
-    removeQuoteTweet() // in case repeatedly sent and make sure user can retry
-    const moreBody = currentTweetId
-      ? {
-          body: {
-            tweetId: currentTweetId
-          }
-        }
-      : {}
-    handleSubmit(event, {
-      allowEmptySubmit: false,
-      ...moreBody
+    if (isDisable) return
+
+    const inputText = input.trim()
+    if (!inputText) return
+    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+
+    removeQuoteTweet() // in case repeatedly send and make sure user can retry
+    setInput("")
+
+    await append({
+      role: "user",
+      content: inputText,
+      data
     })
   }
 
@@ -142,17 +174,21 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         )}
 
         {allMessages.map((m, i) => (
-          <div
-            key={i}
-            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={i} className={`flex flex-col gap-2`}>
             <div
-              className={`prose prose-sm break-words wrap w-fit max-w-full px-4 py-2 rounded-lg message-item ${
-                m.role === "user"
-                  ? "bg-primary-brand text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}>
-              <Markdown>{m.content}</Markdown>
+              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                className={`prose prose-sm break-words wrap w-fit max-w-full px-4 py-2 rounded-lg message-item ${
+                  m.role === "user"
+                    ? "bg-primary-brand text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}>
+                <Markdown>{m.content}</Markdown>
+              </div>
             </div>
+            {m.data?.tweet && (
+              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
+            )}
           </div>
         ))}
 
@@ -172,25 +208,11 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       <div className="bg-white py-2 flex flex-col gap-1">
         {/* quote post info */}
         {quoteTweet && (
-          <div className="bg-slate-100 p-2 rounded-md relative">
-            <div className="flex flex-row gap-1 overflow-hidden whitespace-nowrap text-ellipsis">
-              <div className="font-semibold  truncate">
-                {quoteTweet.displayName}
-              </div>
-              <div className="text-slate-400 truncate">
-                @{quoteTweet.username}
-              </div>
-              <div className="text-slate-400">
-                · {formatRelativeTime(quoteTweet.timestamp)}
-              </div>
-            </div>
-            <div className="mt-1 line-clamp-3">{quoteTweet.tweetText}</div>
-            <div
-              onClick={handleCancelQuoteTweet}
-              className="absolute right-0 -top-2 w-4 h-4 bg-white hover:bg-red-50 rounded-full flex items-center justify-center cursor-pointer">
-              <XIcon className="w-4 h-4 text-red-800" />
-            </div>
-          </div>
+          <ChatTweetSection
+            tweet={quoteTweet}
+            showClearButton={true}
+            handleClear={handleCancelQuoteTweet}
+          />
         )}
         <form
           className="flex rounded-md overflow-hidden border border-primary-brand]"
@@ -213,6 +235,42 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           </button>
         </form>
       </div>
+    </div>
+  )
+}
+
+const ChatTweetSection: FC<{
+  tweet: TweetData
+  showClearButton: boolean
+  handleClear?: () => void
+}> = ({ tweet, showClearButton, handleClear }) => {
+  const handleCancelQuoteTweet = () => {
+    handleClear?.()
+  }
+  return (
+    <div className="bg-slate-100 p-2 rounded-md relative">
+      <div className="items-center flex flex-row gap-1 overflow-hidden whitespace-nowrap text-ellipsis">
+        <div className="w-5 h-5 rounded-full overflow-hidden bg-primary-brand">
+          {tweet.avatarUrl && (
+            <img src={tweet.avatarUrl} className="object-contain" />
+          )}
+        </div>
+        <div className="font-semibold  truncate">{tweet.displayName}</div>
+        <div className="text-slate-400 truncate">
+          @{tweet.username ? tweet.username : "user"}
+        </div>
+        <div className="text-slate-400">
+          · {formatRelativeTime(tweet.timestamp)}
+        </div>
+      </div>
+      <div className="mt-1 line-clamp-3">{tweet.tweetText}</div>
+      {showClearButton && (
+        <div
+          onClick={handleCancelQuoteTweet}
+          className="absolute right-0 -top-2 w-4 h-4 bg-white hover:bg-red-50 rounded-full flex items-center justify-center cursor-pointer">
+          <XIcon className="w-4 h-4 text-red-800" />
+        </div>
+      )}
     </div>
   )
 }
