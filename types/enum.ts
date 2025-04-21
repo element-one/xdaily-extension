@@ -6,7 +6,8 @@ export enum NavbarItemKey {
   SUGGESTION = "ai suggestions",
   COLLECTION = "collection",
   SETTING = "setting",
-  CHAT = "chat"
+  CHAT = "chat",
+  MEMO = "memo"
 }
 
 export enum UserPanelItemKey {
