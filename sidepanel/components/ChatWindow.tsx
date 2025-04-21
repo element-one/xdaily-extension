@@ -3,8 +3,16 @@ import {
   type UseChatHelpers,
   type Message as VercelMessage
 } from "@ai-sdk/react"
+import * as Tooltip from "@radix-ui/react-tooltip"
 import clsx from "clsx"
-import { XIcon } from "lucide-react"
+import {
+  BookmarkIcon,
+  BookOpenIcon,
+  Paperclip,
+  PaperclipIcon,
+  ScissorsIcon,
+  XIcon
+} from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
@@ -154,6 +162,34 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     removeQuoteTweet()
   }
 
+  const QuoteTweetTools = [
+    {
+      icon: <BookmarkIcon className="w-4 h-4" />,
+      tooltip: "Save as Memo",
+      magicWord: "Save as Memo"
+    },
+    {
+      icon: <ScissorsIcon className="w-4 h-4" />,
+      tooltip: "Cut to clipboard",
+      magicWord: "Cut to clipboard"
+    }
+  ]
+
+  const handleClickToolButton = async (magicWord: string) => {
+    if (isDisable) return
+
+    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+
+    removeQuoteTweet() // in case repeatedly send and make sure user can retry
+    setInput("")
+
+    await append({
+      role: "user",
+      content: magicWord,
+      data
+    })
+  }
+
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
       <div className="bg-white py-2 text-base font-semibold">
@@ -208,11 +244,33 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       <div className="bg-white py-2 flex flex-col gap-1">
         {/* quote post info */}
         {quoteTweet && (
-          <ChatTweetSection
-            tweet={quoteTweet}
-            showClearButton={true}
-            handleClear={handleCancelQuoteTweet}
-          />
+          <>
+            <ChatTweetSection
+              tweet={quoteTweet}
+              showClearButton={true}
+              handleClear={handleCancelQuoteTweet}
+            />
+            <div className="flex gap-1 items-center">
+              {QuoteTweetTools.map((tool) => (
+                <Tooltip.Provider key={tool.magicWord}>
+                  <Tooltip.Root delayDuration={200}>
+                    <Tooltip.Trigger
+                      className="cursor-pointer p-2 bg-white hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                      onClick={() => handleClickToolButton(tool.magicWord)}>
+                      {tool.icon}
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        className="rounded-md border border-thinborder bg-muted px-3 py-1.5 text-sm text-foreground shadow-md"
+                        side="top">
+                        {tool.tooltip}
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              ))}
+            </div>
+          </>
         )}
         <form
           className="flex rounded-md overflow-hidden border border-primary-brand]"
