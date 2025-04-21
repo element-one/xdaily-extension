@@ -1,4 +1,5 @@
 import {
+  BookHeartIcon,
   BotMessageSquare,
   FolderOpenDot,
   Settings,
@@ -14,6 +15,7 @@ import { MessageType, type QuoteTweetPayload } from "~types/message"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
+import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { PostPanel } from "./panels/PostPanel/PostPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 import { UserPanel } from "./panels/UserPanel/UserPanel"
@@ -59,12 +61,23 @@ const NavbarItems: NavbarItem[] = [
   }
 ] as const
 
-const SettingNavbarItem: NavbarItem = {
-  key: NavbarItemKey.SETTING,
-  icon: <Settings className="w-5 h-5" />,
-  tooltip: "Setting",
-  component: <SettingPanel />
-}
+const SecondGroupNavbarItems: NavbarItem[] = [
+  {
+    key: NavbarItemKey.MEMO,
+    icon: <BookHeartIcon className="w-5 h-5" />,
+    tooltip: "Memo",
+    component: <MemoPanel />
+  }
+] as const
+
+const BottomNavbarItems: NavbarItem[] = [
+  {
+    key: NavbarItemKey.SETTING,
+    icon: <Settings className="w-5 h-5" />,
+    tooltip: "Setting",
+    component: <SettingPanel />
+  }
+] as const
 
 export const DashboardPage = () => {
   const {
@@ -77,7 +90,9 @@ export const DashboardPage = () => {
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
-      const AllNavbarItems = NavbarItems.concat(SettingNavbarItem)
+      const AllNavbarItems = NavbarItems.concat(SecondGroupNavbarItems).concat(
+        BottomNavbarItems
+      )
       return AllNavbarItems.find((item) => item.key === navbarItemKey)
     }
     return undefined
@@ -181,17 +196,32 @@ export const DashboardPage = () => {
                 />
               )
             })}
+            <div className="w-full h-0.5 bg-primary-brand/20 " />
+            {SecondGroupNavbarItems.map((item) => {
+              return (
+                <MeNavbarItem
+                  key={item.key}
+                  handleClick={() => toggleDrawer(item.key)}
+                  isTargeted={item.key === currentNavbarItem.key}
+                  content={item.icon}
+                  tooltip={item.tooltip}
+                />
+              )
+            })}
           </div>
           {/* bottom buttons */}
           <div className="flex flex-col gap-4">
-            {/* Settings */}
-            <MeNavbarItem
-              key={SettingNavbarItem.key}
-              handleClick={() => toggleDrawer(SettingNavbarItem.key)}
-              isTargeted={SettingNavbarItem.key === currentNavbarItem.key}
-              content={SettingNavbarItem.icon}
-              tooltip={SettingNavbarItem.tooltip}
-            />
+            {BottomNavbarItems.map((item) => {
+              return (
+                <MeNavbarItem
+                  key={item.key}
+                  handleClick={() => toggleDrawer(item.key)}
+                  isTargeted={item.key === currentNavbarItem.key}
+                  content={item.icon}
+                  tooltip={item.tooltip}
+                />
+              )
+            })}
             <UserAvatar />
           </div>
         </aside>
