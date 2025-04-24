@@ -1,4 +1,4 @@
-import { NotebookTextIcon } from "lucide-react"
+import { ChevronLeftIcon, NotebookTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useMemoList } from "~services/memo"
@@ -49,7 +49,15 @@ export const MemoPanel = () => {
   return (
     <div className="mt-0 pt-0 pb-3 flex flex-col justify-between bg-white rounded-md h-full">
       <header className="flex-none">
-        <h1 className="text-base font-semibold flex gap-2 w-fit ">Memo</h1>
+        <h1 className="text-base font-semibold flex gap-1 w-fit items-center">
+          {selectedMemo && (
+            <ChevronLeftIcon
+              className="w-5 h-5 cursor-pointer"
+              onClick={handleCloseMemo}
+            />
+          )}
+          Memo
+        </h1>
         <div className="pt-2 pb-1 border-b-[1.4px]" />
       </header>
       {selectedMemo ? (

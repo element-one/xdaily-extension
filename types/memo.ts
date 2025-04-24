@@ -3,7 +3,7 @@ export interface GetMemoParams {
   take: number
 }
 export interface MemoItem {
-  content: { item: string } // string or JSON string
+  content: { document?: any[] } // string or JSON string
   id: string
   postedAt: Date
   title: string
