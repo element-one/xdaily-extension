@@ -1,13 +1,121 @@
+import { ChevronLeftIcon, NotebookTextIcon } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+
+import { useCreateMemo, useMemoList } from "~services/memo"
+import type { MemoItem } from "~types/memo"
+
+import { MemoEditor } from "./MemoEditor"
+
 export const MemoPanel = () => {
+  const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    updateMemoList,
+    refetch
+  } = useMemoList(15)
+  const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
+
+  useEffect(() => {
+    if (!hasNextPage) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    if (bottomObserver.current) observer.observe(bottomObserver.current)
+
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  const memos = useMemo(() => {
+    return data?.pages ? data.pages : []
+  }, [data])
+
+  const handleCreateMemo = async () => {
+    if (isCreatingMemo) return
+    await createMemo({
+      title: "untitled",
+      content: {
+        document: []
+      }
+    })
+    refetch()
+  }
+
+  const handleSelectMemo = (memo: MemoItem) => {
+    setSelectedMemo(memo)
+  }
+  const handleCloseMemo = () => {
+    setSelectedMemo(null)
+  }
+
+  const handleMemoUpdate = (newMemo: MemoItem) => {
+    setSelectedMemo(newMemo)
+
+    if (!data) return
+    updateMemoList(newMemo)
+  }
+
   return (
     <div className="mt-0 pt-0 pb-3 flex flex-col justify-between bg-white rounded-md h-full">
       <header className="flex-none">
-        <h1 className="text-base font-semibold flex gap-2 w-fit ">Memo</h1>
+        <h1 className="text-base font-semibold flex gap-1 w-fit items-center">
+          {selectedMemo && (
+            <ChevronLeftIcon
+              className="w-5 h-5 cursor-pointer"
+              onClick={handleCloseMemo}
+            />
+          )}
+          Memo
+        </h1>
         <div className="pt-2 pb-1 border-b-[1.4px]" />
       </header>
-      <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-3 hide-scrollbar pt-4">
-        <div>Will be list of memo</div>
-      </main>
+      {selectedMemo ? (
+        <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />
+      ) : (
+        <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-3 hide-scrollbar pt-4">
+          {memos?.length > 0 ? (
+            <section className="flex flex-col gap-2 py-2 flex-1 overflow-y-scroll stylized-scroll">
+              {memos.map((memo) => (
+                <div
+                  onClick={() => handleSelectMemo(memo)}
+                  key={memo.id}
+                  className="flex items-center gap-2 cursor-pointer border border-slate-200 p-2 transition-all hover:border-primary-brand rounded-md">
+                  <NotebookTextIcon className="w-6 h-6 text-primary-brand" />
+                  <span>{memo.title}</span>
+                </div>
+              ))}
+            </section>
+          ) : (
+            <div className="flex flex-col w-full h-full items-center justify-center gap-2">
+              <div>Empty Memo</div>
+              <button
+                onClick={handleCreateMemo}
+                className="items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-white px-3 py-1 w-fit">
+                {isCreatingMemo ? "Creating..." : "Create New Memo"}
+              </button>
+            </div>
+          )}
+          {/* load more */}
+          <div ref={bottomObserver} className="h-4 w-full" />
+          {isFetchingNextPage && <p className="text-center">loading...</p>}
+          <button
+            onClick={handleCreateMemo}
+            className="w-full items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-white px-3 py-1">
+            {isCreatingMemo ? "Creating..." : "Create New Memo"}
+          </button>
+        </main>
+      )}
     </div>
   )
 }
