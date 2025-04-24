@@ -3,16 +3,8 @@ import {
   type UseChatHelpers,
   type Message as VercelMessage
 } from "@ai-sdk/react"
-import * as Tooltip from "@radix-ui/react-tooltip"
 import clsx from "clsx"
-import {
-  BookmarkIcon,
-  BookOpenIcon,
-  Paperclip,
-  PaperclipIcon,
-  ScissorsIcon,
-  XIcon
-} from "lucide-react"
+import { XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
@@ -162,33 +154,33 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     removeQuoteTweet()
   }
 
-  const QuoteTweetTools = [
-    {
-      icon: <BookmarkIcon className="w-4 h-4" />,
-      tooltip: "Save as Memo",
-      magicWord: "Save as Memo"
-    },
-    {
-      icon: <ScissorsIcon className="w-4 h-4" />,
-      tooltip: "Cut to clipboard",
-      magicWord: "Cut to clipboard"
-    }
-  ]
+  // const QuoteTweetTools = [
+  //   {
+  //     icon: <BookmarkIcon className="w-4 h-4" />,
+  //     tooltip: "Save as Memo",
+  //     magicWord: "Save as Memo"
+  //   },
+  //   {
+  //     icon: <ScissorsIcon className="w-4 h-4" />,
+  //     tooltip: "Cut to clipboard",
+  //     magicWord: "Cut to clipboard"
+  //   }
+  // ]
 
-  const handleClickToolButton = async (magicWord: string) => {
-    if (isDisable) return
+  // const handleClickToolButton = async (magicWord: string) => {
+  //   if (isDisable) return
 
-    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+  //   const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
 
-    removeQuoteTweet() // in case repeatedly send and make sure user can retry
-    setInput("")
+  //   removeQuoteTweet() // in case repeatedly send and make sure user can retry
+  //   setInput("")
 
-    await append({
-      role: "user",
-      content: magicWord,
-      data
-    })
-  }
+  //   await append({
+  //     role: "user",
+  //     content: magicWord,
+  //     data
+  //   })
+  // }
 
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
@@ -250,7 +242,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
               showClearButton={true}
               handleClear={handleCancelQuoteTweet}
             />
-            <div className="flex gap-1 items-center">
+            {/* <div className="flex gap-1 items-center">
               {QuoteTweetTools.map((tool) => (
                 <Tooltip.Provider key={tool.magicWord}>
                   <Tooltip.Root delayDuration={200}>
@@ -269,7 +261,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                   </Tooltip.Root>
                 </Tooltip.Provider>
               ))}
-            </div>
+            </div> */}
           </>
         )}
         <form

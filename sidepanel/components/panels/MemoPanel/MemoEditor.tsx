@@ -22,7 +22,6 @@ export const MemoEditor: FC<MemoEditorProps> = ({ memo, onSave }) => {
   const editor = useCreateBlockNote()
 
   useEffect(() => {
-    // editor.setDocument(memo.content)
     if (!editor) return
     editor?.replaceBlocks(editor.document, memo.content?.document ?? [])
   }, [memo, editor])
@@ -60,7 +59,7 @@ export const MemoEditor: FC<MemoEditorProps> = ({ memo, onSave }) => {
       )}
       <BlockNoteView
         editor={editor}
-        className="flex-1 min-h-0 m-4"
+        className="flex-1 min-h-0 my-4"
         theme="light"
         onChange={debouncedHandleUpdateMemo}
       />
