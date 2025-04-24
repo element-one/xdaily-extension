@@ -8,8 +8,13 @@ import { MemoEditor } from "./MemoEditor"
 
 export const MemoPanel = () => {
   const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMemoList(15)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    updateMemoList
+  } = useMemoList(15)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -46,6 +51,13 @@ export const MemoPanel = () => {
     setSelectedMemo(null)
   }
 
+  const handleMemoUpdate = (newMemo: MemoItem) => {
+    setSelectedMemo(newMemo)
+
+    if (!data) return
+    updateMemoList(newMemo)
+  }
+
   return (
     <div className="mt-0 pt-0 pb-3 flex flex-col justify-between bg-white rounded-md h-full">
       <header className="flex-none">
@@ -61,7 +73,7 @@ export const MemoPanel = () => {
         <div className="pt-2 pb-1 border-b-[1.4px]" />
       </header>
       {selectedMemo ? (
-        <MemoEditor memo={selectedMemo} />
+        <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />
       ) : (
         <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-3 hide-scrollbar pt-4">
           {memos?.length > 0 ? (

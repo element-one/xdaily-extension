@@ -19,3 +19,13 @@ export interface GetMemoListResp {
     hasNextPage: number
   }
 }
+
+export interface UpdateMemoParams {
+  data: {
+    title: string
+    content: {
+      document: any[]
+    }
+  }
+  id: string
+}
