@@ -20,6 +20,13 @@ export interface GetMemoListResp {
   }
 }
 
+export interface PostMemoParams {
+  title: string
+  content: {
+    document: any[]
+  }
+}
+
 export interface UpdateMemoParams {
   data: {
     title: string

@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, NotebookTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
-import { useMemoList } from "~services/memo"
+import { useCreateMemo, useMemoList } from "~services/memo"
 import type { MemoItem } from "~types/memo"
 
 import { MemoEditor } from "./MemoEditor"
@@ -13,9 +13,12 @@ export const MemoPanel = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    updateMemoList
+    updateMemoList,
+    refetch
   } = useMemoList(15)
   const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -38,10 +41,15 @@ export const MemoPanel = () => {
     return data?.pages ? data.pages : []
   }, [data])
 
-  const handleCreateMemo = () => {
-    chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/memo`
+  const handleCreateMemo = async () => {
+    if (isCreatingMemo) return
+    await createMemo({
+      title: "untitled",
+      content: {
+        document: []
+      }
     })
+    refetch()
   }
 
   const handleSelectMemo = (memo: MemoItem) => {
@@ -94,13 +102,18 @@ export const MemoPanel = () => {
               <button
                 onClick={handleCreateMemo}
                 className="items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-white px-3 py-1 w-fit">
-                Create
+                {isCreatingMemo ? "Creating..." : "Create New Memo"}
               </button>
             </div>
           )}
           {/* load more */}
           <div ref={bottomObserver} className="h-4 w-full" />
           {isFetchingNextPage && <p className="text-center">loading...</p>}
+          <button
+            onClick={handleCreateMemo}
+            className="w-full items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-white px-3 py-1">
+            {isCreatingMemo ? "Creating..." : "Create New Memo"}
+          </button>
         </main>
       )}
     </div>

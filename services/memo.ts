@@ -11,6 +11,7 @@ import type {
   GetMemoListResp,
   GetMemoParams,
   MemoItem,
+  PostMemoParams,
   UpdateMemoParams
 } from "~types/memo"
 
@@ -80,5 +81,20 @@ export const useUpdateMemo = (
     ...options,
     mutationKey: ["update-memo"],
     mutationFn: updateMemo
+  })
+}
+
+export const postMemoData = async (data: PostMemoParams): Promise<MemoItem> => {
+  const response = await client.post("/users/memos", data)
+  return response.data
+}
+
+export const useCreateMemo = (
+  options?: Partial<UseMutationOptions<MemoItem, Error, PostMemoParams>>
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["post-memo"],
+    mutationFn: postMemoData
   })
 }
