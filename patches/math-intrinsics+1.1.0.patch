@@ -1,0 +1,19 @@
+diff --git a/node_modules/math-intrinsics/sign.js b/node_modules/math-intrinsics/sign.js
+index 9e5173c..3be17a4 100644
+--- a/node_modules/math-intrinsics/sign.js
++++ b/node_modules/math-intrinsics/sign.js
+@@ -1,10 +1,12 @@
+ 'use strict';
+ 
+-var $isNaN = require('./isNaN');
++const isNaN = Number.isNaN || function (a) {
++	return a !== a
++}
+ 
+ /** @type {import('./sign')} */
+ module.exports = function sign(number) {
+-	if ($isNaN(number) || number === 0) {
++	if (isNaN(number) || number === 0) {
+ 		return number;
+ 	}
+ 	return number < 0 ? -1 : +1;
