@@ -23,7 +23,8 @@ module.exports = {
         fill: {
           bg: {
             light: "#151717",
-            input: "#FFFFFF1A"
+            input: "#FFFFFF1A",
+            deep: "#0D0D0D"
           }
         },
         text: {
