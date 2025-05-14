@@ -117,7 +117,7 @@ export const AiSuggestionPanel = () => {
             <p
               className="mt-2 text-sm font-semibold"
               title={tweetDetail?.username ?? "This is the user of the tweet"}>
-              @{tweetDetail?.username ?? "mecoin"}
+              @{tweetDetail?.username ?? "xdaily"}
             </p>
             <p
               className="mt-1 w-[80%] line-clamp-3 text-gray-600"

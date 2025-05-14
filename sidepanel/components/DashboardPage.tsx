@@ -19,6 +19,7 @@ import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { PostPanel } from "./panels/PostPanel/PostPanel"
 import { SettingPanel } from "./panels/SettingPanel"
 import { UserPanel } from "./panels/UserPanel/UserPanel"
+import { Button } from "./ui/button"
 import { UserAvatar } from "./UserAvatar"
 
 type NavbarItem = {
@@ -171,6 +172,7 @@ export const DashboardPage = () => {
     // TODO fonts
     <div className="flex flex-row w-full h-screen overflow-hidden bg-muted">
       {/* main */}
+      <Button>test</Button>
       <div className="flex flex-col relative p-1 transition-all w-[calc(100%-50px)]">
         <div className="bg-white w-full relative flex-1 overflow-hidden rounded-xl">
           <div className="p-4 h-screen">

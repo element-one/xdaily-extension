@@ -1,4 +1,4 @@
-# mecoin-extension
+# xdaily-extension
 
 This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
@@ -38,3 +38,9 @@ This should create a production bundle for your extension, ready to be zipped an
 ## Submit to the webstores
 
 The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+
+## What's more
+
+For plasmo bad support of tailwindcss4 at present, we cannot use shadui to build components.
+
+So in `components/ui`, we just custom component theme with tailwindcss3 + Radix Primitives (unstyled)

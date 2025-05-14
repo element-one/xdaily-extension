@@ -4,6 +4,9 @@ module.exports = {
   darkMode: "class",
   content: ["./**/*.tsx"],
   theme: {
+    borderRadius: {
+      "card-s": "8px"
+    },
     extend: {
       colors: {
         muted: {
@@ -13,8 +16,23 @@ module.exports = {
         },
         thinborder: "#e2e5e9",
         primary: {
-          brand: "#3b82f6",
+          brand: "#FFE600",
+          assist: "#E7D959",
           foreground: "#fafaf9"
+        },
+        fill: {
+          bg: {
+            light: "#151717",
+            input: "#FFFFFF1A"
+          }
+        },
+        text: {
+          default: {
+            primary: "#fff"
+          },
+          inverse: {
+            primary: "#000"
+          }
         }
       }
     }

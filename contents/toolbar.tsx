@@ -223,7 +223,7 @@ const Toolbar = () => {
 
   return (
     <div
-      id="mecoin-toolbar"
+      id="xdaily-toolbar"
       className={clsx(
         "fixed z-50  border border-gray-300 bg-white text-xs text-black rounded-lg shadow-md overflow-hidden transition-all duration-300 flex flex-col items-center gap-1",
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
