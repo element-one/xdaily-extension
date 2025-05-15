@@ -29,7 +29,7 @@ export function Tooltip({
             side={side}
             align={align}
             sideOffset={sideOffset}
-            className={`relative z-50 bg-fill-bg-light border-[1px] border-fill-bg-input rounded-lg px-3 py-2.5 text-text-default-regular text-base ${className}`}>
+            className={`relative z-50 bg-fill-bg-light border border-fill-bg-input rounded-lg px-3 py-2.5 text-text-default-regular text-base ${className}`}>
             {content}
             <RadixTooltip.Arrow className="fill-fill-bg-light stroke-[1px] stroke-fill-bg-input" />
           </RadixTooltip.Content>

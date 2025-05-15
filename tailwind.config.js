@@ -34,7 +34,8 @@ module.exports = {
         text: {
           default: {
             primary: "#fff",
-            regular: "#FFFFFFCC"
+            regular: "#FFFFFFCC",
+            secondary: "#FFFFFF80"
           },
           inverse: {
             primary: "#000"

@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { type FC } from "react"
+import { type FC, type ReactNode } from "react"
 
 import { Tooltip } from "./ui/Tooltip"
 
@@ -25,7 +25,7 @@ export const MeNavbarItem: FC<MeNavbarItemProps> = ({
         className={clsx(
           "flex h-9 w-9 min-w-9 items-center justify-center rounded-full transition-colors cursor-pointer",
           "text-fill-layer-layer hover:bg-fill-bg-light bg-transparent border-[#404040]/80 border-0",
-          isTargeted && "navitem-selected-shadow bg-fill-bg-input border-[1px] "
+          isTargeted && "navitem-selected-shadow bg-fill-bg-input border "
         )}>
         <Icon
           className={clsx(

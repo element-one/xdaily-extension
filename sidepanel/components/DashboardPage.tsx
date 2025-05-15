@@ -1,3 +1,4 @@
+import { AtomIcon } from "lucide-react"
 import { useEffect, useMemo, type FC, type ReactNode } from "react"
 import robotImg from "url:/assets/robot.png" // strange
 
@@ -14,6 +15,7 @@ import ReminderIcon from "./icons/ReminderIcon"
 import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
+import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
 // import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
@@ -30,6 +32,7 @@ type NavbarItem = {
   icon: FC<{
     className?: string
   }>
+
   tooltip: string
   component: ReactNode
 }
@@ -88,6 +91,15 @@ const BottomNavbarItems: NavbarItem[] = [
   }
 ] as const
 
+const ChatNavbarItems: NavbarItem[] = [
+  {
+    key: NavbarItemKey.CHAT,
+    icon: AtomIcon,
+    tooltip: "",
+    component: <ChatPanel />
+  }
+]
+
 export const DashboardPage = () => {
   const {
     navbarItemKey,
@@ -99,7 +111,8 @@ export const DashboardPage = () => {
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
-      const AllNavbarItems = NavbarItems.concat(BottomNavbarItems)
+      const AllNavbarItems =
+        NavbarItems.concat(ChatNavbarItems).concat(BottomNavbarItems)
       return AllNavbarItems.find((item) => item.key === navbarItemKey)
     }
     return undefined
@@ -156,28 +169,28 @@ export const DashboardPage = () => {
     //   checkCurrentTab()
     // }
 
-    // const messageListener = (message: QuoteTweetPayload) => {
-    //   if (message.type === MessageType.QUOTE_TWEET) {
-    //     setQuoteTweet(message.data)
-    //     toggleDrawer(NavbarItemKey.CHAT)
-    //   }
-    // }
+    const messageListener = (message: QuoteTweetPayload) => {
+      if (message.type === MessageType.QUOTE_TWEET) {
+        setQuoteTweet(message.data)
+        toggleDrawer(NavbarItemKey.CHAT)
+      }
+    }
 
-    // chrome.runtime.onMessage.addListener(messageListener)
+    chrome.runtime.onMessage.addListener(messageListener)
     // chrome.tabs.onUpdated.addListener(handleTabUpdate)
     // chrome.tabs.onActivated.addListener(handleTabActivated)
-    // return () => {
-    //   chrome.runtime.onMessage.removeListener(messageListener)
-    //   chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-    //   chrome.tabs.onActivated.removeListener(handleTabActivated)
-    // }
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener)
+      // chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+      // chrome.tabs.onActivated.removeListener(handleTabActivated)
+    }
   }, [])
 
   return (
     <div className="flex flex-row w-full h-screen overflow-hidden">
       {/* main */}
       <div className="flex flex-col relative p-1 transition-all w-[calc(100%-68px)]">
-        <div className="bg-white w-full relative flex-1 overflow-hidden rounded-xl">
+        <div className="bg-fill-bg-deep text-text-default-primary w-full relative flex-1 overflow-hidden rounded-xl">
           <div className="p-4 h-screen">
             <div className="flex flex-col h-full overflow-y-auto hide-scrollbar">
               {currentNavbarItem?.component}
@@ -191,7 +204,8 @@ export const DashboardPage = () => {
           <img
             src={robotImg}
             alt="chat robot"
-            className="w-9 h-9 object-contain"
+            className="w-9 h-9 object-contain cursor-pointer"
+            onClick={() => toggleDrawer(NavbarItemKey.CHAT)}
           />
           {NavbarItems.map((item) => {
             return (

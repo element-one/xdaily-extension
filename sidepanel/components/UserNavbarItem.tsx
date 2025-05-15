@@ -24,7 +24,7 @@ export const UserNavbarItem = () => {
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         sideOffset={0}
-        className="z-50 min-w-[268px] mr-4 overflow-hidden rounded-md border-[1px] border-fill-bg-input bg-fill-bg-light text-text-default-primary shadow-md">
+        className="z-50 min-w-[268px] mr-4 overflow-hidden rounded-md border border-fill-bg-input bg-fill-bg-light text-text-default-primary shadow-md">
         <DropdownMenu.Item
           className="focus:bg-transparent outline-none select-none p-3 flex flex-row items-center justify-start gap-2"
           onSelect={jumpToProfilePage}>

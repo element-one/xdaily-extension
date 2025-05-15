@@ -7,7 +7,7 @@ interface AvatarProps {
   className?: string
 }
 const wrapperClassName =
-  "w-6 h-6 rounded-full border-[1px] border-border-regular bg-border-regular flex items-center justify-center overflow-hidden"
+  "w-6 h-6 rounded-full border border-border-regular bg-border-regular flex items-center justify-center overflow-hidden flex-shrink-0"
 export const Avatar: FC<AvatarProps> = ({ url, alt, className }) => {
   if (!url) {
     return <div className={clsx(wrapperClassName, className)} />
