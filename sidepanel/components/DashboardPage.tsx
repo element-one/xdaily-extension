@@ -1,82 +1,90 @@
-import {
-  BookHeartIcon,
-  BotMessageSquare,
-  FolderOpenDot,
-  Settings,
-  TwitterIcon,
-  UserIcon
-} from "lucide-react"
-import { useEffect, useMemo, type ReactNode } from "react"
+import { useEffect, useMemo, type FC, type ReactNode } from "react"
+import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
 import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
+import AddIcon from "./icons/AddIcon"
+import ExploreIcon from "./icons/ExploreIcon"
+import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
+import MemoIcon from "./icons/MemoIcon"
+import MessageIcon from "./icons/MessageIcon"
+import ReminderIcon from "./icons/ReminderIcon"
+import SettingIcon from "./icons/SettingIcon"
+import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
-import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
-import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
-import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
-import { PostPanel } from "./panels/PostPanel/PostPanel"
-import { SettingPanel } from "./panels/SettingPanel"
-import { UserPanel } from "./panels/UserPanel/UserPanel"
-import { Button } from "./ui/button"
-import { UserAvatar } from "./UserAvatar"
+import { UserNavbarItem } from "./UserNavbarItem"
+
+// import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
+// import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
+// import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
+// import { PostPanel } from "./panels/PostPanel/PostPanel"
+// import { SettingPanel } from "./panels/SettingPanel"
+// import { UserPanel } from "./panels/UserPanel/UserPanel"
+// import { Button } from "./ui/button"
+// import { UserAvatar } from "./UserAvatar"
 
 type NavbarItem = {
   key: NavbarItemKey
-  icon: ReactNode
+  icon: FC<{
+    className?: string
+  }>
   tooltip: string
   component: ReactNode
 }
 
 const NavbarItems: NavbarItem[] = [
   {
-    key: NavbarItemKey.POST,
-    icon: <TwitterIcon className="w-5 h-5" />,
-    tooltip: "Posts",
-    component: <PostPanel />
+    key: NavbarItemKey.EXPLORE,
+    icon: ExploreIcon,
+    tooltip: "Explore",
+    component: <div>explore</div>
   },
   {
-    key: NavbarItemKey.USER,
-    icon: <UserIcon className="w-5 h-5" />,
-    tooltip: "Users",
-    component: <UserPanel />
-  },
-  // {
-  //   key: NavbarItemKey.SUGGESTION,
-  //   icon: <Lightbulb className="w-5 h-5" />,
-  //   tooltip: "AI Suggestions",
-  //   component: <AiSuggestionPanel />
-  // },
-  {
-    key: NavbarItemKey.CHAT,
-    icon: <BotMessageSquare className="w-5 h-5" />,
-    tooltip: "Chat",
-    component: <ChatPanel />
+    key: NavbarItemKey.SETTING,
+    icon: SettingIcon,
+    tooltip: "Setting",
+    component: <div>setting</div>
   },
   {
-    key: NavbarItemKey.COLLECTION,
-    icon: <FolderOpenDot className="w-5 h-5" />,
-    tooltip: "Collections",
-    component: <BoardPanel />
-  }
-] as const
-
-const SecondGroupNavbarItems: NavbarItem[] = [
+    key: NavbarItemKey.KNOWLEDGE,
+    icon: KnowledgeBaseIcon,
+    tooltip: "Knowledge Base",
+    component: <div>knowledge base</div>
+  },
   {
     key: NavbarItemKey.MEMO,
-    icon: <BookHeartIcon className="w-5 h-5" />,
+    icon: MemoIcon,
     tooltip: "Memo",
-    component: <MemoPanel />
+    component: <div>memo</div>
+  },
+  {
+    key: NavbarItemKey.SHEET,
+    icon: SheetIcon,
+    tooltip: "Sheet",
+    component: <div>sheet</div>
+  },
+  {
+    key: NavbarItemKey.REMINDER,
+    icon: ReminderIcon,
+    tooltip: "Reminder",
+    component: <div>reminder</div>
+  },
+  {
+    key: NavbarItemKey.ADD,
+    icon: AddIcon,
+    tooltip: "Add",
+    component: <div>add</div>
   }
 ] as const
 
 const BottomNavbarItems: NavbarItem[] = [
   {
-    key: NavbarItemKey.SETTING,
-    icon: <Settings className="w-5 h-5" />,
-    tooltip: "Setting",
-    component: <SettingPanel />
+    key: NavbarItemKey.MESSAGE,
+    icon: MessageIcon,
+    tooltip: "Messages",
+    component: <div>messages</div>
   }
 ] as const
 
@@ -91,9 +99,7 @@ export const DashboardPage = () => {
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
-      const AllNavbarItems = NavbarItems.concat(SecondGroupNavbarItems).concat(
-        BottomNavbarItems
-      )
+      const AllNavbarItems = NavbarItems.concat(BottomNavbarItems)
       return AllNavbarItems.find((item) => item.key === navbarItemKey)
     }
     return undefined
@@ -105,74 +111,72 @@ export const DashboardPage = () => {
     }
   }
 
-  const checkTweetPage = (urlString: string) => {
-    const url = new URL(urlString)
-    const pathSegments = url.pathname.split("/").filter(Boolean)
+  // const checkTweetPage = (urlString: string) => {
+  //   const url = new URL(urlString)
+  //   const pathSegments = url.pathname.split("/").filter(Boolean)
 
-    // const isTweetDetail =
-    //   pathSegments.length >= 3 &&
-    //   pathSegments[1] === "status" &&
-    //   /^\d+$/.test(pathSegments[2])
+  //   // const isTweetDetail =
+  //   //   pathSegments.length >= 3 &&
+  //   //   pathSegments[1] === "status" &&
+  //   //   /^\d+$/.test(pathSegments[2])
 
-    const RESERVED_PATHS = ["search", "settings", "notifications"]
-    const isUserProfile =
-      pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
+  //   const RESERVED_PATHS = ["search", "settings", "notifications"]
+  //   const isUserProfile =
+  //     pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
 
-    if (isUserProfile) {
-      // go to chat panel if is tweet profile page
-      toggleDrawer(NavbarItemKey.USER)
-      setTimeout(() => {
-        setUserPanelItemKey(UserPanelItemKey.CHAT)
-      }, 50)
-    }
-    // else if (isTweetDetail) {
-    //   // go to suggestion panel if is tweet detail page
-    //   toggleDrawer(NavbarItemKey.SUGGESTION)
-    // }
-  }
+  //   if (isUserProfile) {
+  //     // go to chat panel if is tweet profile page
+  //     toggleDrawer(NavbarItemKey.USER)
+  //     setTimeout(() => {
+  //       setUserPanelItemKey(UserPanelItemKey.CHAT)
+  //     }, 50)
+  //   }
+  //   // else if (isTweetDetail) {
+  //   //   // go to suggestion panel if is tweet detail page
+  //   //   toggleDrawer(NavbarItemKey.SUGGESTION)
+  //   // }
+  // }
 
   useEffect(() => {
     clearNavbar()
 
-    const checkCurrentTab = () => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.url) checkTweetPage(tabs[0].url)
-      })
-    }
-    checkCurrentTab()
+    // const checkCurrentTab = () => {
+    //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    //     if (tabs[0]?.url) checkTweetPage(tabs[0].url)
+    //   })
+    // }
+    // checkCurrentTab()
 
-    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
-      if (changeInfo.status === "complete" && tab.url) {
-        checkTweetPage(tab.url)
-      }
-    }
-    const handleTabActivated = () => {
-      checkCurrentTab()
-    }
+    // const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
+    //   if (changeInfo.status === "complete" && tab.url) {
+    //     checkTweetPage(tab.url)
+    //   }
+    // }
+    // const handleTabActivated = () => {
+    //   checkCurrentTab()
+    // }
 
-    const messageListener = (message: QuoteTweetPayload) => {
-      console.log("testing", message)
-      if (message.type === MessageType.QUOTE_TWEET) {
-        setQuoteTweet(message.data)
-        toggleDrawer(NavbarItemKey.CHAT)
-      }
-    }
+    // const messageListener = (message: QuoteTweetPayload) => {
+    //   if (message.type === MessageType.QUOTE_TWEET) {
+    //     setQuoteTweet(message.data)
+    //     toggleDrawer(NavbarItemKey.CHAT)
+    //   }
+    // }
 
-    chrome.runtime.onMessage.addListener(messageListener)
-    chrome.tabs.onUpdated.addListener(handleTabUpdate)
-    chrome.tabs.onActivated.addListener(handleTabActivated)
-    return () => {
-      chrome.runtime.onMessage.removeListener(messageListener)
-      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-      chrome.tabs.onActivated.removeListener(handleTabActivated)
-    }
+    // chrome.runtime.onMessage.addListener(messageListener)
+    // chrome.tabs.onUpdated.addListener(handleTabUpdate)
+    // chrome.tabs.onActivated.addListener(handleTabActivated)
+    // return () => {
+    //   chrome.runtime.onMessage.removeListener(messageListener)
+    //   chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+    //   chrome.tabs.onActivated.removeListener(handleTabActivated)
+    // }
   }, [])
 
   return (
-    // TODO fonts
-    <div className="flex flex-row w-full h-screen overflow-hidden bg-muted">
+    <div className="flex flex-row w-full h-screen overflow-hidden">
       {/* main */}
-      <div className="flex flex-col relative p-1 transition-all w-[calc(100%-50px)]">
+      <div className="flex flex-col relative p-1 transition-all w-[calc(100%-68px)]">
         <div className="bg-white w-full relative flex-1 overflow-hidden rounded-xl">
           <div className="p-4 h-screen">
             <div className="flex flex-col h-full overflow-y-auto hide-scrollbar">
@@ -181,52 +185,42 @@ export const DashboardPage = () => {
           </div>
         </div>
       </div>
-      {/* aside */}
-      <div className="max-w-[50px] py-2 flex flex-col items-center gap-4 h-full w-[50px]">
-        <aside className="flex h-full flex-col">
-          {/* top tabs */}
-          <div className="flex-grow flex items-center overflow-y-auto gap-4 flex-col">
-            {NavbarItems.map((item) => {
-              return (
-                <MeNavbarItem
-                  key={item.key}
-                  handleClick={() => toggleDrawer(item.key)}
-                  isTargeted={item.key === currentNavbarItem.key}
-                  content={item.icon}
-                  tooltip={item.tooltip}
-                />
-              )
-            })}
-            <div className="w-full h-0.5 bg-primary-brand/20 " />
-            {SecondGroupNavbarItems.map((item) => {
-              return (
-                <MeNavbarItem
-                  key={item.key}
-                  handleClick={() => toggleDrawer(item.key)}
-                  isTargeted={item.key === currentNavbarItem.key}
-                  content={item.icon}
-                  tooltip={item.tooltip}
-                />
-              )
-            })}
-          </div>
-          {/* bottom buttons */}
-          <div className="flex flex-col gap-4">
-            {BottomNavbarItems.map((item) => {
-              return (
-                <MeNavbarItem
-                  key={item.key}
-                  handleClick={() => toggleDrawer(item.key)}
-                  isTargeted={item.key === currentNavbarItem.key}
-                  content={item.icon}
-                  tooltip={item.tooltip}
-                />
-              )
-            })}
-            <UserAvatar />
-          </div>
-        </aside>
-      </div>
+      <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px]">
+        {/* top tabs */}
+        <div className="flex-grow flex items-center overflow-y-auto gap-4 flex-col">
+          <img
+            src={robotImg}
+            alt="chat robot"
+            className="w-9 h-9 object-contain"
+          />
+          {NavbarItems.map((item) => {
+            return (
+              <MeNavbarItem
+                key={item.key}
+                handleClick={() => toggleDrawer(item.key)}
+                isTargeted={item.key === currentNavbarItem.key}
+                icon={item.icon}
+                tooltip={item.tooltip}
+              />
+            )
+          })}
+        </div>
+        {/* bottom buttons */}
+        <div className="flex flex-col gap-4">
+          {BottomNavbarItems.map((item) => {
+            return (
+              <MeNavbarItem
+                key={item.key}
+                handleClick={() => toggleDrawer(item.key)}
+                isTargeted={item.key === currentNavbarItem.key}
+                icon={item.icon}
+                tooltip={item.tooltip}
+              />
+            )
+          })}
+          <UserNavbarItem />
+        </div>
+      </aside>
     </div>
   )
 }

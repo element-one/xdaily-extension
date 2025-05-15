@@ -1,41 +1,39 @@
-import * as Tooltip from "@radix-ui/react-tooltip"
 import clsx from "clsx"
-import { type FC, type ReactNode } from "react"
+import { type FC } from "react"
+
+import { Tooltip } from "./ui/Tooltip"
 
 interface MeNavbarItemProps {
   handleClick?: () => void
   isTargeted: boolean
-  content: ReactNode
   tooltip: string
+  icon: React.ComponentType<{ className?: string }>
 }
 export const MeNavbarItem: FC<MeNavbarItemProps> = ({
   handleClick,
   isTargeted,
-  content,
+  icon: Icon,
   tooltip
 }) => {
   const handleItemClick = () => {
     handleClick?.()
   }
   return (
-    <Tooltip.Provider>
-      <Tooltip.Root delayDuration={200}>
-        <Tooltip.Trigger
-          onClick={handleItemClick}
+    <Tooltip content={tooltip} side="left">
+      <div
+        onClick={handleItemClick}
+        className={clsx(
+          "flex h-9 w-9 min-w-9 items-center justify-center rounded-full transition-colors cursor-pointer",
+          "text-fill-layer-layer hover:bg-fill-bg-light bg-transparent border-[#404040]/80 border-0",
+          isTargeted && "navitem-selected-shadow bg-fill-bg-input border-[1px] "
+        )}>
+        <Icon
           className={clsx(
-            "cursor-pointer p-2 bg-white hover:bg-blue-100 rounded-lg transition-colors duration-200",
-            isTargeted ? "text-primary-brand" : "text-gray-500"
-          )}>
-          {content}
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
-            className="rounded-md border border-thinborder bg-muted px-3 py-1.5 text-sm text-foreground shadow-md"
-            side="top">
-            {tooltip}
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
+            "h-6 w-6 text-2xl transition-transform group-hover:scale-110",
+            isTargeted ? "text-primary-brand" : "text-fill-layer-layer"
+          )}
+        />
+      </div>
+    </Tooltip>
   )
 }

@@ -4,11 +4,12 @@ module.exports = {
   darkMode: "class",
   content: ["./**/*.tsx"],
   theme: {
-    borderRadius: {
-      "card-s": "8px"
-    },
+    // borderRadius: {
+    //   "card-s": "8px"
+    // },
     extend: {
       colors: {
+        orange: "#FF9500",
         muted: {
           DEFAULT: "#f5f5f4",
           foreground: "#78716c",
@@ -25,15 +26,22 @@ module.exports = {
             light: "#151717",
             input: "#FFFFFF1A",
             deep: "#0D0D0D"
+          },
+          layer: {
+            layer: "#4F5254"
           }
         },
         text: {
           default: {
-            primary: "#fff"
+            primary: "#fff",
+            regular: "#FFFFFFCC"
           },
           inverse: {
             primary: "#000"
           }
+        },
+        border: {
+          regular: "#FFFFFF33"
         }
       }
     }
