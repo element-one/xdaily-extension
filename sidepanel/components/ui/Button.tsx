@@ -3,7 +3,7 @@ import React from "react"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "tertiary"
+  variant?: "primary" | "secondary" | "tertiary" | "ghost"
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -11,7 +11,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={clsx(
-          "focus:outline-none focus:ring-2 focus:ring-ring",
+          "focus:outline-none focus:ring-0 focus:ring-ring",
           "inline-flex items-center justify-center rounded-lg font-light transition-colors hover:opacity-70 disabled:opacity-50 disabled:pointer-events-none",
           "h-9 px-2 flex-shrink-0 text-sm",
           {
@@ -19,7 +19,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             "bg-transparent text-primary-brand border border-primary-brand":
               variant === "secondary",
             "bg-fill-bg-light text-text-default-primary border border-fill-bg-input":
-              variant === "tertiary"
+              variant === "tertiary",
+            "bg-transparent border-none": variant === "ghost"
           },
           className
         )}

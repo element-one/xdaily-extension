@@ -4,7 +4,12 @@ import type { MemoItem } from "~types/memo"
 
 import "@blocknote/core/fonts/inter.css"
 
-import { BlockNoteView } from "@blocknote/mantine"
+import {
+  BlockNoteView,
+  darkDefaultTheme,
+  lightDefaultTheme,
+  type Theme
+} from "@blocknote/mantine"
 
 import "@blocknote/mantine/style.css"
 
@@ -17,6 +22,34 @@ interface MemoEditorProps {
   memo: MemoItem
   onSave?: (updatedMemo: MemoItem) => void
 }
+
+const lightCustomTheme = {
+  colors: {
+    editor: {
+      text: "white",
+      background: "transparent"
+    },
+    highlights: lightDefaultTheme.colors!.highlights
+  },
+  borderRadius: 0
+  // fontFamily: "Helvetica Neue, sans-serif"
+} satisfies Theme
+
+// The theme for dark mode,
+// users the light theme defined above with a few changes
+const darkCustomTheme = {
+  ...lightCustomTheme,
+  colors: {
+    ...lightCustomTheme.colors,
+    highlights: darkDefaultTheme.colors!.highlights
+  }
+} satisfies Theme
+
+const customTheme = {
+  light: lightCustomTheme,
+  dark: darkCustomTheme
+}
+
 export const MemoEditor: FC<MemoEditorProps> = ({ memo, onSave }) => {
   const { mutateAsync: updateMemo, isPending: isUpdatingMemo } = useUpdateMemo()
   const editor = useCreateBlockNote()
@@ -60,7 +93,7 @@ export const MemoEditor: FC<MemoEditorProps> = ({ memo, onSave }) => {
       <BlockNoteView
         editor={editor}
         className="flex-1 min-h-0 my-4"
-        theme="light"
+        theme={customTheme}
         onChange={debouncedHandleUpdateMemo}
       />
     </div>

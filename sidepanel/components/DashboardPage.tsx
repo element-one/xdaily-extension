@@ -16,6 +16,7 @@ import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
+import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
 // import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
@@ -60,7 +61,7 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.MEMO,
     icon: MemoIcon,
     tooltip: "Memo",
-    component: <div>memo</div>
+    component: <MemoPanel />
   },
   {
     key: NavbarItemKey.SHEET,
