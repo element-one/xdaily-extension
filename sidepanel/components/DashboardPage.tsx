@@ -17,6 +17,7 @@ import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
+import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
 // import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
@@ -67,7 +68,7 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.SHEET,
     icon: SheetIcon,
     tooltip: "Sheet",
-    component: <div>sheet</div>
+    component: <SheetPanel />
   },
   {
     key: NavbarItemKey.REMINDER,
