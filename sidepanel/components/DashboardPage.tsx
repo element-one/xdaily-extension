@@ -17,6 +17,7 @@ import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
+import { KnowledgeBasePanel } from "./panels/KnowledgeBasePanel/KnowledgeBasePanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
@@ -58,7 +59,7 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.KNOWLEDGE,
     icon: KnowledgeBaseIcon,
     tooltip: "Knowledge Base",
-    component: <div>knowledge base</div>
+    component: <KnowledgeBasePanel />
   },
   {
     key: NavbarItemKey.MEMO,
@@ -202,7 +203,7 @@ export const DashboardPage = () => {
           </div>
         </div>
       </div>
-      <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px]">
+      <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px] bg-text-inverse-primary">
         {/* top tabs */}
         <div className="flex-grow flex items-center overflow-y-auto gap-4 flex-col">
           <img

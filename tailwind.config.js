@@ -4,12 +4,11 @@ module.exports = {
   darkMode: "class",
   content: ["./**/*.tsx"],
   theme: {
-    // borderRadius: {
-    //   "card-s": "8px"
-    // },
     extend: {
       colors: {
         orange: "#FF9500",
+        cyan: "#32ADE6",
+        purple: "#AF52DE",
         muted: {
           DEFAULT: "#f5f5f4",
           foreground: "#78716c",
