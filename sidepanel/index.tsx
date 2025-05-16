@@ -10,6 +10,7 @@ import { MessageType } from "~types/message"
 
 import { DashboardPage } from "./components/DashboardPage"
 import { LoginPage } from "./components/LoginPage"
+import { Loading } from "./components/ui/Loading"
 
 const queryClient = new QueryClient()
 
@@ -58,16 +59,11 @@ const IndexSidePanel = () => {
   }, [])
 
   if (isLoading) {
-    return (
-      // TODO
-      <div className="w-full h-screen flex items-center justify-center bg-muted text-slate-900 text-lg">
-        loading...
-      </div>
-    )
+    return <Loading />
   }
 
   return (
-    <div className="flex flex-row w-full h-screen overflow-hidden bg-muted">
+    <div className="flex flex-row w-full h-screen overflow-hidden bg-fill-bg-deep">
       {isAuthenticated ? <DashboardPage /> : <LoginPage />}
     </div>
   )

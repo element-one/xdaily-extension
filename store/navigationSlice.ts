@@ -16,7 +16,7 @@ type NavigationActions = {
 export type NavigationSlice = NavigationState & NavigationActions
 
 const initialState: NavigationState = {
-  navbarItemKey: NavbarItemKey.POST,
+  navbarItemKey: NavbarItemKey.EXPLORE,
   userPanelItemKey: UserPanelItemKey.LIST
 }
 

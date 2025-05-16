@@ -6,6 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        orange: "#FF9500",
+        cyan: "#32ADE6",
+        purple: "#AF52DE",
+        green: "#34C759",
+        red: "#FF3B30",
         muted: {
           DEFAULT: "#f5f5f4",
           foreground: "#78716c",
@@ -13,8 +18,33 @@ module.exports = {
         },
         thinborder: "#e2e5e9",
         primary: {
-          brand: "#3b82f6",
+          brand: "#FFE600",
+          assist: "#E7D959",
           foreground: "#fafaf9"
+        },
+        fill: {
+          bg: {
+            light: "#151717",
+            input: "#FFFFFF1A",
+            deep: "#0D0D0D",
+            grey: "#313131"
+          },
+          layer: {
+            layer: "#4F5254"
+          }
+        },
+        text: {
+          default: {
+            primary: "#fff",
+            regular: "#FFFFFFCC",
+            secondary: "#FFFFFF80"
+          },
+          inverse: {
+            primary: "#000"
+          }
+        },
+        border: {
+          regular: "#FFFFFF33"
         }
       }
     }

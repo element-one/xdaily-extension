@@ -1,13 +1,22 @@
 export const X_SITE = "https://x.com"
 
 export enum NavbarItemKey {
-  POST = "post",
-  USER = "user",
-  SUGGESTION = "ai suggestions",
-  COLLECTION = "collection",
+  // POST = "post",
+  // USER = "user",
+  // SUGGESTION = "ai suggestions",
+  // COLLECTION = "collection",
+  // SETTING = "setting",
+  // CHAT = "chat",
+  // MEMO = "memo"
+  EXPLORE = "explore",
   SETTING = "setting",
-  CHAT = "chat",
-  MEMO = "memo"
+  KNOWLEDGE = "knowledge_base",
+  MEMO = "memo",
+  SHEET = "sheets",
+  REMINDER = "reminder",
+  ADD = "add",
+  MESSAGE = "message",
+  CHAT = "self_robot_chat"
 }
 
 export enum UserPanelItemKey {

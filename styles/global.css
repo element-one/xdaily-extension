@@ -26,3 +26,13 @@
   background-color: #d3d3d3;
   border-radius: 6px;
 }
+
+.navitem-selected-shadow {
+  box-shadow:
+    -1px 3px 6px 0px #00000014,
+    -3px 11px 11px 0px #00000012,
+    -7px 24px 15px 0px #0000000a,
+    -13px 43px 18px 0px #00000003,
+    -20px 68px 20px 0px #00000000;
+  backdrop-filter: blur(25px);
+}

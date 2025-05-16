@@ -46,14 +46,14 @@ export const useStore = create<StoreState>()(
       ...createChatSlice(...a)
     }),
     {
-      name: "mecoin-extension-storage",
+      name: "xdaily-extension-storage",
       storage: createJSONStorage(() => customStorage)
     }
   )
 )
 
 plasmoStorage.watch({
-  "mecoin-extension-storage": (change) => {
+  "xdaily-extension-storage": (change) => {
     const { oldValue, newValue } = change
     const newValueState = newValue ? JSON.parse(newValue)?.state ?? null : null
     if (newValue !== oldValue) {

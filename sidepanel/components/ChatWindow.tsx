@@ -4,14 +4,17 @@ import {
   type Message as VercelMessage
 } from "@ai-sdk/react"
 import clsx from "clsx"
-import { XIcon } from "lucide-react"
+import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
-import { formatRelativeTime } from "~libs/date"
+import { formatRelativeTime, formatTweetDate } from "~libs/date"
 import { useChatHistory } from "~services/chat"
 import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
+
+import { Avatar } from "./ui/Avatar"
+import { EmptyContent } from "./ui/EmptyContent"
 
 interface ChatWindowProps {
   screenName: string
@@ -183,12 +186,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   // }
 
   return (
-    <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50">
-      <div className="bg-white py-2 text-base font-semibold">
+    <div className="flex gap-y-6 rounded-md flex-col h-full">
+      <div className="text-xs font-semibold h-[18px] flex items-center text-primary-brand">
         {screenName ? `@${screenName}` : "Bot"}
       </div>
       <div
-        className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4 stylized-scroll"
+        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll"
         ref={chatRef}
         onScroll={(e) => {
           if ((e.currentTarget.scrollTop ?? 0) === 0) {
@@ -196,20 +199,20 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           }
         }}>
         {isLoadingHistory && !showGreeting && (
-          <div className="w-full text-center text-muted-foreground">
+          <div className="w-full text-center text-white">
             Loading history...
           </div>
         )}
 
         {allMessages.map((m, i) => (
-          <div key={i} className={`flex flex-col gap-2`}>
+          <div key={i} className={`flex flex-col gap-3`}>
             <div
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`prose prose-sm break-words wrap w-fit max-w-full px-4 py-2 rounded-lg message-item ${
+                className={`prose prose-sm break-words wrap w-fit max-w-[92%] p-3 rounded-lg message-item font-light text-sm border border-fill-bg-input ${
                   m.role === "user"
-                    ? "bg-primary-brand text-white"
-                    : "bg-gray-200 text-gray-800"
+                    ? "bg-primary-brand text-text-inverse-primary"
+                    : "bg-fill-bg-light text-text-default-primary"
                 }`}>
                 <Markdown>{m.content}</Markdown>
               </div>
@@ -221,28 +224,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         ))}
 
         {(status === "submitted" || status === "streaming") && (
-          <div className="self-start bg-gray-200 text-gray-500 px-4 py-2 rounded-lg w-fit animate-pulse">
+          <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
             Thinking...
           </div>
         )}
-        {showGreeting && (
-          <div className="text-primary-brand w-full h-full flex items-center justify-center text-lg">
-            Hi, How can I help you?
-          </div>
-        )}
+        {showGreeting && <EmptyContent content="Hi, How can I help you?" />}
       </div>
 
       {/* input and send message button */}
-      <div className="bg-white py-2 flex flex-col gap-1">
-        {/* quote post info */}
-        {quoteTweet && (
-          <>
-            <ChatTweetSection
-              tweet={quoteTweet}
-              showClearButton={true}
-              handleClear={handleCancelQuoteTweet}
-            />
-            {/* <div className="flex gap-1 items-center">
+      <div className="py-2 flex flex-col gap-1">
+        {/* todo toolbar */}
+        {/* <div className="flex gap-1 items-center">
               {QuoteTweetTools.map((tool) => (
                 <Tooltip.Provider key={tool.magicWord}>
                   <Tooltip.Root delayDuration={200}>
@@ -262,26 +254,33 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                 </Tooltip.Provider>
               ))}
             </div> */}
-          </>
-        )}
         <form
-          className="flex rounded-md overflow-hidden border border-primary-brand]"
+          className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
           onSubmit={(event) => handleFormSubmit(event)}>
-          <input
+          {/* quote post info */}
+          {quoteTweet && (
+            <div className="w-full mb-2">
+              <ChatTweetSection
+                tweet={quoteTweet}
+                showClearButton={true}
+                handleClear={handleCancelQuoteTweet}
+              />
+            </div>
+          )}
+          <textarea
             disabled={status !== "ready"}
-            type="text"
             value={input}
             onChange={handleInputChange}
-            placeholder="Type your message..."
-            className="flex-1  px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-brand"
+            placeholder="Ask me anything..."
+            className="mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
           />
           <button
             type="submit"
             className={clsx(
-              "bg-primary-brand text-white  px-4 py-2 hover:bg-primary-brand focus:outline-none focus:ring-2 focus:ring-primary-brand",
+              "border border-[#404040] w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:brightness-75 focus:outline-none focus:ring-0",
               isDisable && "opacity-70 cursor-not-allowed"
             )}>
-            Send
+            <ArrowUpIcon className="w-6 h-6 text-primary-brand" />
           </button>
         </form>
       </div>
@@ -298,27 +297,32 @@ const ChatTweetSection: FC<{
     handleClear?.()
   }
   return (
-    <div className="bg-slate-100 p-2 rounded-md relative">
-      <div className="items-center flex flex-row gap-1 overflow-hidden whitespace-nowrap text-ellipsis">
-        <div className="w-5 h-5 rounded-full overflow-hidden bg-primary-brand">
-          {tweet.avatarUrl && (
-            <img src={tweet.avatarUrl} className="object-contain" />
-          )}
-        </div>
-        <div className="font-semibold  truncate">{tweet.displayName}</div>
-        <div className="text-slate-400 truncate">
-          @{tweet.username ? tweet.username : "user"}
-        </div>
-        <div className="text-slate-400">
-          · {formatRelativeTime(tweet.timestamp)}
+    <div className="bg-fill-bg-light rounded-xl relative border border-fill-bg-input p-3 w-full">
+      <div className="items-center flex flex-row gap-2 justify-start">
+        <Avatar
+          url={tweet.avatarUrl}
+          className="w-8 h-8"
+          alt={tweet.displayName}
+        />
+        <div>
+          <div className="text-sm text-text-default-primary truncate h-[18px] flex items-center">
+            {tweet.displayName}
+          </div>
+          <div className="h-[18px] flex items-center text-primary-brand text-xs truncate">
+            @{tweet.username ? tweet.username : "user"}
+          </div>
         </div>
       </div>
-      <div className="mt-1 line-clamp-3">{tweet.tweetText}</div>
+      <div className="mt-2 line-clamp-2">{tweet.tweetText}</div>
+      <div className="mt-2 text-text-default-secondary text-xs flex items-center h-[18px] gap-1">
+        <ClockIcon className="w-[14px] h-[14px] text-orange" />
+        <span>{formatTweetDate(tweet.timestamp)}</span>
+      </div>
       {showClearButton && (
         <div
           onClick={handleCancelQuoteTweet}
-          className="absolute right-0 -top-2 w-4 h-4 bg-white hover:bg-red-50 rounded-full flex items-center justify-center cursor-pointer">
-          <XIcon className="w-4 h-4 text-red-800" />
+          className="absolute top-3 right-3 w-4 h-4 bg-fill-bg-input hover:brightness-75 rounded-full flex items-center justify-center cursor-pointer">
+          <XIcon className="w-3 h-3 text-text-default-secondary" />
         </div>
       )}
     </div>
