@@ -49,12 +49,12 @@ const NavbarItems: NavbarItem[] = [
     tooltip: "Explore",
     component: <ExplorePanel />
   },
-  {
-    key: NavbarItemKey.SETTING,
-    icon: SettingIcon,
-    tooltip: "Setting",
-    component: <div>setting</div>
-  },
+  // {
+  //   key: NavbarItemKey.SETTING,
+  //   icon: SettingIcon,
+  //   tooltip: "Setting",
+  //   component: <div>setting</div>
+  // },
   {
     key: NavbarItemKey.KNOWLEDGE,
     icon: KnowledgeBaseIcon,
@@ -72,28 +72,28 @@ const NavbarItems: NavbarItem[] = [
     icon: SheetIcon,
     tooltip: "Sheet",
     component: <SheetPanel />
-  },
-  {
-    key: NavbarItemKey.REMINDER,
-    icon: ReminderIcon,
-    tooltip: "Reminder",
-    component: <ReminderPanel />
-  },
-  {
-    key: NavbarItemKey.ADD,
-    icon: AddIcon,
-    tooltip: "Add",
-    component: <div>add</div>
   }
+  // {
+  //   key: NavbarItemKey.REMINDER,
+  //   icon: ReminderIcon,
+  //   tooltip: "Reminder",
+  //   component: <ReminderPanel />
+  // },
+  // {
+  //   key: NavbarItemKey.ADD,
+  //   icon: AddIcon,
+  //   tooltip: "Add",
+  //   component: <div>add</div>
+  // }
 ] as const
 
 const BottomNavbarItems: NavbarItem[] = [
-  {
-    key: NavbarItemKey.MESSAGE,
-    icon: MessageIcon,
-    tooltip: "Messages",
-    component: <div>messages</div>
-  }
+  // {
+  //   key: NavbarItemKey.MESSAGE,
+  //   icon: MessageIcon,
+  //   tooltip: "Messages",
+  //   component: <div>messages</div>
+  // }
 ] as const
 
 const ChatNavbarItems: NavbarItem[] = [
