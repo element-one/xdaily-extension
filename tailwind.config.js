@@ -9,6 +9,8 @@ module.exports = {
         orange: "#FF9500",
         cyan: "#32ADE6",
         purple: "#AF52DE",
+        green: "#34C759",
+        red: "#FF3B30",
         muted: {
           DEFAULT: "#f5f5f4",
           foreground: "#78716c",
@@ -24,7 +26,8 @@ module.exports = {
           bg: {
             light: "#151717",
             input: "#FFFFFF1A",
-            deep: "#0D0D0D"
+            deep: "#0D0D0D",
+            grey: "#313131"
           },
           layer: {
             layer: "#4F5254"
