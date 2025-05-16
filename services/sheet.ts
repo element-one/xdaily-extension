@@ -1,13 +1,16 @@
 import {
   useInfiniteQuery,
+  useMutation,
   useQueryClient,
-  type InfiniteData
+  type InfiniteData,
+  type UseMutationOptions
 } from "@tanstack/react-query"
 
 import client from "~libs/client"
 import type {
   GetSheetListParams,
   GetSheetListResp,
+  PostSheetDataParam,
   SheetItem
 } from "~types/sheet"
 
@@ -61,4 +64,21 @@ export const useSheetList = (take: number) => {
     ...infiniteQuery,
     updateSheetList
   }
+}
+
+export const postSheetData = async (
+  data: PostSheetDataParam
+): Promise<SheetItem> => {
+  const response = await client.post("/users/sheets", data)
+  return response.data
+}
+
+export const useCreateSheet = (
+  options?: Partial<UseMutationOptions<SheetItem, Error, PostSheetDataParam>>
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["post-sheet"],
+    mutationFn: postSheetData
+  })
 }

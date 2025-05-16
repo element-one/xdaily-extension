@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useCreateMemo, useMemoList } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
+import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
+import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import type { MemoItem } from "~types/memo"
 
 import { MemoEditor } from "./MemoEditor"
@@ -70,32 +72,39 @@ export const MemoPanel = () => {
 
   return (
     <div className="flex flex-col justify-between rounded-md h-full">
-      <header className="flex-none h-8 flex items-center justify-between">
-        <h1 className="text-base font-semibold flex gap-1 w-fit items-center">
-          {selectedMemo && (
-            <ChevronLeftIcon
-              className="w-5 h-5 cursor-pointer"
-              onClick={handleCloseMemo}
-            />
-          )}
-          Memo
-        </h1>
-        {!selectedMemo && (
-          <div className="flex items-center gap-x-2">
-            <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-              <SearchIcon className="w-5 h-5 text-text-default-regular" />
-            </button>
-            <button
-              disabled={isCreatingMemo}
-              className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50"
-              onClick={handleCreateMemo}>
-              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                <PlusIcon className="w-4 h-4" strokeWidth={4} />
-              </div>
-            </button>
-          </div>
-        )}
-      </header>
+      {selectedMemo ? (
+        <PanelHeader
+          title={
+            <>
+              <ChevronLeftIcon
+                className="w-5 h-5 cursor-pointer"
+                onClick={handleCloseMemo}
+              />{" "}
+              Memo
+            </>
+          }
+        />
+      ) : (
+        <PanelHeader
+          title="Memo"
+          rightContent={
+            <div className="flex items-center gap-x-2">
+              <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
+                <SearchIcon className="w-5 h-5 text-text-default-regular" />
+              </button>
+              <Button
+                variant="ghost"
+                isDisabled={isCreatingMemo}
+                className="p-0"
+                onClick={handleCreateMemo}>
+                <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                  <PlusIcon className="w-4 h-4" strokeWidth={4} />
+                </div>
+              </Button>
+            </div>
+          }
+        />
+      )}
       {selectedMemo ? (
         <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />
       ) : (
@@ -140,14 +149,7 @@ export const MemoPanel = () => {
               ))}
             </section>
           ) : (
-            <div className="flex flex-col w-full h-full items-center justify-center gap-2">
-              <div>Empty Memo</div>
-              {/* <button
-                onClick={handleCreateMemo}
-                className="items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-poppins bg-primary-brand text-white px-3 py-1 w-fit">
-                {isCreatingMemo ? "Creating..." : "Create New Memo"}
-              </button> */}
-            </div>
+            <EmptyContent content="Empty Memo" />
           )}
           {/* load more */}
           <div ref={bottomObserver} className="h-4 w-full" />

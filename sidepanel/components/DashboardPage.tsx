@@ -16,7 +16,9 @@ import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
+import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
+import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
@@ -44,7 +46,7 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.EXPLORE,
     icon: ExploreIcon,
     tooltip: "Explore",
-    component: <div>explore</div>
+    component: <ExplorePanel />
   },
   {
     key: NavbarItemKey.SETTING,
@@ -74,7 +76,7 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.REMINDER,
     icon: ReminderIcon,
     tooltip: "Reminder",
-    component: <div>reminder</div>
+    component: <ReminderPanel />
   },
   {
     key: NavbarItemKey.ADD,

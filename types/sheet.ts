@@ -20,3 +20,10 @@ export interface GetSheetListResp {
     hasNextPage: number
   }
 }
+
+export interface PostSheetDataParam {
+  title: string
+  content: {
+    item: string // string or JSON string
+  }
+}

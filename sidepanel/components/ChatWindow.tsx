@@ -14,6 +14,7 @@ import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
 
 import { Avatar } from "./ui/Avatar"
+import { EmptyContent } from "./ui/EmptyContent"
 
 interface ChatWindowProps {
   screenName: string
@@ -227,11 +228,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             Thinking...
           </div>
         )}
-        {showGreeting && (
-          <div className="text-primary-brand w-full h-full flex items-center justify-center text-lg">
-            Hi, How can I help you?
-          </div>
-        )}
+        {showGreeting && <EmptyContent content="Hi, How can I help you?" />}
       </div>
 
       {/* input and send message button */}

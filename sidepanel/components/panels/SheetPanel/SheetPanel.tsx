@@ -1,14 +1,30 @@
 import { PlusIcon, SearchIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
-import { useSheetList } from "~services/sheet"
+import { useCreateSheet, useSheetList } from "~services/sheet"
+import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
+import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
+import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 
 export const SheetPanel = () => {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useSheetList(15)
+  const {
+    data,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    refetch: refetchSheetList
+  } = useSheetList(15)
+  const { mutateAsync: createSheet, isPending: isCreatingSheet } =
+    useCreateSheet()
 
   const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const handleGoSheetPage = () => {
+    chrome.tabs.create({
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/sheet`
+    })
+  }
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -31,34 +47,47 @@ export const SheetPanel = () => {
     return data?.pages ? data.pages : []
   }, [data])
 
+  const handleCreateSheet = async () => {
+    try {
+      await createSheet({
+        title: "Untitled",
+        content: {
+          // TODO
+          item: JSON.stringify({})
+        }
+      })
+      refetchSheetList()
+    } catch (e) {}
+  }
+
   return (
     <div className="flex flex-col justify-between rounded-md h-full">
-      <header className="flex-none h-8 flex items-center justify-between">
-        <h1 className="text-base font-semibold flex gap-1 w-fit items-center">
-          Sheet
-        </h1>
-        <div className="flex items-center gap-x-2">
-          <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-            <SearchIcon className="w-5 h-5 text-text-default-regular" />
-          </button>
-          <button
-            // disabled={isCreatingMemo}
-            className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-            <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-              <PlusIcon className="w-4 h-4" strokeWidth={4} />
-            </div>
-          </button>
-        </div>
-      </header>
+      <PanelHeader
+        title="Sheet"
+        rightContent={
+          <div className="flex items-center gap-x-2">
+            <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
+              <SearchIcon className="w-5 h-5 text-text-default-regular" />
+            </button>
+            <Button
+              variant="ghost"
+              isDisabled={isCreatingSheet}
+              onClick={handleCreateSheet}
+              className="p-0">
+              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                <PlusIcon className="w-4 h-4" strokeWidth={4} />
+              </div>
+            </Button>
+          </div>
+        }
+      />
       <main className="flex-1 min-h-0 flex flex-col overflow-y-hidden overflow-x-hidden py-4">
-        {!!sheetData.length && (
+        {!!sheetData.length ? (
           <section className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll stylized-scroll">
             {sheetData.map((item) => (
               <Card
                 key={item.id}
-                onClick={() => {
-                  // handleClickCell(item)
-                }}
+                onClick={handleGoSheetPage}
                 title={item.title}
                 footerIcon={
                   <svg
@@ -86,6 +115,8 @@ export const SheetPanel = () => {
               />
             ))}
           </section>
+        ) : (
+          <EmptyContent content="No Sheet Now" />
         )}
         {/* load more */}
         <div ref={bottomObserver} className="h-4 w-full" />
