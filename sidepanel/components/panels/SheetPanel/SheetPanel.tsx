@@ -61,7 +61,7 @@ export const SheetPanel = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between rounded-md h-full">
+    <div className="flex flex-col h-full">
       <PanelHeader
         title="Sheet"
         rightContent={

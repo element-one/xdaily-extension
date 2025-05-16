@@ -60,3 +60,38 @@ export interface GetUserCollectionResp {
     hasNextPage: number
   }
 }
+
+export interface GetKolCollectionParams {
+  page: number
+  take: number
+  categoryId?: string
+}
+export interface KolCollection {
+  id: string
+  name: string
+  screenName: string
+  avatar: string
+  bio?: string
+  followers: number
+  following: number
+  tweets: number
+  location?: string
+  website?: string
+  isKol: boolean
+  isVerified: boolean
+  userId: string
+  joinedAt: Date
+  updatedAt: Date
+}
+
+export interface GetKolCollectionResp {
+  data: KolCollection[]
+  meta: {
+    page: number
+    take: number
+    itemCount: number
+    pageCount: number
+    hasPreviousPage: number
+    hasNextPage: number
+  }
+}
