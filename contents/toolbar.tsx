@@ -85,11 +85,11 @@ const ToolbarButton: FC<ToolbarButtonProps> = ({
     onClick?.()
   }
   return (
-    <Tooltip content={tooltip} side="left" sideOffset={8}>
+    <Tooltip content={tooltip} side="left" sideOffset={16}>
       <div
         onClick={handleClick}
         className={clsx(
-          "flex justify-center items-center w-6 h-6 rounded cursor-pointer hover:bg-fill-bg-deep",
+          "font-geist flex justify-center items-center w-6 h-6 rounded cursor-pointer hover:bg-fill-bg-deep",
           isLoading ? "cursor-not-allowed" : "cursor-pointer"
         )}>
         {isLoading ? (

@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Geist";
+  src: url("/assets/fonts/Geist[wght].woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -35,4 +43,9 @@
     -13px 43px 18px 0px #00000003,
     -20px 68px 20px 0px #00000000;
   backdrop-filter: blur(25px);
+}
+
+body {
+  font-family: "Geist", sans-serif;
+  font-weight: 400;
 }

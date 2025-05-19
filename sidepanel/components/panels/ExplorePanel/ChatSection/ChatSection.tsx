@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FC } from "react"
 
+import { Button } from "~sidepanel/components/ui/Button"
 import { useStore } from "~store/store"
 import { NavbarItemKey, UserPanelItemKey, X_SITE } from "~types/enum"
 
 import { ChatStatusSection } from "./ChatStatusSection"
 
-export const ChatSection = () => {
+export const ChatSection: FC = () => {
   const { setNavbarItemKey, setUserPanelItemKey } = useStore()
   const [screenName, setScreenName] = useState<string>("") // screen name is extra from the site url
 
-  //   get user agent id from the current active tab url
   useEffect(() => {
     const isTwitterDomain = (urlStr: string) => {
       try {
@@ -75,7 +75,7 @@ export const ChatSection = () => {
   }, [])
 
   const handleGoCollection = () => {
-    setNavbarItemKey(NavbarItemKey.USER)
+    setNavbarItemKey(NavbarItemKey.EXPLORE)
     setUserPanelItemKey(UserPanelItemKey.LIST)
   }
 
@@ -87,19 +87,13 @@ export const ChatSection = () => {
 
   if (!screenName) {
     return (
-      <div className="flex gap-y-4 rounded-md flex-col h-full bg-gray-50 items-center justify-center">
+      <div className="flex gap-y-4 rounded-md flex-col h-full text-text-default-primary items-center justify-center">
         <div className="text-base font-semibold">Choose a user...</div>
         <div className="flex flex-col gap-2">
-          <button
-            onClick={handleGoX}
-            className="rounded-md bg-primary-brand text-white  px-4 py-2 hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-primary-brand">
-            From web
-          </button>
-          <button
-            onClick={handleGoCollection}
-            className="rounded-md border-2 border-primary-brand text-primary-brand  hover:bg-slate-100  px-4 py-2  focus:outline-none focus:ring-2 focus:ring-primary-brand">
-            From Users
-          </button>
+          <Button onClick={handleGoX}>From web</Button>
+          <Button onClick={handleGoCollection} variant="secondary">
+            From KOLs
+          </Button>
         </div>
       </div>
     )

@@ -5,6 +5,9 @@ module.exports = {
   content: ["./**/*.tsx"],
   theme: {
     extend: {
+      fontFamily: {
+        geist: ["Geist", "sans-serif"]
+      },
       colors: {
         orange: "#FF9500",
         cyan: "#32ADE6",

@@ -14,23 +14,19 @@ import MessageIcon from "./icons/MessageIcon"
 import ReminderIcon from "./icons/ReminderIcon"
 import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
+import { KolNavbar } from "./KolNavbar"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
+import { InvitePanel } from "./panels/InvitePanel/InvitePanel"
 import { KnowledgeBasePanel } from "./panels/KnowledgeBasePanel/KnowledgeBasePanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
+import { StudioSettingPanel } from "./panels/StudioSettingPanel/StudioSettingPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
-// import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
-// import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
-// import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
-// import { PostPanel } from "./panels/PostPanel/PostPanel"
 // import { SettingPanel } from "./panels/SettingPanel"
-// import { UserPanel } from "./panels/UserPanel/UserPanel"
-// import { Button } from "./ui/button"
-// import { UserAvatar } from "./UserAvatar"
 
 type NavbarItem = {
   key: NavbarItemKey
@@ -49,12 +45,12 @@ const NavbarItems: NavbarItem[] = [
     tooltip: "Explore",
     component: <ExplorePanel />
   },
-  // {
-  //   key: NavbarItemKey.SETTING,
-  //   icon: SettingIcon,
-  //   tooltip: "Setting",
-  //   component: <div>setting</div>
-  // },
+  {
+    key: NavbarItemKey.SETTING,
+    icon: SettingIcon,
+    tooltip: "Studio",
+    component: <StudioSettingPanel />
+  },
   {
     key: NavbarItemKey.KNOWLEDGE,
     icon: KnowledgeBaseIcon,
@@ -72,28 +68,28 @@ const NavbarItems: NavbarItem[] = [
     icon: SheetIcon,
     tooltip: "Sheet",
     component: <SheetPanel />
+  },
+  {
+    key: NavbarItemKey.REMINDER,
+    icon: ReminderIcon,
+    tooltip: "Reminder",
+    component: <ReminderPanel />
   }
-  // {
-  //   key: NavbarItemKey.REMINDER,
-  //   icon: ReminderIcon,
-  //   tooltip: "Reminder",
-  //   component: <ReminderPanel />
-  // },
   // {
   //   key: NavbarItemKey.ADD,
   //   icon: AddIcon,
-  //   tooltip: "Add",
-  //   component: <div>add</div>
+  //   tooltip: "Invite People",
+  //   component: <InvitePanel />
   // }
 ] as const
 
 const BottomNavbarItems: NavbarItem[] = [
-  // {
-  //   key: NavbarItemKey.MESSAGE,
-  //   icon: MessageIcon,
-  //   tooltip: "Messages",
-  //   component: <div>messages</div>
-  // }
+  {
+    key: NavbarItemKey.INVITE,
+    icon: MessageIcon,
+    tooltip: "Invite User",
+    component: <InvitePanel />
+  }
 ] as const
 
 const ChatNavbarItems: NavbarItem[] = [
@@ -110,8 +106,8 @@ export const DashboardPage = () => {
     navbarItemKey,
     setNavbarItemKey,
     clearNavbar,
-    setUserPanelItemKey,
-    setQuoteTweet
+    setQuoteTweet,
+    setUserPanelItemKey
   } = useStore()
 
   const currentNavbarItem = useMemo(() => {
@@ -129,50 +125,41 @@ export const DashboardPage = () => {
     }
   }
 
-  // const checkTweetPage = (urlString: string) => {
-  //   const url = new URL(urlString)
-  //   const pathSegments = url.pathname.split("/").filter(Boolean)
+  const checkTweetPage = (urlString: string) => {
+    const url = new URL(urlString)
+    const pathSegments = url.pathname.split("/").filter(Boolean)
 
-  //   // const isTweetDetail =
-  //   //   pathSegments.length >= 3 &&
-  //   //   pathSegments[1] === "status" &&
-  //   //   /^\d+$/.test(pathSegments[2])
+    const RESERVED_PATHS = ["search", "settings", "notifications"]
+    const isUserProfile =
+      pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
 
-  //   const RESERVED_PATHS = ["search", "settings", "notifications"]
-  //   const isUserProfile =
-  //     pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
-
-  //   if (isUserProfile) {
-  //     // go to chat panel if is tweet profile page
-  //     toggleDrawer(NavbarItemKey.USER)
-  //     setTimeout(() => {
-  //       setUserPanelItemKey(UserPanelItemKey.CHAT)
-  //     }, 50)
-  //   }
-  //   // else if (isTweetDetail) {
-  //   //   // go to suggestion panel if is tweet detail page
-  //   //   toggleDrawer(NavbarItemKey.SUGGESTION)
-  //   // }
-  // }
+    if (isUserProfile) {
+      // go to chat panel if is tweet profile page
+      toggleDrawer(NavbarItemKey.EXPLORE)
+      setTimeout(() => {
+        setUserPanelItemKey(UserPanelItemKey.CHAT)
+      }, 50)
+    }
+  }
 
   useEffect(() => {
     clearNavbar()
 
-    // const checkCurrentTab = () => {
-    //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    //     if (tabs[0]?.url) checkTweetPage(tabs[0].url)
-    //   })
-    // }
-    // checkCurrentTab()
+    const checkCurrentTab = () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.url) checkTweetPage(tabs[0].url)
+      })
+    }
+    checkCurrentTab()
 
-    // const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
-    //   if (changeInfo.status === "complete" && tab.url) {
-    //     checkTweetPage(tab.url)
-    //   }
-    // }
-    // const handleTabActivated = () => {
-    //   checkCurrentTab()
-    // }
+    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
+      if (changeInfo.status === "complete" && tab.url) {
+        checkTweetPage(tab.url)
+      }
+    }
+    const handleTabActivated = () => {
+      checkCurrentTab()
+    }
 
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
@@ -182,12 +169,12 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    // chrome.tabs.onUpdated.addListener(handleTabUpdate)
-    // chrome.tabs.onActivated.addListener(handleTabActivated)
+    chrome.tabs.onUpdated.addListener(handleTabUpdate)
+    chrome.tabs.onActivated.addListener(handleTabActivated)
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener)
-      // chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-      // chrome.tabs.onActivated.removeListener(handleTabActivated)
+      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
+      chrome.tabs.onActivated.removeListener(handleTabActivated)
     }
   }, [])
 
@@ -223,6 +210,7 @@ export const DashboardPage = () => {
               />
             )
           })}
+          <KolNavbar />
         </div>
         {/* bottom buttons */}
         <div className="flex flex-col gap-4">
