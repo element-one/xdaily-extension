@@ -22,6 +22,7 @@ import { KnowledgeBasePanel } from "./panels/KnowledgeBasePanel/KnowledgeBasePan
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
+import { StudioSettingPanel } from "./panels/StudioSettingPanel/StudioSettingPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
 // import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
@@ -50,12 +51,12 @@ const NavbarItems: NavbarItem[] = [
     tooltip: "Explore",
     component: <ExplorePanel />
   },
-  // {
-  //   key: NavbarItemKey.SETTING,
-  //   icon: SettingIcon,
-  //   tooltip: "Setting",
-  //   component: <div>setting</div>
-  // },
+  {
+    key: NavbarItemKey.SETTING,
+    icon: SettingIcon,
+    tooltip: "Studio",
+    component: <StudioSettingPanel />
+  },
   {
     key: NavbarItemKey.KNOWLEDGE,
     icon: KnowledgeBaseIcon,
