@@ -4,13 +4,19 @@ import { Avatar } from "~sidepanel/components/ui/Avatar"
 import type { KolCollection } from "~types/collection"
 import { X_SITE } from "~types/enum"
 
-type KolItemProps = KolCollection
+// type KolItemProps = KolCollection
 
-export const KolItem: FC<KolItemProps> = (user) => {
+interface KolItemProps {
+  item: KolCollection
+  onClickItem?: () => void
+}
+
+export const KolItem: FC<KolItemProps> = ({ item: user, onClickItem }) => {
   const handleClickTweetItem = () => {
     chrome.tabs.create({
       url: `${X_SITE}/${user.screenName}`
     })
+    onClickItem?.()
   }
 
   return (

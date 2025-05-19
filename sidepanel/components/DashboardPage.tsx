@@ -3,7 +3,7 @@ import { useEffect, useMemo, type FC, type ReactNode } from "react"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
-import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
+import { NavbarItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
 import AddIcon from "./icons/AddIcon"
@@ -108,13 +108,8 @@ const ChatNavbarItems: NavbarItem[] = [
 ]
 
 export const DashboardPage = () => {
-  const {
-    navbarItemKey,
-    setNavbarItemKey,
-    clearNavbar,
-    setUserPanelItemKey,
-    setQuoteTweet
-  } = useStore()
+  const { navbarItemKey, setNavbarItemKey, clearNavbar, setQuoteTweet } =
+    useStore()
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -131,50 +126,8 @@ export const DashboardPage = () => {
     }
   }
 
-  // const checkTweetPage = (urlString: string) => {
-  //   const url = new URL(urlString)
-  //   const pathSegments = url.pathname.split("/").filter(Boolean)
-
-  //   // const isTweetDetail =
-  //   //   pathSegments.length >= 3 &&
-  //   //   pathSegments[1] === "status" &&
-  //   //   /^\d+$/.test(pathSegments[2])
-
-  //   const RESERVED_PATHS = ["search", "settings", "notifications"]
-  //   const isUserProfile =
-  //     pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
-
-  //   if (isUserProfile) {
-  //     // go to chat panel if is tweet profile page
-  //     toggleDrawer(NavbarItemKey.USER)
-  //     setTimeout(() => {
-  //       setUserPanelItemKey(UserPanelItemKey.CHAT)
-  //     }, 50)
-  //   }
-  //   // else if (isTweetDetail) {
-  //   //   // go to suggestion panel if is tweet detail page
-  //   //   toggleDrawer(NavbarItemKey.SUGGESTION)
-  //   // }
-  // }
-
   useEffect(() => {
     clearNavbar()
-
-    // const checkCurrentTab = () => {
-    //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    //     if (tabs[0]?.url) checkTweetPage(tabs[0].url)
-    //   })
-    // }
-    // checkCurrentTab()
-
-    // const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
-    //   if (changeInfo.status === "complete" && tab.url) {
-    //     checkTweetPage(tab.url)
-    //   }
-    // }
-    // const handleTabActivated = () => {
-    //   checkCurrentTab()
-    // }
 
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
@@ -184,12 +137,8 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    // chrome.tabs.onUpdated.addListener(handleTabUpdate)
-    // chrome.tabs.onActivated.addListener(handleTabActivated)
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener)
-      // chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-      // chrome.tabs.onActivated.removeListener(handleTabActivated)
     }
   }, [])
 
