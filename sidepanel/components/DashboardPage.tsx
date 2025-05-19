@@ -14,6 +14,7 @@ import MessageIcon from "./icons/MessageIcon"
 import ReminderIcon from "./icons/ReminderIcon"
 import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
+import { KolNavbar } from "./KolNavbar"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
@@ -209,6 +210,7 @@ export const DashboardPage = () => {
               />
             )
           })}
+          <KolNavbar />
         </div>
         {/* bottom buttons */}
         <div className="flex flex-col gap-4">
