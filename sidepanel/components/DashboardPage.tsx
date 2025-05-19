@@ -25,14 +25,7 @@ import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
 import { StudioSettingPanel } from "./panels/StudioSettingPanel/StudioSettingPanel"
 import { UserNavbarItem } from "./UserNavbarItem"
 
-// import { BoardPanel } from "./panels/BoardPanel/BoardPanel"
-// import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
-// import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
-// import { PostPanel } from "./panels/PostPanel/PostPanel"
 // import { SettingPanel } from "./panels/SettingPanel"
-// import { UserPanel } from "./panels/UserPanel/UserPanel"
-// import { Button } from "./ui/button"
-// import { UserAvatar } from "./UserAvatar"
 
 type NavbarItem = {
   key: NavbarItemKey
