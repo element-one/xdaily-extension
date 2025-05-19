@@ -72,13 +72,13 @@ const NavbarItems: NavbarItem[] = [
     icon: SheetIcon,
     tooltip: "Sheet",
     component: <SheetPanel />
+  },
+  {
+    key: NavbarItemKey.REMINDER,
+    icon: ReminderIcon,
+    tooltip: "Reminder",
+    component: <ReminderPanel />
   }
-  // {
-  //   key: NavbarItemKey.REMINDER,
-  //   icon: ReminderIcon,
-  //   tooltip: "Reminder",
-  //   component: <ReminderPanel />
-  // },
   // {
   //   key: NavbarItemKey.ADD,
   //   icon: AddIcon,
