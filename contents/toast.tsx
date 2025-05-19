@@ -27,7 +27,7 @@ const Toast: React.FC<ToastProps> = ({
   duration = 3000
 }) => {
   const [isVisible, setIsVisible] = useState(true)
-  const bgColor = type === "success" ? "bg-green-500" : "bg-red-500"
+  const bgColor = type === "success" ? "bg-green" : "bg-red"
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,7 +41,7 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <div
-      className={`px-4 py-2 shadow-lg z-50 ${bgColor} text-white transition-all transform opacity-100 animate-slideIn`}>
+      className={`font-geist px-4 py-2 shadow-lg rounded-lg z-50 ${bgColor} text-white transition-all transform opacity-100 animate-slideIn`}>
       {message}
     </div>
   )

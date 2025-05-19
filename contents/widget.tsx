@@ -66,7 +66,7 @@ const WidgetButton = () => {
   }
 
   return (
-    <div className="group fixed text-white bg-transparent left-auto right-0 bottom-[232px] z-[1000] flex flex-col">
+    <div className="font-geist group fixed text-white bg-transparent left-auto right-0 bottom-[232px] z-[1000] flex flex-col">
       <div className={buttonClassname} onClick={toggleSidePanel}>
         <img
           src={robotImg}

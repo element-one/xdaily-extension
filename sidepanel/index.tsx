@@ -63,7 +63,7 @@ const IndexSidePanel = () => {
   }
 
   return (
-    <div className="flex flex-row w-full h-screen overflow-hidden bg-fill-bg-deep">
+    <div className="flex flex-row w-full h-screen overflow-hidden bg-fill-bg-deep font-geist">
       {isAuthenticated ? <DashboardPage /> : <LoginPage />}
     </div>
   )
