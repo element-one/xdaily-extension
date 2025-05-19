@@ -1,7 +1,6 @@
-import clsx from "clsx"
-
 import { useApplyKol, useCheckKolStatus } from "~services/chat"
 import { ChatWindow } from "~sidepanel/components/ChatWindow"
+import { Button } from "~sidepanel/components/ui/Button"
 import { KolStatus } from "~types/enum"
 
 export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
@@ -42,14 +41,7 @@ export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
         <div>Please wait for approvement</div>
       ) : (
         // data is none => means need to apply
-        <button
-          onClick={handleApply}
-          className={clsx(
-            "rounded-md bg-primary-brand text-white  px-4 py-2 hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-primary-brand",
-            isPending && "opacity-70 cursor-not-allowed"
-          )}>
-          APPLY
-        </button>
+        <Button onClick={handleApply}>Apply</Button>
       )}
     </div>
   )

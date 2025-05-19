@@ -4,7 +4,6 @@ import { useKolCollections } from "~services/collection"
 import { Button } from "~sidepanel/components/ui/Button"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
-import type { KolCollection } from "~types/collection"
 
 import { KolItem } from "./KolItem"
 
@@ -13,10 +12,7 @@ const allCategory = {
   name: "All"
 }
 
-interface KolSectionProps {
-  onClickKol?: (kol: KolCollection) => void
-}
-export const KolSection: FC<KolSectionProps> = ({ onClickKol }) => {
+export const KolSection: FC = () => {
   // TODO search category
   const [currentCategory, setCurrentCategory] = useState<string>(allCategory.id)
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -43,10 +39,6 @@ export const KolSection: FC<KolSectionProps> = ({ onClickKol }) => {
   const collection = useMemo(() => {
     return [...(data?.pages ? data.pages : [])]
   }, [data])
-
-  const handleClickKol = (kol) => {
-    onClickKol?.(kol)
-  }
 
   return (
     <div className="flex flex-col h-full">
@@ -75,11 +67,7 @@ export const KolSection: FC<KolSectionProps> = ({ onClickKol }) => {
         {collection?.length > 0 ? (
           <section className="flex flex-col gap-4 py-2 flex-1 overflow-y-scroll stylized-scroll">
             {collection.map((kol, index) => (
-              <KolItem
-                item={kol}
-                key={index}
-                onClickItem={() => handleClickKol(kol)}
-              />
+              <KolItem item={kol} key={index} />
             ))}
           </section>
         ) : (

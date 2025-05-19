@@ -1,9 +1,8 @@
 import { ChevronLeftIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { useStore } from "~store/store"
-import type { KolCollection, UserCollection } from "~types/collection"
 import { UserPanelItemKey } from "~types/enum"
 
 import { ChatSection } from "./ChatSection/ChatSection"
@@ -11,7 +10,6 @@ import { KolSection } from "./KolSection"
 
 export const ExplorePanel = () => {
   const { userPanelItemKey, setUserPanelItemKey } = useStore()
-  const [screenName, setScreenName] = useState("")
 
   useEffect(() => {
     setUserPanelItemKey(UserPanelItemKey.LIST)
@@ -19,17 +17,10 @@ export const ExplorePanel = () => {
 
   const handleBack = () => {
     setUserPanelItemKey(UserPanelItemKey.LIST)
-    setScreenName("")
-  }
-  const handleClickKol = (kol: KolCollection) => {
-    setScreenName(kol.screenName)
-    setTimeout(() => {
-      setUserPanelItemKey(UserPanelItemKey.CHAT)
-    }, 10)
   }
 
   if (userPanelItemKey === UserPanelItemKey.LIST) {
-    return <KolSection onClickKol={handleClickKol} />
+    return <KolSection />
   }
 
   return (
@@ -46,7 +37,7 @@ export const ExplorePanel = () => {
           </div>
         }
       />
-      <ChatSection screenName={screenName} />
+      <ChatSection />
     </div>
   )
 }
