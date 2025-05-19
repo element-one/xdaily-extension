@@ -15,7 +15,7 @@ export enum NavbarItemKey {
   SHEET = "sheets",
   REMINDER = "reminder",
   ADD = "add",
-  MESSAGE = "message",
+  INVITE = "invite",
   CHAT = "self_robot_chat"
 }
 

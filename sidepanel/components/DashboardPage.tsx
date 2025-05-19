@@ -17,6 +17,7 @@ import SheetIcon from "./icons/SheetIcon"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
+import { InvitePanel } from "./panels/InvitePanel/InvitePanel"
 import { KnowledgeBasePanel } from "./panels/KnowledgeBasePanel/KnowledgeBasePanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
@@ -82,18 +83,18 @@ const NavbarItems: NavbarItem[] = [
   // {
   //   key: NavbarItemKey.ADD,
   //   icon: AddIcon,
-  //   tooltip: "Add",
-  //   component: <div>add</div>
+  //   tooltip: "Invite People",
+  //   component: <InvitePanel />
   // }
 ] as const
 
 const BottomNavbarItems: NavbarItem[] = [
-  // {
-  //   key: NavbarItemKey.MESSAGE,
-  //   icon: MessageIcon,
-  //   tooltip: "Messages",
-  //   component: <div>messages</div>
-  // }
+  {
+    key: NavbarItemKey.INVITE,
+    icon: MessageIcon,
+    tooltip: "Invite User",
+    component: <InvitePanel />
+  }
 ] as const
 
 const ChatNavbarItems: NavbarItem[] = [
