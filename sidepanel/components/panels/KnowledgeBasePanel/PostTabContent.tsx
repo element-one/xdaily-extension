@@ -3,15 +3,35 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useTweetCollections } from "~services/collection"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
+import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import { type TweetCollection } from "~types/collection"
 import { MessageType, type AddTweetCollectionPayload } from "~types/message"
 
 import { TweetItem } from "./TweetItem"
 
-// import { TweetListItem } from "./TweetListItem"
+const PostTabContentSkeleton = () => {
+  return (
+    <div className="mt-3 flex flex-col gap-2 py-2">
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="w-full p-4 rounded-lg border border-fill-bg-input bg-fill-bg-deep flex flex-row items-center justify-between relative">
+            <div className="flex flex-col w-full">
+              <Skeleton className="h-5 w-8" />
+              <Skeleton className="w-full h-4 mt-2" />
+              <Skeleton className="w-1/2 h-4 mt-1" />
+              <Skeleton className="mt-2 w-10 h-4" />
+            </div>
+          </div>
+        ))}
+    </div>
+  )
+}
 
 export const PostTabContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useTweetCollections(15)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
@@ -48,10 +68,14 @@ export const PostTabContent = () => {
     return [...addedCollection, ...(data?.pages ? data.pages : [])]
   }, [addedCollection, data])
 
+  if (isLoading) {
+    return <PostTabContentSkeleton />
+  }
+
   return (
     <main className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden pb-4 hide-scrollbar">
       {collection?.length > 0 ? (
-        <section className="mt-3 flex flex-col gap-2 py-2 overflow-y-scroll  stylized-scroll">
+        <section className="mt-3 flex flex-col gap-2 py-2 overflow-y-scroll hide-scrollbar">
           {collection.map((item, index) => (
             <TweetItem key={index} {...item} />
           ))}

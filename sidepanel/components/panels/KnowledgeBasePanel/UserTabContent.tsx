@@ -2,13 +2,35 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useUserCollections } from "~services/collection"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
+import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import { type UserCollection } from "~types/collection"
 import { MessageType, type AddUserCollectionPayload } from "~types/message"
 
 import { UserItem } from "./UserItem"
 
+const UserTabContentSkeleton = () => {
+  return (
+    <section className="flex flex-col gap-4 py-2 flex-1">
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="w-full p-4 rounded-lg border border-fill-bg-input bg-fill-bg-deep">
+            <Skeleton className="w-12 h-12 rounded-full" />
+            <div className="mt-4">
+              <Skeleton className="w-10 h-5" />
+              <Skeleton className="w-14 h-5 mt-1" />
+            </div>
+            <Skeleton className="mt-2 h-5 w-full" />
+          </div>
+        ))}
+    </section>
+  )
+}
+
 export const UserTabContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useUserCollections(15)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
@@ -45,10 +67,14 @@ export const UserTabContent = () => {
     return [...addedCollection, ...(data?.pages ? data.pages : [])]
   }, [addedCollection, data])
 
+  if (isLoading) {
+    return <UserTabContentSkeleton />
+  }
+
   return (
     <main className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden pb-4 hide-scrollbar">
       {collection?.length > 0 ? (
-        <section className="flex flex-col gap-4 py-2 flex-1 overflow-y-scroll stylized-scroll">
+        <section className="flex flex-col gap-4 py-2 flex-1 overflow-y-scroll hidden-scroll">
           {collection.map((kol, index) => (
             <UserItem {...kol} key={index} />
           ))}
