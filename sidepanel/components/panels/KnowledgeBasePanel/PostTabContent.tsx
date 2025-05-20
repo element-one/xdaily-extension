@@ -75,7 +75,7 @@ export const PostTabContent = () => {
   return (
     <main className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden pb-4 hide-scrollbar">
       {collection?.length > 0 ? (
-        <section className="mt-3 flex flex-col gap-2 py-2 overflow-y-scroll hide-scrollbar">
+        <section className="flex flex-col gap-2 py-2 overflow-y-scroll hide-scrollbar">
           {collection.map((item, index) => (
             <TweetItem key={index} {...item} />
           ))}

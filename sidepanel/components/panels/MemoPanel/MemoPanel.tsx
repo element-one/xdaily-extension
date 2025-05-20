@@ -1,14 +1,55 @@
-import { ChevronLeftIcon, PlusIcon, SearchIcon, Share2Icon } from "lucide-react"
+import {
+  ChevronLeftIcon,
+  EllipsisIcon,
+  PlusIcon,
+  SearchIcon,
+  Share2Icon,
+  Trash2Icon
+} from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
-import { useCreateMemo, useMemoList } from "~services/memo"
+import { useCreateMemo, useDeleteMemo, useMemoList } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
+import { Divider } from "~sidepanel/components/ui/Divider"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "~sidepanel/components/ui/DropdownMenu"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
+import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import type { MemoItem } from "~types/memo"
 
 import { MemoEditor } from "./MemoEditor"
+
+const MemoPanelSkeleton = () => {
+  return (
+    <div className="mt-4 py-2 flex flex-col gap-4">
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="border border-fill-bg-input rounded-lg py-3 bg-fill-bg-light  flex flex-col items-start gap-2">
+            <Skeleton className="h-6 w-8 mx-3" />
+            <Skeleton className="w-2/3 h-5 mx-3" />
+            <Divider />
+            <div className="flex w-full items-center justify-between text-text-default-secondary">
+              <span className="inline-flex items-center gap-x-1">
+                <Skeleton className="w-4 rounded-full" />
+                <Skeleton className="h-5 w-8" />
+                <span>·</span>
+                <Skeleton className="h-5 w-10" />
+              </span>
+            </div>
+          </div>
+        ))}
+    </div>
+  )
+}
 
 export const MemoPanel = () => {
   const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
@@ -18,11 +59,14 @@ export const MemoPanel = () => {
     hasNextPage,
     isFetchingNextPage,
     updateMemoList,
-    refetch
+    refetch,
+    isLoading
   } = useMemoList(15)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
+
+  const { mutateAsync: deleteMemo, isPending: isDeletingMemo } = useDeleteMemo()
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -68,6 +112,17 @@ export const MemoPanel = () => {
 
     if (!data) return
     updateMemoList(newMemo)
+  }
+
+  const handleDeleteMemo = async (memo: MemoItem) => {
+    try {
+      await deleteMemo({ id: memo.id })
+      refetch()
+    } catch (e) {}
+  }
+
+  if (isLoading) {
+    return <MemoPanelSkeleton />
   }
 
   return (
@@ -140,9 +195,33 @@ export const MemoPanel = () => {
                   footerTitle="Note"
                   footerTime={memo.postedAt}
                   footerOperation={
-                    <Button variant="ghost" className="w-fit h-fit p-0">
-                      <Share2Icon className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-x-2">
+                      <Button
+                        variant="ghost"
+                        className="w-fit h-fit p-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                        }}>
+                        <Share2Icon className="w-4 h-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="w-fit h-fit p-0">
+                            <EllipsisIcon className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteMemo(memo)
+                            }}>
+                            <Trash2Icon className="text-red w-4 h-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   }
                   onClick={() => handleSelectMemo(memo)}
                 />

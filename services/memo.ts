@@ -98,3 +98,15 @@ export const useCreateMemo = (
     mutationFn: postMemoData
   })
 }
+
+export const deleteMemo = async ({ id }: { id: string }) => {
+  const response = await client.delete(`/users/memos/${id}`)
+  return response.data
+}
+
+export const useDeleteMemo = () => {
+  return useMutation({
+    mutationKey: ["delete-memo"],
+    mutationFn: deleteMemo
+  })
+}
