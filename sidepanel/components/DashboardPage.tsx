@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import { AtomIcon } from "lucide-react"
 import { useEffect, useMemo, type FC, type ReactNode } from "react"
 import robotImg from "url:/assets/robot.png" // strange
@@ -33,9 +34,9 @@ type NavbarItem = {
   icon: FC<{
     className?: string
   }>
-
   tooltip: string
   component: ReactNode
+  wrapperClassName?: string
 }
 
 const NavbarItems: NavbarItem[] = [
@@ -43,7 +44,8 @@ const NavbarItems: NavbarItem[] = [
     key: NavbarItemKey.EXPLORE,
     icon: ExploreIcon,
     tooltip: "Explore",
-    component: <ExplorePanel />
+    component: <ExplorePanel />,
+    wrapperClassName: "!p-0 !py-4"
   },
   {
     key: NavbarItemKey.SETTING,
@@ -183,7 +185,11 @@ export const DashboardPage = () => {
       {/* main */}
       <div className="flex flex-col relative p-1 transition-all w-[calc(100%-68px)]">
         <div className="bg-fill-bg-deep text-text-default-primary w-full relative flex-1 overflow-hidden rounded-xl">
-          <div className="p-4 h-screen">
+          <div
+            className={clsx(
+              "p-4 h-screen",
+              currentNavbarItem?.wrapperClassName
+            )}>
             <div className="flex flex-col h-full overflow-y-auto hide-scrollbar">
               {currentNavbarItem?.component}
             </div>

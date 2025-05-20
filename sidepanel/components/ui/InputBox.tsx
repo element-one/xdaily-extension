@@ -11,7 +11,7 @@ const InputBox = React.forwardRef<HTMLInputElement, InputBoxProps>(
       <input
         ref={ref}
         className={clsx(
-          "w-full focus:outline-none focus:ring-0 bg-fill-bg-light border border-fill-bg-input rounded-lg h-9 p-2",
+          "caret-primary-brand w-full focus:outline-none focus:ring-0 bg-fill-bg-light border border-fill-bg-input rounded-lg h-9 p-2",
           className
         )}
         {...props}

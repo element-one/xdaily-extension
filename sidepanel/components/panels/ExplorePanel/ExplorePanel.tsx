@@ -6,7 +6,7 @@ import { useStore } from "~store/store"
 import { UserPanelItemKey } from "~types/enum"
 
 import { ChatSection } from "./ChatSection/ChatSection"
-import { KolSection } from "./KolSection"
+import { ExploreSection } from "./ExploreSection"
 
 export const ExplorePanel = () => {
   const { userPanelItemKey, setUserPanelItemKey } = useStore()
@@ -20,11 +20,11 @@ export const ExplorePanel = () => {
   }
 
   if (userPanelItemKey === UserPanelItemKey.LIST) {
-    return <KolSection />
+    return <ExploreSection />
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-4">
       <PanelHeader
         title={
           <div

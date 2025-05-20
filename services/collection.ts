@@ -1,4 +1,11 @@
-import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query"
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  type InfiniteData,
+  type UseMutationOptions,
+  type UseQueryOptions
+} from "@tanstack/react-query"
 
 import client from "~libs/client"
 import type {
@@ -8,6 +15,8 @@ import type {
   GetTweetCollectionResp,
   GetUserCollectionParams,
   GetUserCollectionResp,
+  GetUserSearchParams,
+  GetUserSearchResp,
   KolCollection,
   TweetCollection,
   UserCollection
@@ -105,5 +114,29 @@ export const useKolCollections = (take: number, categoryId?: string) => {
       pages: data.pages.map((page) => page.data).flat(),
       pageParams: data.pageParams
     })
+  })
+}
+
+export const getSearchExplore = async ({
+  keywords,
+  take
+}: GetUserSearchParams): Promise<GetUserSearchResp> => {
+  let reqUrl = `/users/search?keywords=${keywords}`
+  if (take) {
+    reqUrl += `&take=${take}`
+  }
+  const response = await client.get(reqUrl)
+  return response.data
+}
+
+export const userSearchExplore = (
+  options?: Partial<
+    UseMutationOptions<GetUserSearchResp, Error, GetUserSearchParams>
+  >
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["search-explore"],
+    mutationFn: getSearchExplore
   })
 }
