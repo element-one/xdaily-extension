@@ -1,15 +1,8 @@
-import * as RadixTooltip from "@radix-ui/react-tooltip"
 import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
 import { BotIcon, LoaderCircleIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  type FC,
-  type ReactNode
-} from "react"
+import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
@@ -60,7 +53,7 @@ const Tooltip: React.FC<TooltipProps> = ({
       {children}
       <div
         className={clsx(
-          "absolute z-50 whitespace-nowrap bg-fill-bg-light border border-fill-bg-input rounded-lg px-3 py-2.5 text-text-default-regular text-base opacity-0 group-hover:opacity-100 transition pointer-events-none",
+          "absolute z-50 whitespace-nowrap bg-fill-bg-light border border-fill-bg-input rounded-lg px-3 py-2.5 text-text-default-regular text-xs opacity-0 group-hover:opacity-100 transition pointer-events-none",
           offsetStyle[side]
         )}>
         {content}
@@ -328,7 +321,7 @@ const Toolbar = () => {
       />
       <ToolbarButton
         onClick={handleQuoteTweet}
-        tooltip="Reminder"
+        tooltip="Quote Tweet"
         isLoading={false}
         icon={
           <svg

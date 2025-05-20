@@ -95,3 +95,15 @@ export interface GetKolCollectionResp {
     hasNextPage: number
   }
 }
+
+export interface GetUserSearchParams {
+  keywords: string
+  take?: number
+}
+
+export interface GetUserSearchResp {
+  people: UserCollection[]
+  files: any[]
+  channels: any[]
+  text: any[]
+}

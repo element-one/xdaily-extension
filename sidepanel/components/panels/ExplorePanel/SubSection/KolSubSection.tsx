@@ -1,22 +1,41 @@
-import { useEffect, useMemo, useRef, useState, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { useKolCollections } from "~services/collection"
 import { Button } from "~sidepanel/components/ui/Button"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
+import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 
-import { KolItem } from "./KolItem"
+import { KolItem } from "../KolItem"
 
 const allCategory = {
   id: "",
   name: "All"
 }
 
-export const KolSection: FC = () => {
-  // TODO search category
-  const [currentCategory, setCurrentCategory] = useState<string>(allCategory.id)
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useKolCollections(15, currentCategory)
+const KolSectionSkeleton = () => {
+  return (
+    <div className="bg-fill-input flex min-h-[188px] flex-col gap-4 w-full p-4 rounded-lg border border-fill-bg-input bg-fill-bg-deep">
+      <div className="flex items-start justify-between">
+        <Skeleton className="h-12 w-12 rounded-full" />
+      </div>
+
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+    </div>
+  )
+}
+
+interface KolSubSectionProps {
+  onFilter: () => void
+}
+export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
+  // just all category
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useKolCollections(15, allCategory.id)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -41,11 +60,11 @@ export const KolSection: FC = () => {
   }, [data])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-4">
       <PanelHeader
         title="Category"
         rightContent={
-          <Button variant="ghost" className="!p-0 h-fit">
+          <Button variant="ghost" className="!p-0 h-fit" onClick={onFilter}>
             <svg
               width="20"
               height="20"
@@ -69,6 +88,14 @@ export const KolSection: FC = () => {
             {collection.map((kol, index) => (
               <KolItem item={kol} key={index} />
             ))}
+          </section>
+        ) : isLoading ? (
+          <section className="flex flex-col gap-4 py-2">
+            {Array(3)
+              .fill(null)
+              .map((_, index) => (
+                <KolSectionSkeleton key={index} />
+              ))}
           </section>
         ) : (
           <EmptyContent content="Empty Category" />
