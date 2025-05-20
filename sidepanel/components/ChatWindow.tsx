@@ -8,13 +8,24 @@ import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
 
-import { formatRelativeTime, formatTweetDate } from "~libs/date"
+import { formatTweetDate } from "~libs/date"
 import { useChatHistory } from "~services/chat"
 import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
 
+import MemoIcon from "./icons/MemoIcon"
+import ReminderIcon from "./icons/ReminderIcon"
+import SheetIcon from "./icons/SheetIcon"
 import { Avatar } from "./ui/Avatar"
 import { EmptyContent } from "./ui/EmptyContent"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "./ui/Select"
+import { Tooltip } from "./ui/Tooltip"
 
 interface ChatWindowProps {
   screenName: string
@@ -157,33 +168,41 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     removeQuoteTweet()
   }
 
-  // const QuoteTweetTools = [
-  //   {
-  //     icon: <BookmarkIcon className="w-4 h-4" />,
-  //     tooltip: "Save as Memo",
-  //     magicWord: "Save as Memo"
-  //   },
-  //   {
-  //     icon: <ScissorsIcon className="w-4 h-4" />,
-  //     tooltip: "Cut to clipboard",
-  //     magicWord: "Cut to clipboard"
-  //   }
-  // ]
+  const Tools = [
+    {
+      type: "memo",
+      icon: <MemoIcon className="size-5" />,
+      tooltip: "Save as Memo",
+      magicWord: "Save as Memo"
+    },
+    {
+      type: "sheet",
+      icon: <SheetIcon className="size-5" />,
+      tooltip: "Save as Sheet",
+      magicWord: "Save as Sheet"
+    },
+    {
+      type: "reminder",
+      icon: <ReminderIcon className="size-5" />,
+      tooltip: "Remind later",
+      magicWord: "Remind me later"
+    }
+  ]
 
-  // const handleClickToolButton = async (magicWord: string) => {
-  //   if (isDisable) return
+  const handleClickToolButton = async (magicWord: string) => {
+    if (isDisable) return
 
-  //   const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
 
-  //   removeQuoteTweet() // in case repeatedly send and make sure user can retry
-  //   setInput("")
+    removeQuoteTweet() // in case repeatedly send and make sure user can retry
+    setInput("")
 
-  //   await append({
-  //     role: "user",
-  //     content: magicWord,
-  //     data
-  //   })
-  // }
+    await append({
+      role: "user",
+      content: magicWord,
+      data
+    })
+  }
 
   return (
     <div className="flex gap-y-6 rounded-md flex-col h-full">
@@ -228,32 +247,40 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             Thinking...
           </div>
         )}
-        {showGreeting && <EmptyContent content="Hi, How can I help you?" />}
+        {showGreeting && (
+          <EmptyContent
+            content="Hi, How can I help you?"
+            hideImage={true}
+            textClassName="text-primary-brand"
+          />
+        )}
       </div>
 
       {/* input and send message button */}
       <div className="py-2 flex flex-col gap-1">
-        {/* todo toolbar */}
-        {/* <div className="flex gap-1 items-center">
-              {QuoteTweetTools.map((tool) => (
-                <Tooltip.Provider key={tool.magicWord}>
-                  <Tooltip.Root delayDuration={200}>
-                    <Tooltip.Trigger
-                      className="cursor-pointer p-2 bg-white hover:bg-blue-100 rounded-lg transition-colors duration-200"
-                      onClick={() => handleClickToolButton(tool.magicWord)}>
-                      {tool.icon}
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        className="rounded-md border border-thinborder bg-muted px-3 py-1.5 text-sm text-foreground shadow-md"
-                        side="top">
-                        {tool.tooltip}
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
-              ))}
-            </div> */}
+        <div className="flex mb-2 items-center justify-between gap-10">
+          <Select value="default">
+            <SelectTrigger className="w-[176px]" size="sm">
+              <SelectValue placeholder="Select model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="default" value="default">
+                Default
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="flex gap-4 items-center">
+            {Tools.map((tool) => (
+              <Tooltip key={tool.type} content={tool.tooltip}>
+                <div
+                  onClick={() => handleClickToolButton(tool.magicWord)}
+                  className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
+                  {tool.icon}
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+        </div>
         <form
           className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
           onSubmit={(event) => handleFormSubmit(event)}>

@@ -64,7 +64,7 @@ export const ReminderPanel = () => {
       <PanelHeader title="Reminder" />
       <main className="flex-1 min-h-0 flex flex-col overflow-y-hidden overflow-x-hidden py-4">
         {!!ReminderData.length ? (
-          <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-scroll stylized-scroll">
+          <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-scroll hide-scrollbar">
             {selectedReminder && (
               <div className="h-[18px] text-xs text-text-default-secondary">
                 {dayjs(selectedReminder.date).format("MMMM D, YYYY")}
@@ -98,7 +98,7 @@ export const ReminderPanel = () => {
                 </div>
               ))}
             </div>
-            <div className="flex min-h-0 flex-1 overlfow-y-auto">
+            <div className="flex min-h-0 flex-1 overlfow-y-auto hide-scrollbar">
               {selectedReminder ? (
                 <ReminderList item={selectedReminder} />
               ) : (
