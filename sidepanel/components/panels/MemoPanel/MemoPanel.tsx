@@ -121,10 +121,6 @@ export const MemoPanel = () => {
     } catch (e) {}
   }
 
-  if (isLoading) {
-    return <MemoPanelSkeleton />
-  }
-
   return (
     <div className="flex flex-col h-full">
       {selectedMemo ? (
@@ -162,6 +158,8 @@ export const MemoPanel = () => {
       )}
       {selectedMemo ? (
         <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />
+      ) : isLoading ? (
+        <MemoPanelSkeleton />
       ) : (
         <main className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
           {memos?.length > 0 ? (
@@ -195,10 +193,10 @@ export const MemoPanel = () => {
                   footerTitle="Note"
                   footerTime={memo.postedAt}
                   footerOperation={
-                    <div className="flex items-center gap-x-2">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
-                        className="w-fit h-fit p-0"
+                        className="w-fit h-fit !p-0"
                         onClick={(e) => {
                           e.stopPropagation()
                         }}>
@@ -206,7 +204,7 @@ export const MemoPanel = () => {
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="w-fit h-fit p-0">
+                          <Button variant="ghost" className="w-fit h-fit !p-0">
                             <EllipsisIcon className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
