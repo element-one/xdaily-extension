@@ -207,7 +207,6 @@ const Toolbar = () => {
   const handleQuoteTweet = async () => {
     if (!tweet) return
     const tweetInfo = extractTweetDataFromTweet(tweet)
-    console.log("testing", tweetInfo)
     if (!tweetInfo) {
       // TODO maybe a toast
       return

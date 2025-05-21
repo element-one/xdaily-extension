@@ -27,8 +27,5 @@ export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
     set({
       quoteTweet: null
     }),
-  setKolScreenName: (screenName: string) => {
-    console.log("testing", screenName)
-    return set({ kolScreenName: screenName })
-  }
+  setKolScreenName: (screenName: string) => set({ kolScreenName: screenName })
 })

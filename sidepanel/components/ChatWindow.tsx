@@ -66,6 +66,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const msg = data.messages.pop()
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
+        const quoteContent = msg.data?.tweet?.tweetText
 
         const response = await fetch(url, {
           method: "POST",
@@ -75,7 +76,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           credentials: "include", // cookie
           body: JSON.stringify({
             message: userMessage,
-            tweetId
+            tweetId,
+            quote: quoteContent
           })
         })
         return response

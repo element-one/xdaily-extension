@@ -16,10 +16,8 @@ const ChatSection: FC<ChatSectionProps> = ({ screenName }) => {
 export const KolChatSection: FC = () => {
   const { kolScreenName, setKolScreenName } = useStore()
 
-  console.log("kolScreenName", kolScreenName)
-
   const handleBack = () => {
-    // setKolScreenName("")
+    setKolScreenName("")
   }
   if (!kolScreenName) {
     return <></>

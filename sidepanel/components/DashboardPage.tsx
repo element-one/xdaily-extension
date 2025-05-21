@@ -123,8 +123,8 @@ export const DashboardPage = () => {
   }, [navbarItemKey])
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
+    setKolScreenName("")
     if (itemKey !== navbarItemKey) {
-      setKolScreenName("")
       setNavbarItemKey(itemKey)
     }
   }
