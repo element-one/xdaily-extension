@@ -1,8 +1,15 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { ClockIcon } from "lucide-react"
+import { ClockIcon, EllipsisIcon, Trash2Icon } from "lucide-react"
 import type { FC } from "react"
 
+import { Button } from "~sidepanel/components/ui/Button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "~sidepanel/components/ui/DropdownMenu"
 import { ReminderStatus, type FormatReminderItem } from "~types/reminder"
 
 const colorMaps = {
@@ -16,13 +23,22 @@ const colorMaps = {
 interface ReminderListProps {
   data: FormatReminderItem[]
   sectionRefs: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+  onDeleteReminder?: (id: string) => void
 }
 
-export const ReminderList: FC<ReminderListProps> = ({ data, sectionRefs }) => {
+export const ReminderList: FC<ReminderListProps> = ({
+  data,
+  sectionRefs,
+  onDeleteReminder
+}) => {
   const formatTimeSpan = (fromAt: Date | string, toAt: Date | string) => {
     const from = dayjs(fromAt).format("HH:mm")
     const to = dayjs(toAt).format("HH:mm")
     return `${from} - ${to}`
+  }
+
+  const handleDeleteReminder = (id: string) => {
+    onDeleteReminder?.(id)
   }
   return (
     <div className="flex flex-col gap-4">
@@ -51,16 +67,35 @@ export const ReminderList: FC<ReminderListProps> = ({ data, sectionRefs }) => {
                 </div>
                 <div className="font-medium text-sm">{detail.description}</div>
                 <div className="w-full h-[1px] bg-fill-bg-input" />
-                <div className="h-[18px] flex gap-1 items-center">
-                  <span
-                    className="inline-block w-1 h-1 rounded-full translate-y-[2px]"
-                    style={{ backgroundColor: colorMaps[detail.status] }}
-                  />
-                  <span
-                    className="capitalize text-xs"
-                    style={{ color: colorMaps[detail.status] }}>
-                    {detail.status}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="h-[18px] flex gap-1 items-center">
+                    <span
+                      className="inline-block w-1 h-1 rounded-full translate-y-[2px]"
+                      style={{ backgroundColor: colorMaps[detail.status] }}
+                    />
+                    <span
+                      className="capitalize text-xs"
+                      style={{ color: colorMaps[detail.status] }}>
+                      {detail.status}
+                    </span>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="w-fit h-fit !p-0">
+                        <EllipsisIcon className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteReminder(detail.id)
+                        }}>
+                        <Trash2Icon className="text-red w-4 h-4" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             ))}

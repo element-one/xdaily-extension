@@ -57,12 +57,12 @@ export const CreateReminderDialog: FC<CreateReminderDialogProps> = ({
       return
     }
 
-    if (from.isBefore(now)) {
+    if (from.isBefore(now, "day")) {
       toast("Start time cannot be earlier than today")
       return
     }
 
-    if (to.isBefore(from)) {
+    if (to.isBefore(from, "day")) {
       toast("End time cannot be earlier than start time")
       return
     }

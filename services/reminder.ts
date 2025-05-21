@@ -92,3 +92,15 @@ export const useCreateReminder = (
     mutationFn: createReminder
   })
 }
+
+export const deleteReminder = async ({ id }: { id: string }) => {
+  const response = await client.delete(`/users/reminders/${id}`)
+  return response.data
+}
+
+export const useDeleteReminder = () => {
+  return useMutation({
+    mutationKey: ["delete-reminder"],
+    mutationFn: deleteReminder
+  })
+}

@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import { PlusIcon, SearchIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
-import { useReminders } from "~services/reminder"
+import { useDeleteReminder, useReminders } from "~services/reminder"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Divider } from "~sidepanel/components/ui/Divider"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
@@ -40,6 +40,7 @@ const ReminderPanelSkeleton = () => {
 }
 export const ReminderPanel = () => {
   const { data, isLoading, refetch } = useReminders() // do not use take
+  const { mutateAsync: deleteReminder } = useDeleteReminder()
 
   const tabRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -126,8 +127,14 @@ export const ReminderPanel = () => {
   }
 
   const handleAddClick = () => {
-    console.log("testing")
     onDialogChange(true)
+  }
+
+  const handleDeleteReminder = async (id: string) => {
+    try {
+      await deleteReminder({ id })
+      refetch()
+    } catch (e) {}
   }
 
   return (
@@ -185,7 +192,11 @@ export const ReminderPanel = () => {
               <div
                 ref={listWrapperRef}
                 className="flex-1 overflow-y-auto hide-scrollbar">
-                <ReminderList data={reminderData} sectionRefs={sectionRefs} />
+                <ReminderList
+                  data={reminderData}
+                  sectionRefs={sectionRefs}
+                  onDeleteReminder={handleDeleteReminder}
+                />
               </div>
             </section>
           ) : (
