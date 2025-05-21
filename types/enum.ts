@@ -19,11 +19,6 @@ export enum NavbarItemKey {
   CHAT = "self_robot_chat"
 }
 
-export enum UserPanelItemKey {
-  LIST = "user_panel_list",
-  CHAT = "user_panel_chat"
-}
-
 export enum ChatStatus {
   IDLE = "idle",
   STREAMING = "streaming",

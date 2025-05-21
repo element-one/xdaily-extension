@@ -7,7 +7,7 @@ type TweetListProps = TweetCollection
 export const TweetItem: FC<TweetListProps> = (props) => {
   const handleClickTweetItem = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/library/bookmarks/posts`
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
     })
   }
 

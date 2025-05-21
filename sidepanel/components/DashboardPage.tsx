@@ -4,7 +4,7 @@ import { useEffect, useMemo, type FC, type ReactNode } from "react"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
-import { NavbarItemKey, UserPanelItemKey } from "~types/enum"
+import { NavbarItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
 import AddIcon from "./icons/AddIcon"
@@ -15,6 +15,7 @@ import MessageIcon from "./icons/MessageIcon"
 import ReminderIcon from "./icons/ReminderIcon"
 import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
+import { KolChatSection } from "./KolChatSection/KolChatSection"
 import { KolNavbar } from "./KolNavbar"
 import { MeNavbarItem } from "./MeNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
@@ -109,7 +110,7 @@ export const DashboardPage = () => {
     setNavbarItemKey,
     clearNavbar,
     setQuoteTweet,
-    setUserPanelItemKey
+    setKolScreenName
   } = useStore()
 
   const currentNavbarItem = useMemo(() => {
@@ -122,46 +123,15 @@ export const DashboardPage = () => {
   }, [navbarItemKey])
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
+    setKolScreenName("")
     if (itemKey !== navbarItemKey) {
       setNavbarItemKey(itemKey)
     }
   }
 
-  const checkTweetPage = (urlString: string) => {
-    const url = new URL(urlString)
-    const pathSegments = url.pathname.split("/").filter(Boolean)
-
-    const RESERVED_PATHS = ["search", "settings", "notifications"]
-    const isUserProfile =
-      pathSegments.length === 1 && !RESERVED_PATHS.includes(pathSegments[0])
-
-    if (isUserProfile) {
-      // go to chat panel if is tweet profile page
-      toggleDrawer(NavbarItemKey.EXPLORE)
-      setTimeout(() => {
-        setUserPanelItemKey(UserPanelItemKey.CHAT)
-      }, 50)
-    }
-  }
-
   useEffect(() => {
     clearNavbar()
-
-    const checkCurrentTab = () => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.url) checkTweetPage(tabs[0].url)
-      })
-    }
-    checkCurrentTab()
-
-    const handleTabUpdate = (tabId: number, changeInfo: any, tab: any) => {
-      if (changeInfo.status === "complete" && tab.url) {
-        checkTweetPage(tab.url)
-      }
-    }
-    const handleTabActivated = () => {
-      checkCurrentTab()
-    }
+    setKolScreenName("")
 
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
@@ -171,12 +141,8 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    chrome.tabs.onUpdated.addListener(handleTabUpdate)
-    chrome.tabs.onActivated.addListener(handleTabActivated)
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener)
-      chrome.tabs.onUpdated.removeListener(handleTabUpdate)
-      chrome.tabs.onActivated.removeListener(handleTabActivated)
     }
   }, [])
 
@@ -187,13 +153,14 @@ export const DashboardPage = () => {
         <div className="bg-fill-bg-deep text-text-default-primary w-full relative flex-1 overflow-hidden rounded-xl">
           <div
             className={clsx(
-              "p-4 h-screen",
+              "py-4 pl-4 pr-0 h-screen",
               currentNavbarItem?.wrapperClassName
             )}>
             <div className="flex flex-col h-full overflow-y-auto hide-scrollbar">
               {currentNavbarItem?.component}
             </div>
           </div>
+          <KolChatSection />
         </div>
       </div>
       <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px] bg-text-inverse-primary">

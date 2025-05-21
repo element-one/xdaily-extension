@@ -1,8 +1,3 @@
-export interface ReminderItem {
-  id: string
-  date: Date
-}
-
 export enum ReminderStatus {
   UPCOMING = "upcoming",
   PENDING = "pending",
@@ -10,9 +5,40 @@ export enum ReminderStatus {
   PAST = "past",
   CANCEL = "cancel"
 }
-export interface ReminderDetailItem {
-  timeSpan: string
-  status: ReminderStatus
+export interface ReminderItem {
+  id: string
   title: string
-  info: string
+  description: string
+  fromAt: Date
+  toAt: Date
+  status: ReminderStatus
+}
+
+export interface GetRemindersParmas {
+  page: number
+  take?: number
+}
+
+export interface GetRemindersResp {
+  data: ReminderItem[]
+  meta: {
+    page: number
+    take: number
+    itemCount: number
+    pageCount: number
+    hasPreviousPage: number
+    hasNextPage: number
+  }
+}
+
+export interface FormatReminderItem {
+  id: string
+  items: ReminderItem[]
+}
+
+export interface CreateReminderParams {
+  title: string
+  description: string
+  fromAt: Date
+  toAt: Date
 }

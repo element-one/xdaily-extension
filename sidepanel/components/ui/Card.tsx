@@ -1,15 +1,16 @@
+import type { FC, ReactNode } from "react"
+
 import { formatRelativeTime } from "~libs/date"
-import type { FC } from "~node_modules/@types/react"
 
 import { Divider } from "./Divider"
 
 interface CardProps {
   onClick?: () => void
-  title: string
+  title: string | ReactNode
   content?: string
-  footerIcon: React.ReactNode
+  footerIcon: ReactNode
   footerTitle: string
-  footerOperation?: React.ReactNode
+  footerOperation?: ReactNode
   footerTime?: Date
 }
 export const Card: FC<CardProps> = ({

@@ -18,7 +18,6 @@ export const SuggestionTag: FC<SuggestionTagProps> = ({
   }, [addable, deletable])
 
   const handleClick = () => {
-    console.log("testing click")
     if (addable || deletable) {
       onTagClick?.()
     }

@@ -107,3 +107,23 @@ export interface GetUserSearchResp {
   channels: any[]
   text: any[]
 }
+
+export interface FileCollection {
+  id: string
+  fileUrl: string
+  fileType: string
+  content: any | null
+  status: string // TODO enum
+  createdAt: Date
+}
+export interface GetFileCollectionResp {
+  data: FileCollection[]
+  meta: {
+    page: number
+    take: number
+    itemCount: number
+    pageCount: number
+    hasPreviousPage: number
+    hasNextPage: number
+  }
+}

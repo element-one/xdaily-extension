@@ -59,7 +59,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { messages, input, handleInputChange, status, append, setInput } =
     useChat({
       id: screenName, // as different session
-      // TODO real api request
       api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
       streamProtocol: "text",
       fetch: async (url, options) => {
@@ -67,6 +66,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const msg = data.messages.pop()
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
+        const quoteContent = msg.data?.tweet?.tweetText
 
         const response = await fetch(url, {
           method: "POST",
@@ -76,7 +76,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           credentials: "include", // cookie
           body: JSON.stringify({
             message: userMessage,
-            tweetId
+            tweetId,
+            quote: quoteContent
           })
         })
         return response
@@ -127,6 +128,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    scrollToBottom()
+  }, [quoteTweet])
+
   // scroll to bottom after init history
   useEffect(() => {
     const initHistory = async () => {
@@ -136,9 +141,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     initHistory()
   }, [])
 
-  const isDisable = useMemo(() => {
-    return status !== "ready" || isLoadingHistory
+  const isDisableStatus = useMemo(() => {
+    return status === "submitted" || status === "streaming"
   }, [status])
+
+  const isDisable = useMemo(() => {
+    return isDisableStatus || isLoadingHistory
+  }, [isDisableStatus])
 
   const loadMoreHistory = async () => {
     if (isLoadingHistory || !hasNextPage) return
@@ -225,6 +234,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
         {allMessages.map((m, i) => (
           <div key={i} className={`flex flex-col gap-3`}>
+            {m.data?.tweet && (
+              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
+            )}
             <div
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -236,15 +248,22 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                 <Markdown>{m.content}</Markdown>
               </div>
             </div>
-            {m.data?.tweet && (
-              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
-            )}
           </div>
         ))}
 
         {(status === "submitted" || status === "streaming") && (
           <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
             Thinking...
+          </div>
+        )}
+        {/* quote post info */}
+        {quoteTweet && (
+          <div className="w-full mb-2">
+            <ChatTweetSection
+              tweet={quoteTweet}
+              showClearButton={true}
+              handleClear={handleCancelQuoteTweet}
+            />
           </div>
         )}
         {showGreeting && (
@@ -257,7 +276,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       </div>
 
       {/* input and send message button */}
-      <div className="py-2 flex flex-col gap-1">
+      <div className="py-2 flex flex-col gap-1 relative">
         <div className="flex mb-2 items-center justify-between gap-10">
           <Select value="default">
             <SelectTrigger className="w-[176px]" size="sm">
@@ -284,22 +303,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         <form
           className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
           onSubmit={(event) => handleFormSubmit(event)}>
-          {/* quote post info */}
-          {quoteTweet && (
-            <div className="w-full mb-2">
-              <ChatTweetSection
-                tweet={quoteTweet}
-                showClearButton={true}
-                handleClear={handleCancelQuoteTweet}
-              />
-            </div>
-          )}
           <textarea
-            disabled={status !== "ready"}
+            disabled={isDisableStatus}
             value={input}
             onChange={handleInputChange}
             placeholder="Ask me anything..."
-            className="mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
+            className="caret-primary-brand mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
           />
           <button
             type="submit"
@@ -310,6 +319,11 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <ArrowUpIcon className="w-6 h-6 text-primary-brand" />
           </button>
         </form>
+        {status === "error" && (
+          <div className="px-2 text-[10px] text-red absolute top-full left-0 right-0 -translate-y-1/2 pt-1">
+            Something wrong, please try again.
+          </div>
+        )}
       </div>
     </div>
   )
