@@ -59,7 +59,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { messages, input, handleInputChange, status, append, setInput } =
     useChat({
       id: screenName, // as different session
-      // TODO real api request
       api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
       streamProtocol: "text",
       fetch: async (url, options) => {
@@ -140,9 +139,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     initHistory()
   }, [])
 
-  const isDisable = useMemo(() => {
-    return status !== "ready" || isLoadingHistory
+  const isDisableStatus = useMemo(() => {
+    return status === "submitted" || status === "streaming"
   }, [status])
+
+  const isDisable = useMemo(() => {
+    return isDisableStatus || isLoadingHistory
+  }, [isDisableStatus])
 
   const loadMoreHistory = async () => {
     if (isLoadingHistory || !hasNextPage) return
@@ -271,7 +274,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       </div>
 
       {/* input and send message button */}
-      <div className="py-2 flex flex-col gap-1">
+      <div className="py-2 flex flex-col gap-1 relative">
         <div className="flex mb-2 items-center justify-between gap-10">
           <Select value="default">
             <SelectTrigger className="w-[176px]" size="sm">
@@ -299,7 +302,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
           onSubmit={(event) => handleFormSubmit(event)}>
           <textarea
-            disabled={status !== "ready"}
+            disabled={isDisableStatus}
             value={input}
             onChange={handleInputChange}
             placeholder="Ask me anything..."
@@ -314,6 +317,11 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <ArrowUpIcon className="w-6 h-6 text-primary-brand" />
           </button>
         </form>
+        {status === "error" && (
+          <div className="px-2 text-[10px] text-red absolute top-full left-0 right-0 -translate-y-1/2 pt-1">
+            Something wrong, please try again.
+          </div>
+        )}
       </div>
     </div>
   )

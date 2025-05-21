@@ -1,24 +1,24 @@
 import type { FC } from "react"
 
 import { Avatar } from "~sidepanel/components/ui/Avatar"
+import { useStore } from "~store/store"
 import type { KolCollection } from "~types/collection"
-import { X_SITE } from "~types/enum"
 
 interface KolItemProps {
   item: KolCollection
 }
 
 export const KolItem: FC<KolItemProps> = ({ item: user }) => {
-  const handleClickTweetItem = () => {
-    chrome.tabs.create({
-      url: `${X_SITE}/${user.screenName}`
-    })
+  const { setKolScreenName } = useStore()
+
+  const handleClickTweetItem = (screenName: string) => {
+    setKolScreenName(screenName)
   }
 
   return (
     <div
       className="w-full p-4 rounded-lg border border-fill-bg-input bg-fill-bg-deep hover:border-primary-brand cursor-pointer"
-      onClick={handleClickTweetItem}>
+      onClick={() => handleClickTweetItem(user.screenName)}>
       <div>
         <Avatar alt={user.screenName} url={user.avatar} className="w-12 h-12" />
       </div>
