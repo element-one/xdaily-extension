@@ -11,6 +11,7 @@ import { MessageType } from "~types/message"
 import { DashboardPage } from "./components/DashboardPage"
 import { LoginPage } from "./components/LoginPage"
 import { Loading } from "./components/ui/Loading"
+import { ToastProvider } from "./components/ui/Toast"
 
 const queryClient = new QueryClient()
 
@@ -71,7 +72,9 @@ const IndexSidePanel = () => {
 
 const RootApp = () => (
   <QueryClientProvider client={queryClient}>
-    <IndexSidePanel />
+    <ToastProvider>
+      <IndexSidePanel />
+    </ToastProvider>
   </QueryClientProvider>
 )
 

@@ -8,6 +8,7 @@ import dayjs from "dayjs"
 
 import client from "~libs/client"
 import type {
+  CreateReminderParams,
   GetRemindersParmas,
   GetRemindersResp,
   ReminderItem
@@ -17,31 +18,15 @@ export const getReminders = async ({
   page,
   take
 }: GetRemindersParmas): Promise<GetRemindersResp> => {
-  const response = await client.get(
-    `/users/reminders?page=${page}&take=${take}`
-  )
+  let url = `/users/reminders?page=${page}`
+  if (take) {
+    url += `&take=${take}`
+  }
+  const response = await client.get(url)
   return response.data
 }
 
-// export const useReminders = (take: number) => {
-//   return useInfiniteQuery<GetRemindersResp, Error, InfiniteData<ReminderItem>>({
-//     queryKey: ["user-collections", take],
-//     queryFn: ({ pageParam = 1 }) =>
-//       getReminders({ page: pageParam as number, take }),
-//     initialPageParam: 1,
-//     refetchOnWindowFocus: false,
-//     refetchOnReconnect: false,
-//     getNextPageParam: (lastPage) => {
-//       return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
-//     },
-//     select: (data) => ({
-//       pages: data.pages.map((page) => page.data).flat(),
-//       pageParams: data.pageParams
-//     })
-//   })
-// }
-
-export const useReminders = (take: number) => {
+export const useReminders = (take?: number) => {
   return useInfiniteQuery<
     GetRemindersResp,
     Error,
@@ -86,5 +71,24 @@ export const useReminders = (take: number) => {
         pageParams: data.pageParams as number[]
       }
     }
+  })
+}
+
+export const createReminder = async (
+  data: CreateReminderParams
+): Promise<ReminderItem> => {
+  const response = await client.post("/users/reminders", data)
+  return response.data
+}
+
+export const useCreateReminder = (
+  options?: Partial<
+    UseMutationOptions<ReminderItem, Error, CreateReminderParams>
+  >
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["create-reminder"],
+    mutationFn: createReminder
   })
 }

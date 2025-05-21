@@ -16,7 +16,7 @@ export interface ReminderItem {
 
 export interface GetRemindersParmas {
   page: number
-  take: number
+  take?: number
 }
 
 export interface GetRemindersResp {
@@ -34,4 +34,11 @@ export interface GetRemindersResp {
 export interface FormatReminderItem {
   id: string
   items: ReminderItem[]
+}
+
+export interface CreateReminderParams {
+  title: string
+  description: string
+  fromAt: Date
+  toAt: Date
 }
