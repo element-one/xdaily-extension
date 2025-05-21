@@ -23,7 +23,7 @@ export const KolChatSection: FC = () => {
     return <></>
   }
   return (
-    <div className="flex flex-col h-full p-4 absolute inset-0 bg-fill-bg-deep">
+    <div className="flex flex-col h-full py-4 pl-4 pr-0 absolute inset-0 bg-fill-bg-deep">
       <PanelHeader
         title={
           <div

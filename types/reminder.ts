@@ -1,8 +1,3 @@
-export interface ReminderItem {
-  id: string
-  date: Date
-}
-
 export enum ReminderStatus {
   UPCOMING = "upcoming",
   PENDING = "pending",
@@ -15,4 +10,9 @@ export interface ReminderDetailItem {
   status: ReminderStatus
   title: string
   info: string
+}
+export interface ReminderItem {
+  id: string
+  date: Date
+  // items: ReminderDetailItem[]
 }

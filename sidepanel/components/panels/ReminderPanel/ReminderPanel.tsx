@@ -8,76 +8,81 @@ import type { ReminderItem } from "~types/reminder"
 
 import { ReminderList } from "./ReminderList"
 
-const MockData: ReminderItem[] = [
-  {
-    id: "1",
-    date: new Date("2025-5-14")
-  },
-  {
-    id: "2",
-    date: new Date("2025-5-15")
-  },
-  {
-    id: "3",
-    date: new Date("2025-5-16")
-  },
-  {
-    id: "4",
-    date: new Date("2025-5-17")
-  },
-  {
-    id: "5",
-    date: new Date("2025-5-18")
-  }
-] as const
+const ReminderData: ReminderItem[] = [
+  { id: "1", date: new Date("2025-5-14") },
+  { id: "2", date: new Date("2025-5-15") },
+  { id: "3", date: new Date("2025-5-16") },
+  { id: "4", date: new Date("2025-5-17") },
+  { id: "5", date: new Date("2025-5-18") }
+]
 
 export const ReminderPanel = () => {
-  const ReminderData = MockData.slice(0)
   const tabRefs = useRef<Record<string, HTMLDivElement | null>>({})
-  const [selectedReminder, setSelectedReminder] = useState<ReminderItem | null>(
-    null
-  )
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const listWrapperRef = useRef<HTMLDivElement | null>(null)
+
+  const [selectedId, setSelectedId] = useState(ReminderData[0].id)
 
   useEffect(() => {
-    // select if not selected
-    if (ReminderData.length > 0 && !selectedReminder) {
-      setSelectedReminder(ReminderData[0])
-    }
-  }, [ReminderData, selectedReminder])
-
-  const handleSelectReminder = (item: ReminderItem) => {
-    if (item.id !== selectedReminder.id) {
-      setSelectedReminder(item)
-      const ref = tabRefs.current[item.id]
-      if (ref) {
-        ref.scrollIntoView({
-          behavior: "smooth",
-          inline: "center",
-          block: "nearest"
-        })
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting)
+        if (visible) {
+          const visibleId = visible.target.getAttribute("data-id")
+          if (visibleId && visibleId !== selectedId) {
+            setSelectedId(visibleId)
+          }
+        }
+      },
+      {
+        root: listWrapperRef.current,
+        threshold: 0.5
       }
+    )
+
+    Object.values(sectionRefs.current).forEach((el) => {
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [selectedId])
+
+  useEffect(() => {
+    const currentTab = tabRefs.current[selectedId]
+    if (currentTab) {
+      currentTab.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+      })
+    }
+  }, [selectedId])
+
+  const handleSelectTab = (id: string) => {
+    const section = sectionRefs.current[id]
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      })
     }
   }
 
   return (
     <div className="flex flex-col h-full">
       <PanelHeader title="Reminder" />
-      <main className="flex-1 min-h-0 flex flex-col overflow-y-hidden overflow-x-hidden py-4">
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden py-4">
         {!!ReminderData.length ? (
-          <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-scroll hide-scrollbar">
-            {selectedReminder && (
-              <div className="h-[18px] text-xs text-text-default-secondary">
-                {dayjs(selectedReminder.date).format("MMMM D, YYYY")}
-              </div>
-            )}
-            <div className="flex gap-2 w-full overflow-x-auto hide-scrollbar">
+          <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+            <div className="flex gap-2 w-full overflow-x-auto hide-scrollbar px-4">
               {ReminderData.map((item) => (
                 <div
-                  onClick={() => handleSelectReminder(item)}
+                  key={item.id}
+                  onClick={() => handleSelectTab(item.id)}
                   ref={(el) => (tabRefs.current[item.id] = el)}
                   className={clsx(
                     "bg-fill-bg-light py-1 group cursor-pointer w-14 h-[74px] rounded-lg border transition-all shrink-0 flex flex-col gap-2 hover:border-primary-brand hover:text-primary-brand",
-                    selectedReminder?.id === item.id
+                    selectedId === item.id
                       ? "border-primary-brand text-primary-brand"
                       : "border-fill-bg-input text-text-default-secondary"
                   )}>
@@ -87,7 +92,7 @@ export const ReminderPanel = () => {
                   <div
                     className={clsx(
                       "border w-full group-hover:border-primary-brand",
-                      selectedReminder?.id === item.id
+                      selectedId === item.id
                         ? "border-primary-brand"
                         : "border-fill-bg-input"
                     )}
@@ -98,20 +103,15 @@ export const ReminderPanel = () => {
                 </div>
               ))}
             </div>
-            <div className="flex min-h-0 flex-1 overlfow-y-auto hide-scrollbar">
-              {selectedReminder ? (
-                <ReminderList item={selectedReminder} />
-              ) : (
-                <EmptyContent content="No Reminder" />
-              )}
+            <div
+              ref={listWrapperRef}
+              className="flex-1 overflow-y-auto hide-scrollbar px-4">
+              <ReminderList data={ReminderData} sectionRefs={sectionRefs} />
             </div>
           </section>
         ) : (
           <EmptyContent content="No Reminder Now" />
         )}
-        {/* load more */}
-        {/* <div ref={bottomObserver} className="h-4 w-full" /> */}
-        {/* {isFetchingNextPage && <p className="text-center">loading...</p>} */}
       </main>
     </div>
   )
