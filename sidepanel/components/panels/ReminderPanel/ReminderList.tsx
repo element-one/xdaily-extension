@@ -40,6 +40,11 @@ export const ReminderList: FC<ReminderListProps> = ({
   const handleDeleteReminder = (id: string) => {
     onDeleteReminder?.(id)
   }
+  const handleClickReminder = () => {
+    chrome.tabs.create({
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/reminder`
+    })
+  }
   return (
     <div className="flex flex-col gap-4">
       {data.map((item) => (
@@ -55,8 +60,9 @@ export const ReminderList: FC<ReminderListProps> = ({
             {item.items.map((detail, index) => (
               <div
                 key={index}
+                onClick={handleClickReminder}
                 className={clsx(
-                  "gap-2 flex flex-col rounded-lg border border-fill-bg-input py-3 px-3 bg-fill-bg-light",
+                  "gap-2 flex flex-col rounded-lg border border-fill-bg-input py-3 px-3 bg-fill-bg-light cursor-pointer hover:border-primary-brand",
                   detail.status === ReminderStatus.CANCEL
                     ? "text-text-default-secondary"
                     : "text-text-default-primary"
