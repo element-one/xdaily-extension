@@ -127,6 +127,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    scrollToBottom()
+  }, [quoteTweet])
+
   // scroll to bottom after init history
   useEffect(() => {
     const initHistory = async () => {
@@ -225,6 +229,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
         {allMessages.map((m, i) => (
           <div key={i} className={`flex flex-col gap-3`}>
+            {m.data?.tweet && (
+              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
+            )}
             <div
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -236,15 +243,22 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                 <Markdown>{m.content}</Markdown>
               </div>
             </div>
-            {m.data?.tweet && (
-              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
-            )}
           </div>
         ))}
 
         {(status === "submitted" || status === "streaming") && (
           <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
             Thinking...
+          </div>
+        )}
+        {/* quote post info */}
+        {quoteTweet && (
+          <div className="w-full mb-2">
+            <ChatTweetSection
+              tweet={quoteTweet}
+              showClearButton={true}
+              handleClear={handleCancelQuoteTweet}
+            />
           </div>
         )}
         {showGreeting && (
@@ -284,22 +298,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         <form
           className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
           onSubmit={(event) => handleFormSubmit(event)}>
-          {/* quote post info */}
-          {quoteTweet && (
-            <div className="w-full mb-2">
-              <ChatTweetSection
-                tweet={quoteTweet}
-                showClearButton={true}
-                handleClear={handleCancelQuoteTweet}
-              />
-            </div>
-          )}
           <textarea
             disabled={status !== "ready"}
             value={input}
             onChange={handleInputChange}
             placeholder="Ask me anything..."
-            className="mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
+            className="caret-primary-brand mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
           />
           <button
             type="submit"

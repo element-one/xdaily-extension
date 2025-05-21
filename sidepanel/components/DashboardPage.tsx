@@ -187,7 +187,7 @@ export const DashboardPage = () => {
         <div className="bg-fill-bg-deep text-text-default-primary w-full relative flex-1 overflow-hidden rounded-xl">
           <div
             className={clsx(
-              "p-4 h-screen",
+              "py-4 px-2 h-screen",
               currentNavbarItem?.wrapperClassName
             )}>
             <div className="flex flex-col h-full overflow-y-auto hide-scrollbar">
