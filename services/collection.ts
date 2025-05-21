@@ -1,10 +1,8 @@
 import {
   useInfiniteQuery,
   useMutation,
-  useQuery,
   type InfiniteData,
-  type UseMutationOptions,
-  type UseQueryOptions
+  type UseMutationOptions
 } from "@tanstack/react-query"
 
 import client from "~libs/client"

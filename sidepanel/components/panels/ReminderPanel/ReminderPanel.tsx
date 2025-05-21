@@ -1,27 +1,35 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useReminders } from "~services/reminder"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
-import type { ReminderItem } from "~types/reminder"
 
 import { ReminderList } from "./ReminderList"
-
-const ReminderData: ReminderItem[] = [
-  { id: "1", date: new Date("2025-5-14") },
-  { id: "2", date: new Date("2025-5-15") },
-  { id: "3", date: new Date("2025-5-16") },
-  { id: "4", date: new Date("2025-5-17") },
-  { id: "5", date: new Date("2025-5-18") }
-]
 
 export const ReminderPanel = () => {
   const tabRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const listWrapperRef = useRef<HTMLDivElement | null>(null)
 
-  const [selectedId, setSelectedId] = useState(ReminderData[0].id)
+  const [selectedId, setSelectedId] = useState("")
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useReminders(20)
+
+  console.log("data", data)
+
+  const reminderData = useMemo(() => {
+    return data?.pages ?? []
+  }, [data])
+
+  useEffect(() => {
+    const firstItem = reminderData[0]
+    if (firstItem) {
+      setSelectedId(firstItem.id)
+    }
+  }, [reminderData])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -68,14 +76,16 @@ export const ReminderPanel = () => {
     }
   }
 
+  // loading
+
   return (
     <div className="flex flex-col h-full">
       <PanelHeader title="Reminder" />
       <main className="flex-1 min-h-0 flex flex-col overflow-hidden py-4">
-        {!!ReminderData.length ? (
+        {!!reminderData.length ? (
           <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
             <div className="flex gap-2 w-full overflow-x-auto hide-scrollbar px-4">
-              {ReminderData.map((item) => (
+              {reminderData.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => handleSelectTab(item.id)}
@@ -87,7 +97,7 @@ export const ReminderPanel = () => {
                       : "border-fill-bg-input text-text-default-secondary"
                   )}>
                   <div className="h-[18px] flex items-center justify-center text-xs">
-                    {dayjs(item.date).format("ddd").toUpperCase()}
+                    {dayjs(item.id).format("ddd").toUpperCase()}
                   </div>
                   <div
                     className={clsx(
@@ -98,7 +108,7 @@ export const ReminderPanel = () => {
                     )}
                   />
                   <div className="flex-1 text-xl font-bold flex items-center justify-center">
-                    {dayjs(item.date).format("DD")}
+                    {dayjs(item.id).format("DD")}
                   </div>
                 </div>
               ))}
@@ -106,7 +116,7 @@ export const ReminderPanel = () => {
             <div
               ref={listWrapperRef}
               className="flex-1 overflow-y-auto hide-scrollbar px-4">
-              <ReminderList data={ReminderData} sectionRefs={sectionRefs} />
+              <ReminderList data={reminderData} sectionRefs={sectionRefs} />
             </div>
           </section>
         ) : (
