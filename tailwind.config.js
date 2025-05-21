@@ -14,6 +14,7 @@ module.exports = {
         purple: "#AF52DE",
         green: "#34C759",
         red: "#FF3B30",
+        blue: "#007AFF",
         muted: {
           DEFAULT: "#f5f5f4",
           foreground: "#78716c",

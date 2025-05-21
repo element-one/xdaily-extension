@@ -9,7 +9,9 @@ import {
 
 import client from "~libs/client"
 import type {
+  FileCollection,
   GetCollectionParams,
+  GetFileCollectionResp,
   GetKolCollectionParams,
   GetKolCollectionResp,
   GetTweetCollectionResp,
@@ -138,5 +140,37 @@ export const userSearchExplore = (
     ...options,
     mutationKey: ["search-explore"],
     mutationFn: getSearchExplore
+  })
+}
+
+export const getFileCollection = async ({
+  page,
+  take
+}: GetCollectionParams): Promise<GetFileCollectionResp> => {
+  const response = await client.get(
+    `/users/knowledge-bases?page=${page}&take=${take}`
+  )
+  return response.data
+}
+
+export const useFileCollections = (take: number) => {
+  return useInfiniteQuery<
+    GetFileCollectionResp,
+    Error,
+    InfiniteData<FileCollection>
+  >({
+    queryKey: ["file-collections", take],
+    queryFn: ({ pageParam = 1 }) =>
+      getFileCollection({ page: pageParam as number, take }),
+    initialPageParam: 1,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    getNextPageParam: (lastPage) => {
+      return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
+    },
+    select: (data) => ({
+      pages: data.pages.map((page) => page.data).flat(),
+      pageParams: data.pageParams
+    })
   })
 }

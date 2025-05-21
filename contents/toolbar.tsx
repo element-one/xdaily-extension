@@ -82,11 +82,11 @@ const ToolbarButton: FC<ToolbarButtonProps> = ({
       <div
         onClick={handleClick}
         className={clsx(
-          "font-geist flex justify-center items-center w-6 h-6 rounded cursor-pointer hover:bg-fill-bg-deep",
+          "font-geist flex justify-center items-center w-8 h-8 rounded cursor-pointer hover:bg-fill-bg-deep",
           isLoading ? "cursor-not-allowed" : "cursor-pointer"
         )}>
         {isLoading ? (
-          <LoaderCircleIcon className="size-6 animate-spin text-primary-brand" />
+          <LoaderCircleIcon className="size-8 animate-spin text-primary-brand" />
         ) : (
           <>{icon}</>
         )}
@@ -272,8 +272,8 @@ const Toolbar = () => {
         icon={
           <svg
             className="text-green"
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             viewBox="0 0 16 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -292,7 +292,7 @@ const Toolbar = () => {
           </svg>
         }
       />
-      <ToolbarButton
+      {/* <ToolbarButton
         onClick={handleSubscribeUser}
         isLoading={isSubscribing}
         tooltip="User"
@@ -318,7 +318,7 @@ const Toolbar = () => {
             />
           </svg>
         }
-      />
+      /> */}
       <ToolbarButton
         onClick={handleQuoteTweet}
         tooltip="Quote Tweet"
@@ -357,7 +357,7 @@ const Toolbar = () => {
           tooltip="Chat"
           onClick={handleChatWithUser}
           isLoading={false}
-          icon={<BotIcon className="size-4 text-orange" />}
+          icon={<BotIcon className="size-6 text-orange" />}
         />
       )}
     </div>

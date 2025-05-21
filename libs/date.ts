@@ -5,7 +5,7 @@ dayjs.extend(relativeTime)
 
 export const formatTweetDate = (datetimeStr: string) => {
   const date = isNaN(Number(datetimeStr)) ? datetimeStr : Number(datetimeStr)
-  return dayjs(date).format("h:mma ・MMM.D,YYYY")
+  return dayjs(date).format("h:mma・MMM.D,YYYY")
 }
 
 export const formatRelativeTime = (datetimeStr: string) => {
