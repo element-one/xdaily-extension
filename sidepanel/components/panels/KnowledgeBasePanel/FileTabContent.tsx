@@ -2,7 +2,7 @@ import { ClockIcon, FileTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
 import { formatTweetDate } from "~libs/date"
-import { useFileCollections } from "~services/collection"
+import { useKnowledgeBaseCollections } from "~services/collection"
 import DocIcon from "~sidepanel/components/icons/DocIcon"
 import ExcelIcon from "~sidepanel/components/icons/ExcelIcon"
 import PdfIcon from "~sidepanel/components/icons/PdfIcon"
@@ -43,7 +43,11 @@ const FileTabContentSkeleton = () => {
 
 export const FileTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useFileCollections(15)
+    useKnowledgeBaseCollections({
+      take: 15,
+      isSelected: true,
+      notEqualsType: "text"
+    })
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -65,25 +69,22 @@ export const FileTabContent = () => {
 
   const collection = useMemo(() => {
     return (data?.pages || []).map((item) => {
-      const urlParts = item.fileUrl.split("/")
+      const urlParts = (item.fileUrl ?? "").split("/")
       const fileName = urlParts[urlParts.length - 1]
-      const fileType = item.fileType
+      const fileType = item.type
       let fileIcon = <></>
       if (fileType.includes("pdf")) {
         fileIcon = <PdfIcon className="w-5 h-5 text-red" />
-      } else if (
-        item.fileType.includes("word") ||
-        item.fileType.includes("document")
-      ) {
+      } else if (fileType.includes("word") || fileType.includes("document")) {
         fileIcon = <DocIcon className="w-5 h-5 text-green" />
       } else if (
-        item.fileType.includes("excel") ||
-        item.fileType.includes("spreadsheet")
+        fileType.includes("excel") ||
+        fileType.includes("spreadsheet")
       ) {
         fileIcon = <ExcelIcon className="w-5 h-5 text-blue" />
-      } else if (item.fileType.includes("image")) {
+      } else if (fileType.includes("image")) {
         fileIcon = <PPTIcon className="w-5 h-5 text-purple" />
-      } else if (item.fileType.includes("text")) {
+      } else if (fileType.includes("text")) {
         fileIcon = <TextIcon className="w-5 h-5 text-cyan" />
       } else {
         fileIcon = (
@@ -100,9 +101,13 @@ export const FileTabContent = () => {
     })
   }, [data])
 
-  const handleOpen = (url: string) => {
+  const handleOpen = (url?: string) => {
     if (url) {
       window.open(url, "_blank")
+    } else {
+      chrome.tabs.create({
+        url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
+      })
     }
   }
 
@@ -111,24 +116,32 @@ export const FileTabContent = () => {
       {isLoading ? (
         <FileTabContentSkeleton />
       ) : collection?.length > 0 ? (
-        <section className="flex flex-col gap-2 py-2 overflow-y-scroll hide-scrollbar">
-          {collection.map((item) => (
-            <Card
-              onClick={() => {
-                handleOpen(item.fileUrl)
-              }}
-              key={item.id}
-              title={
-                <div className="inline-flex items-center gap-2">
-                  <span>{item.fileIcon}</span>
-                  <span className="text-sm font-normal">{item.fileName}</span>
-                </div>
-              }
-              footerIcon={<ClockIcon className="w-4 h-4 text-orange" />}
-              footerTitle={formatTweetDate(item.createdAt as any as string)}
-            />
-          ))}
-        </section>
+        <>
+          <div className="w-full flex items-centr justify-between text-text-default-primary text-xs">
+            <span>Selected Knowledge</span>
+            <span>{collection.length}</span>
+          </div>
+          <section className="flex flex-col gap-2 py-3 overflow-y-scroll hide-scrollbar">
+            {collection.map((item) => (
+              <Card
+                onClick={() => {
+                  handleOpen(item.fileUrl)
+                }}
+                key={item.id}
+                title={
+                  <div className="flex items-center gap-2 w-full">
+                    <span>{item.fileIcon}</span>
+                    <span className="text-sm font-normal truncate w-full break-all">
+                      {item.fileName}
+                    </span>
+                  </div>
+                }
+                footerIcon={<ClockIcon className="w-4 h-4 text-orange" />}
+                footerTitle={formatTweetDate(item.createdAt as any as string)}
+              />
+            ))}
+          </section>
+        </>
       ) : (
         <EmptyContent content="File is empty" />
       )}

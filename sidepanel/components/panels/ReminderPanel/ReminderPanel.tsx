@@ -9,8 +9,9 @@ import { Divider } from "~sidepanel/components/ui/Divider"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
+import type { ReminderItem } from "~types/reminder"
 
-import { CreateReminderDialog } from "./CreateReminderDialog"
+import { ReminderDialog } from "./ReminderDialog"
 import { ReminderList } from "./ReminderList"
 
 const ReminderPanelSkeleton = () => {
@@ -50,6 +51,7 @@ export const ReminderPanel = () => {
   const [isScrollable, setIsScrollable] = useState(false)
 
   const [isDialogOpen, onDialogChange] = useState(false)
+  const [editingItem, setEditingItem] = useState<ReminderItem | null>(null)
 
   const reminderData = useMemo(() => {
     return data?.pages ?? []
@@ -127,6 +129,12 @@ export const ReminderPanel = () => {
   }
 
   const handleAddClick = () => {
+    setEditingItem(null)
+    onDialogChange(true)
+  }
+
+  const handleEditClick = (item: ReminderItem) => {
+    setEditingItem(item)
     onDialogChange(true)
   }
 
@@ -135,6 +143,10 @@ export const ReminderPanel = () => {
       await deleteReminder({ id })
       refetch()
     } catch (e) {}
+  }
+
+  const onDialogComplete = async () => {
+    await refetch()
   }
 
   return (
@@ -147,7 +159,7 @@ export const ReminderPanel = () => {
               <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
                 <SearchIcon className="w-5 h-5 text-text-default-regular" />
               </button>
-              <Button variant="ghost" className="p-0" onClick={handleAddClick}>
+              <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
                 <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
                   <PlusIcon className="w-4 h-4" strokeWidth={4} />
                 </div>
@@ -196,6 +208,7 @@ export const ReminderPanel = () => {
                   data={reminderData}
                   sectionRefs={sectionRefs}
                   onDeleteReminder={handleDeleteReminder}
+                  onEditReminder={handleEditClick}
                 />
               </div>
             </section>
@@ -204,10 +217,11 @@ export const ReminderPanel = () => {
           )}
         </main>
       </div>
-      <CreateReminderDialog
+      <ReminderDialog
         open={isDialogOpen}
         onOpenChange={onDialogChange}
-        onCreateComplete={refetch}
+        reminderItem={editingItem}
+        onComplete={onDialogComplete}
       />
     </>
   )

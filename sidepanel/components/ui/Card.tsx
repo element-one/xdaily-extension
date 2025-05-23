@@ -7,7 +7,7 @@ import { Divider } from "./Divider"
 interface CardProps {
   onClick?: () => void
   title: string | ReactNode
-  content?: string
+  content?: string | ReactNode
   footerIcon: ReactNode
   footerTitle: string
   footerOperation?: ReactNode
@@ -26,7 +26,7 @@ export const Card: FC<CardProps> = ({
     <div
       onClick={() => onClick?.()}
       className="border border-fill-bg-input rounded-lg py-3 bg-fill-bg-light hover:border-primary-brand flex cursor-pointer flex-col items-start gap-2 transition-all">
-      <div className="text-text-default-primary truncate text-base font-semibold px-3">
+      <div className="text-text-default-primary truncate text-base font-semibold px-3 w-full">
         {title}
       </div>
       {content && (

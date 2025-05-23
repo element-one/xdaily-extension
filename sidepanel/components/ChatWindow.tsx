@@ -307,7 +307,14 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             disabled={isDisableStatus}
             value={input}
             onChange={handleInputChange}
-            placeholder="Ask me anything..."
+            rows={1}
+            placeholder="Ask me anything... (Shift + Enter to add a line)"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                handleFormSubmit(e)
+              }
+            }}
             className="caret-primary-brand mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
           />
           <button

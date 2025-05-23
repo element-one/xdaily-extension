@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger
 } from "~sidepanel/components/ui/DropdownMenu"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
+import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import type { MemoItem } from "~types/memo"
@@ -121,6 +122,38 @@ export const MemoPanel = () => {
     } catch (e) {}
   }
 
+  const getFirstImageUrl = (memo: MemoItem) => {
+    const document = memo?.content?.document ?? []
+    const imageBlock = document.find(
+      (block: any) => block.type === "image" && block.props?.url
+    )
+    return imageBlock?.props?.url ?? null
+  }
+
+  const extractAllTextWithLineBreaks = (memo: MemoItem) => {
+    const lines: string[] = []
+    const document = memo?.content?.document ?? []
+    const MAX_LINE = 5
+
+    for (const block of document) {
+      if (lines.length >= MAX_LINE) break
+      if (Array.isArray(block.content)) {
+        const line = block.content
+          .filter(
+            (item: any) => item.type === "text" && typeof item.text === "string"
+          )
+          .map((item: any) => item.text)
+          .join("")
+
+        if (line.trim()) {
+          lines.push(line)
+        }
+      }
+    }
+
+    return lines.join("\n")
+  }
+
   return (
     <div className="flex flex-col h-full">
       {selectedMemo ? (
@@ -169,7 +202,21 @@ export const MemoPanel = () => {
                   key={memo.id}
                   title={memo.title}
                   content={
-                    (memo.content.document ?? [])?.[0]?.content?.[0]?.text ?? ""
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <div className="text-text-default-secondary line-clamp-4 min-h-0 flex-1 text-sm font-medium">
+                        {extractAllTextWithLineBreaks(memo)}
+                      </div>
+                      {getFirstImageUrl(memo) && (
+                        <ImageWithFallback
+                          src={getFirstImageUrl(memo)}
+                          alt="memo image"
+                          width={80}
+                          height={80}
+                          className="h-20 w-20 shrink-0 rounded object-cover"
+                          fallbackClassName="w-20 h-20 rounded"
+                        />
+                      )}
+                    </div>
                   }
                   footerIcon={
                     <svg

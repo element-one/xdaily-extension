@@ -108,13 +108,22 @@ export interface GetUserSearchResp {
   text: any[]
 }
 
+export interface GetKnowledgeBaseCollectionParams {
+  page: number
+  take: number
+  isSelected?: boolean
+  notEqualsType?: string
+  equalsType?: string
+}
+
 export interface FileCollection {
   id: string
-  fileUrl: string
-  fileType: string
-  content: any | null
-  status: string // TODO enum
+  fileUrl: string | null
+  type: string
+  content: any | null | string
+  status: string
   createdAt: Date
+  isSelected: Boolean
 }
 export interface GetFileCollectionResp {
   data: FileCollection[]

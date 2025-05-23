@@ -10,6 +10,7 @@ import type {
   FileCollection,
   GetCollectionParams,
   GetFileCollectionResp,
+  GetKnowledgeBaseCollectionParams,
   GetKolCollectionParams,
   GetKolCollectionResp,
   GetTweetCollectionResp,
@@ -141,25 +142,41 @@ export const userSearchExplore = (
   })
 }
 
-export const getFileCollection = async ({
+export const getKnowledgeBaseCollections = async ({
   page,
-  take
-}: GetCollectionParams): Promise<GetFileCollectionResp> => {
-  const response = await client.get(
-    `/users/knowledge-bases?page=${page}&take=${take}`
-  )
+  take,
+  isSelected,
+  notEqualsType,
+  equalsType
+}: GetKnowledgeBaseCollectionParams): Promise<GetFileCollectionResp> => {
+  let url = `/users/knowledge-bases?page=${page}&take=${take}&isSelected]${!!isSelected}`
+  if (notEqualsType) {
+    url += `&notEqualsType=${notEqualsType}`
+  }
+  if (equalsType) {
+    url += `&equalsType=${equalsType}`
+  }
+
+  const response = await client.get(url)
   return response.data
 }
 
-export const useFileCollections = (take: number) => {
+export const useKnowledgeBaseCollections = (
+  params: Omit<GetKnowledgeBaseCollectionParams, "page">
+) => {
   return useInfiniteQuery<
     GetFileCollectionResp,
     Error,
     InfiniteData<FileCollection>
   >({
-    queryKey: ["file-collections", take],
+    queryKey: [
+      "knowledge-collections",
+      params.take,
+      params.equalsType,
+      params.notEqualsType
+    ],
     queryFn: ({ pageParam = 1 }) =>
-      getFileCollection({ page: pageParam as number, take }),
+      getKnowledgeBaseCollections({ page: pageParam as number, ...params }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
