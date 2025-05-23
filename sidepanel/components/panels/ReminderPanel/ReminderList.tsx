@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { ClockIcon, EllipsisIcon, Trash2Icon } from "lucide-react"
+import { BookmarkIcon, ClockIcon, EllipsisIcon, Trash2Icon } from "lucide-react"
 import type { FC } from "react"
 
 import { Button } from "~sidepanel/components/ui/Button"
@@ -10,7 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "~sidepanel/components/ui/DropdownMenu"
-import { ReminderStatus, type FormatReminderItem } from "~types/reminder"
+import {
+  ReminderStatus,
+  type FormatReminderItem,
+  type ReminderItem
+} from "~types/reminder"
 
 const colorMaps = {
   [ReminderStatus.UPCOMING]: "#FFE600",
@@ -24,12 +28,14 @@ interface ReminderListProps {
   data: FormatReminderItem[]
   sectionRefs: React.MutableRefObject<Record<string, HTMLDivElement | null>>
   onDeleteReminder?: (id: string) => void
+  onEditReminder?: (item: ReminderItem) => void
 }
 
 export const ReminderList: FC<ReminderListProps> = ({
   data,
   sectionRefs,
-  onDeleteReminder
+  onDeleteReminder,
+  onEditReminder
 }) => {
   const formatTimeSpan = (fromAt: Date | string, toAt: Date | string) => {
     const from = dayjs(fromAt).format("HH:mm")
@@ -39,6 +45,9 @@ export const ReminderList: FC<ReminderListProps> = ({
 
   const handleDeleteReminder = (id: string) => {
     onDeleteReminder?.(id)
+  }
+  const handleEditReminder = (item: ReminderItem) => {
+    onEditReminder?.(item)
   }
   const handleClickReminder = () => {
     chrome.tabs.create({
@@ -92,6 +101,14 @@ export const ReminderList: FC<ReminderListProps> = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditReminder(detail)
+                        }}>
+                        <BookmarkIcon className="text-green w-4 h-4" />
+                        <span className="text-xs">Edit</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation()

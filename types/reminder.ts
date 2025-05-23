@@ -9,8 +9,8 @@ export interface ReminderItem {
   id: string
   title: string
   description: string
-  fromAt: Date
-  toAt: Date
+  fromAt: string
+  toAt: string
   status: ReminderStatus
 }
 
@@ -39,6 +39,11 @@ export interface FormatReminderItem {
 export interface CreateReminderParams {
   title: string
   description: string
-  fromAt: Date
-  toAt: Date
+  fromAt: string
+  toAt: string
+}
+
+export interface UpdateReminderParam {
+  data: CreateReminderParams
+  id: string
 }

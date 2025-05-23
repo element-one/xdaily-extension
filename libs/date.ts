@@ -26,3 +26,19 @@ export const formatRelativeTime = (datetimeStr: string) => {
     return time.format("MMM D")
   }
 }
+
+//from 2025-05-23T02:09:00.000Z
+// to YYYY-MM-DDTHH:mm
+export const utcToLocalInput = (utcString: string) => {
+  if (!utcString) return ""
+  const date = new Date(utcString)
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16)
+}
+
+export const localInputToUTC = (localString: string) => {
+  if (!localString) return ""
+  const date = new Date(localString)
+  return date.toISOString()
+}

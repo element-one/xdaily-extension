@@ -11,7 +11,8 @@ import type {
   CreateReminderParams,
   GetRemindersParmas,
   GetRemindersResp,
-  ReminderItem
+  ReminderItem,
+  UpdateReminderParam
 } from "~types/reminder"
 
 export const getReminders = async ({
@@ -102,5 +103,24 @@ export const useDeleteReminder = () => {
   return useMutation({
     mutationKey: ["delete-reminder"],
     mutationFn: deleteReminder
+  })
+}
+
+export const updateReminder = async ({
+  id,
+  data
+}: UpdateReminderParam): Promise<ReminderItem> => {
+  const response = await client.put(`/users/reminders/${id}`, data)
+  return response.data
+}
+export const useUpdateReminder = (
+  options?: Partial<
+    UseMutationOptions<ReminderItem, Error, UpdateReminderParam>
+  >
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["update-reminder"],
+    mutationFn: updateReminder
   })
 }
