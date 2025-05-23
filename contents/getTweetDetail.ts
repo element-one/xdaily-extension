@@ -57,8 +57,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         url: window.location.href
       } as TweetDetailPageData
 
-      console.log("Tweet Data:", tweetData)
-
       sendResponse(tweetData)
     })
 

@@ -130,6 +130,7 @@ export const StudioSettingPanel = () => {
       <div className="flex gap-3">
         {tabs.map((tab) => (
           <button
+            key={tab.key}
             className={clsx(
               "text-text-default-primary border flex cursor-pointer items-center rounded-lg px-2 py-1 text-xs",
               tabKey === tab.key

@@ -44,7 +44,6 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
   useEffect(() => {
     if (open) {
       if (reminderItem) {
-        console.log("testing", reminderItem)
         setTitle(reminderItem.title)
         setDescription(reminderItem.description)
         setTimeRange({

@@ -159,7 +159,7 @@ export const ReminderPanel = () => {
               <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
                 <SearchIcon className="w-5 h-5 text-text-default-regular" />
               </button>
-              <Button variant="ghost" className="p-0" onClick={handleAddClick}>
+              <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
                 <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
                   <PlusIcon className="w-4 h-4" strokeWidth={4} />
                 </div>
