@@ -7,7 +7,7 @@ import { Divider } from "./Divider"
 interface CardProps {
   onClick?: () => void
   title: string | ReactNode
-  content?: string
+  content?: string | ReactNode
   footerIcon: ReactNode
   footerTitle: string
   footerOperation?: ReactNode
