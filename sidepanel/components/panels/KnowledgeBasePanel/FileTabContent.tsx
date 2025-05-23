@@ -2,10 +2,7 @@ import { ClockIcon, FileTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
 import { formatTweetDate } from "~libs/date"
-import {
-  useFileCollections,
-  useKnowledgeBaseCollections
-} from "~services/collection"
+import { useKnowledgeBaseCollections } from "~services/collection"
 import DocIcon from "~sidepanel/components/icons/DocIcon"
 import ExcelIcon from "~sidepanel/components/icons/ExcelIcon"
 import PdfIcon from "~sidepanel/components/icons/PdfIcon"
