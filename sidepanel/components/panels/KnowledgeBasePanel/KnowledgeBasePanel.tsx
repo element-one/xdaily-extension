@@ -1,13 +1,11 @@
-import { FileTextIcon, UsersIcon } from "lucide-react"
-import { useRef } from "react"
+import { FileTextIcon } from "lucide-react"
 
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { TabContent, Tabs, TabTrigger } from "~sidepanel/components/ui/Tabs"
 
 import { FileTabContent } from "./FileTabContent"
 import { PostTabContent } from "./PostTabContent"
-import { TextTabCotent } from "./TextTabContent"
-import { UserTabContent } from "./UserTabContent"
+import { TextTabContent } from "./TextTabContent"
 
 enum KnowledgeType {
   FILE = "knowledge_file",
@@ -26,7 +24,7 @@ const TabData = [
     key: KnowledgeType.TEXT,
     label: "Text",
     icon: <FileTextIcon className="w-4 h-4 text-green shrink-0" />,
-    content: <TextTabCotent />
+    content: <TextTabContent />
   },
   {
     key: KnowledgeType.POST,

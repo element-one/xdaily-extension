@@ -10,6 +10,7 @@ import type {
   FileCollection,
   GetCollectionParams,
   GetFileCollectionResp,
+  GetKnowledgeBaseCollectionParams,
   GetKolCollectionParams,
   GetKolCollectionResp,
   GetTweetCollectionResp,
@@ -160,6 +161,54 @@ export const useFileCollections = (take: number) => {
     queryKey: ["file-collections", take],
     queryFn: ({ pageParam = 1 }) =>
       getFileCollection({ page: pageParam as number, take }),
+    initialPageParam: 1,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    getNextPageParam: (lastPage) => {
+      return lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined
+    },
+    select: (data) => ({
+      pages: data.pages.map((page) => page.data).flat(),
+      pageParams: data.pageParams
+    })
+  })
+}
+
+export const getKnowledgeBaseCollections = async ({
+  page,
+  take,
+  isSelected,
+  notEqualsType,
+  equalsType
+}: GetKnowledgeBaseCollectionParams): Promise<GetFileCollectionResp> => {
+  let url = `/users/knowledge-bases?page=${page}&take=${take}&isSelected]${!!isSelected}`
+  if (notEqualsType) {
+    url += `&notEqualsType=${notEqualsType}`
+  }
+  if (equalsType) {
+    url += `&equalsType=${equalsType}`
+  }
+
+  const response = await client.get(url)
+  return response.data
+}
+
+export const useKnowledgeBaseCollections = (
+  params: Omit<GetKnowledgeBaseCollectionParams, "page">
+) => {
+  return useInfiniteQuery<
+    GetFileCollectionResp,
+    Error,
+    InfiniteData<FileCollection>
+  >({
+    queryKey: [
+      "knowledge-collections",
+      params.take,
+      params.equalsType,
+      params.notEqualsType
+    ],
+    queryFn: ({ pageParam = 1 }) =>
+      getKnowledgeBaseCollections({ page: pageParam as number, ...params }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

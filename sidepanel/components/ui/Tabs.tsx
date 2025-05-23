@@ -110,7 +110,7 @@ const TabContent = forwardRef<
   <RadixTabs.Content
     ref={ref}
     className={clsx(
-      "mt-6 data-[state=active]:flex hidden flex-col flex-1 min-h-0 overflow-y-auto stylized-scroll ",
+      "mt-3 pt-3 data-[state=active]:flex hidden flex-col flex-1 min-h-0 overflow-y-auto stylized-scroll border-t border-fill-bg-input",
       className
     )}
     {...props}
