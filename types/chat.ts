@@ -1,3 +1,5 @@
+import type { User } from "~node_modules/@blocknote/core/types/src/comments"
+
 import type { KolStatus } from "./enum"
 
 export interface ChatMessage {
@@ -54,4 +56,43 @@ export interface GetChatHistoryResp {
 
 export interface KolStatusResp {
   kolStatus: KolStatus
+}
+
+export interface UserAgentModel {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
+}
+export interface UserAgentTool {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
+}
+export interface UserAgent {
+  id: string
+  name: string
+  instructions: string
+  description: string | null
+  createdAt: string
+  models: UserAgentModel[]
+  tools: UserAgentTool[]
+}
+
+export interface UserAgentResp {
+  data: UserAgent[]
+}
+
+export interface DetailedUserAgentModel {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
+  updatedAt: string
+  deletedAt: string
+}
+
+export interface UserAgentModelResp {
+  data: DetailedUserAgentModel[]
 }

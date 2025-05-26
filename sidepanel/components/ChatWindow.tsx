@@ -6,10 +6,21 @@ import {
 import clsx from "clsx"
 import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
-import { useEffect, useMemo, useRef, type FC, type FormEvent } from "react"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FC,
+  type FormEvent
+} from "react"
 
 import { formatTweetDate } from "~libs/date"
-import { useChatHistory } from "~services/chat"
+import {
+  useChatHistory,
+  useGetUserAgentModels,
+  useGetUserAgents
+} from "~services/chat"
 import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
 
@@ -44,7 +55,8 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 }
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
-  const { removeQuoteTweet } = useStore()
+  const { removeQuoteTweet, userInfo } = useStore()
+  const chatWithMyself = userInfo?.username === screenName
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -53,6 +65,24 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     isFetching,
     isFetchingNextPage
   } = useChatHistory(screenName, 20)
+
+  const { data: userAgentsResp } = useGetUserAgents()
+  const { data: modelsResp } = useGetUserAgentModels(
+    userAgentsResp?.data[0]?.id ?? ""
+  )
+  const [actModelId, setActModelId] = useState("")
+
+  const models = useMemo(() => {
+    if (!modelsResp) return []
+    return modelsResp.data ?? []
+  }, [modelsResp])
+
+  useEffect(() => {
+    if (models.length > 0) {
+      const defaultModel = models.find((m) => m.name.toLowerCase() === "gpt-4o")
+      setActModelId(defaultModel?.id ?? "")
+    }
+  }, [models])
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
@@ -214,7 +244,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   }
 
   return (
-    <div className="flex gap-y-6 rounded-md flex-col h-full">
+    <div className="flex gap-y-6 rounded-md flex-col h-full flex-1 min-h-0">
       <div className="text-xs font-semibold h-[18px] flex items-center text-primary-brand">
         {screenName ? `@${screenName}` : "Bot"}
       </div>
@@ -276,18 +306,27 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       </div>
 
       {/* input and send message button */}
-      <div className="py-2 flex flex-col gap-1 relative">
+      <div className="py-2 flex flex-col gap-1 relative shrink-0">
         <div className="flex mb-2 items-center justify-between gap-10">
-          <Select value="default">
-            <SelectTrigger className="w-[176px]" size="sm">
-              <SelectValue placeholder="Select model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="default" value="default">
-                Default
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          {!!models.length ? (
+            <Select
+              value={actModelId}
+              onValueChange={setActModelId}
+              disabled={!chatWithMyself}>
+              <SelectTrigger className="w-[176px]" size="sm">
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                {models.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    {model.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div />
+          )}
           <div className="flex gap-4 items-center">
             {Tools.map((tool) => (
               <Tooltip key={tool.type} content={tool.tooltip}>

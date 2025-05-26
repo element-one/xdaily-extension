@@ -1,9 +1,9 @@
 {
   "name": "xdaily-extension",
-  "displayName": "xdaily extension",
+  "displayName": "xDaily: AI Assistant for daily X tasks",
   "version": "0.0.1",
-  "description": "xdaily extension",
-  "author": "xdaily",
+  "description": "AI Assistant for daily X tasks",
+  "author": "xDaily",
   "scripts": {
     "postinstall": "patch-package",
     "dev": "plasmo dev --env=env.development",
