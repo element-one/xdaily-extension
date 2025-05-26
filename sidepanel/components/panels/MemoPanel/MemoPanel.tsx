@@ -3,7 +3,6 @@ import {
   EllipsisIcon,
   PlusIcon,
   SearchIcon,
-  Share2Icon,
   Trash2Icon
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -241,14 +240,6 @@ export const MemoPanel = () => {
                   footerTime={memo.postedAt}
                   footerOperation={
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        className="w-fit h-fit !p-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                        }}>
-                        <Share2Icon className="w-4 h-4" />
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="w-fit h-fit !p-0">
