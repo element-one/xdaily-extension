@@ -1,10 +1,4 @@
-import {
-  EllipsisIcon,
-  PlusIcon,
-  SearchIcon,
-  Share2Icon,
-  Trash2Icon
-} from "lucide-react"
+import { EllipsisIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
 import { useCreateSheet, useSheetList } from "~services/sheet"
@@ -166,14 +160,6 @@ export const SheetPanel = () => {
                   footerTime={item.postedAt}
                   footerOperation={
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        className="w-fit h-fit !p-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                        }}>
-                        <Share2Icon className="w-4 h-4" />
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="w-fit h-fit !p-0">

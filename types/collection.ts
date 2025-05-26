@@ -103,9 +103,9 @@ export interface GetUserSearchParams {
 
 export interface GetUserSearchResp {
   people: UserCollection[]
-  files: any[]
-  channels: any[]
-  text: any[]
+  files: FileCollection[]
+  post: TweetCollection[]
+  text: FileCollection[]
 }
 
 export interface GetKnowledgeBaseCollectionParams {

@@ -9,9 +9,13 @@ import {
 import client from "~libs/client"
 import type {
   ChatMessage,
+  DetailedUserAgentModel,
   GetChatHistoryParams,
   GetChatHistoryResp,
-  KolStatusResp
+  KolStatusResp,
+  UserAgent,
+  UserAgentModelResp,
+  UserAgentResp
 } from "~types/chat"
 
 export const getChatHistory = async ({
@@ -82,5 +86,36 @@ export const useApplyKol = (
   return useMutation({
     ...options,
     mutationFn: applyKol
+  })
+}
+
+export const getUserAgents = async (): Promise<UserAgentResp> => {
+  const response = await client.get("/users/agents")
+  return response.data
+}
+
+export const useGetUserAgents = () => {
+  return useQuery({
+    retry: 0,
+    refetchOnWindowFocus: false,
+    queryKey: ["user-agents"],
+    queryFn: getUserAgents
+  })
+}
+
+export const getUserAgentModels = async (
+  id: string
+): Promise<UserAgentModelResp> => {
+  const response = await client.get(`/users/agents/${id}/models`)
+  return response.data
+}
+
+export const useGetUserAgentModels = (id: string) => {
+  return useQuery({
+    retry: 0,
+    refetchOnWindowFocus: false,
+    queryKey: ["user-agent-models", id],
+    queryFn: () => getUserAgentModels(id),
+    enabled: !!id
   })
 }
