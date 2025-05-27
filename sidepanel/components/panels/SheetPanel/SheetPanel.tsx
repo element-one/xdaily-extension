@@ -1,5 +1,5 @@
 import { EllipsisIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useCreateSheet, useSheetList } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
@@ -56,6 +56,8 @@ export const SheetPanel = () => {
 
   const bottomObserver = useRef<HTMLDivElement>(null)
 
+  const [searchValue, setSearchValue] = useState("")
+
   const handleGoSheetPage = () => {
     chrome.tabs.create({
       url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/sheet`
@@ -80,8 +82,36 @@ export const SheetPanel = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const sheetData = useMemo(() => {
-    return data?.pages ? data.pages : []
-  }, [data])
+    if (!data?.pages) return []
+
+    const keyword = searchValue.trim().toLowerCase()
+
+    if (!keyword) return data.pages
+
+    return data.pages.filter((memo) => {
+      const { title, content } = memo
+      let match = false
+
+      if (title?.toLowerCase().includes(keyword)) {
+        match = true
+      }
+
+      try {
+        const parsed = JSON.parse(content?.item ?? "{}")
+        const cellContents =
+          parsed?.data?.map((cell: any) => cell.payload?.content || "") || []
+        if (
+          cellContents.some((text: string) =>
+            text.toLowerCase().includes(keyword)
+          )
+        ) {
+          match = true
+        }
+      } catch (err) {}
+
+      return match
+    })
+  }, [data, searchValue])
 
   const handleCreateSheet = async () => {
     try {
@@ -102,26 +132,26 @@ export const SheetPanel = () => {
     //   refetchSheetList()
     // } catch (e) {}
   }
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value)
+  }
 
   return (
     <div className="flex flex-col h-full">
       <PanelHeader
         title="Sheet"
-        rightContent={
-          <div className="flex items-center gap-x-2">
-            <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-              <SearchIcon className="w-5 h-5 text-text-default-regular" />
-            </button>
-            <Button
-              variant="ghost"
-              isDisabled={isCreatingSheet}
-              onClick={handleCreateSheet}
-              className="p-0">
-              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                <PlusIcon className="w-4 h-4" strokeWidth={4} />
-              </div>
-            </Button>
-          </div>
+        showSearchButton={true}
+        onSearchChange={handleSearchChange}
+        extraRightContent={
+          <Button
+            variant="ghost"
+            isDisabled={isCreatingSheet}
+            onClick={handleCreateSheet}
+            className="p-0">
+            <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+              <PlusIcon className="w-4 h-4" strokeWidth={4} />
+            </div>
+          </Button>
         }
       />
       {isLoading ? (
