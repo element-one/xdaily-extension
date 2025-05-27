@@ -7,7 +7,6 @@ import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
-import AddIcon from "./icons/AddIcon"
 import ExploreIcon from "./icons/ExploreIcon"
 import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
 import MemoIcon from "./icons/MemoIcon"
@@ -138,19 +137,19 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        cleanup()
-      }
-    }
-    document.addEventListener("visibilitychange", handleVisibilityChange)
 
     const cleanup = () => {
       chrome.runtime.onMessage.removeListener(messageListener)
       clearNavbar()
       setKolScreenName("")
     }
-    return cleanup
+    window.addEventListener("unload", cleanup)
+    return () => {
+      window.removeEventListener("unload", cleanup)
+      chrome.runtime.onMessage.removeListener(messageListener)
+      clearNavbar()
+      setKolScreenName("")
+    }
   }, [])
 
   return (

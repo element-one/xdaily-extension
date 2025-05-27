@@ -57,7 +57,6 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { removeQuoteTweet, userInfo } = useStore()
-  const chatWithMyself = userInfo?.username === screenName
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -67,13 +66,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     isFetchingNextPage
   } = useChatHistory(screenName, 20)
 
-  const { data: userAgentsResp } = useGetUserAgents()
+  const { data: chatModelInfo } = useGetChatModelInfo(screenName)
   const { data: modelsResp } = useGetUserAgentModels(
-    userAgentsResp?.data[0]?.id ?? ""
+    chatModelInfo?.agent?.id ?? ""
   )
-  // const { data } = useGetChatModelInfo(screenName)
-
-  // console.log("testing", data)
 
   const [actModelId, setActModelId] = useState("")
 
@@ -83,11 +79,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   }, [modelsResp])
 
   useEffect(() => {
-    if (models.length > 0) {
-      const defaultModel = models.find((m) => m.name.toLowerCase() === "gpt-4o")
-      setActModelId(defaultModel?.id ?? "")
+    if (chatModelInfo) {
+      setActModelId(chatModelInfo.model.id ?? "")
     }
-  }, [models])
+  }, [chatModelInfo])
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
@@ -317,14 +312,14 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <Select
               value={actModelId}
               onValueChange={setActModelId}
-              disabled={!chatWithMyself}>
+              disabled={!chatModelInfo || !chatModelInfo.isSelf}>
               <SelectTrigger className="w-[176px]" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    {model.name}
+                    {model.screenName}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -87,7 +87,10 @@ export interface UserAgentResp {
 export interface DetailedUserAgentModel {
   id: string
   name: string
+  provider: string
   description: string | null
+  iconUrl: string | null
+  screenName: string
   createdAt: string
   updatedAt: string
   deletedAt: string
