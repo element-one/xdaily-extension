@@ -153,7 +153,7 @@ export const MemoPanel = () => {
   const handleSearchChange = useDebounce((value: string) => {
     const keyword = value.trim().toLowerCase()
     setSearchValue(keyword ?? "")
-  }, 500)
+  }, 800)
 
   const memos = useMemo(() => {
     return data?.pages ?? []

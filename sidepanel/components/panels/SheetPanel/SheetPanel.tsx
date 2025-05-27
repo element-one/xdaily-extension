@@ -1,6 +1,7 @@
-import { EllipsisIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
+import { EllipsisIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useCreateSheet, useSheetList } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -42,6 +43,7 @@ const SheetPanelSkeleton = () => {
   )
 }
 export const SheetPanel = () => {
+  const [searchValue, setSearchValue] = useState("")
   const {
     data,
     isFetchingNextPage,
@@ -49,14 +51,12 @@ export const SheetPanel = () => {
     hasNextPage,
     refetch: refetchSheetList,
     isLoading
-  } = useSheetList(15)
+  } = useSheetList(15, searchValue)
   const { mutateAsync: createSheet, isPending: isCreatingSheet } =
     useCreateSheet()
   // const { mutateAsync: deleteSheet } = useDeleteSheet()
 
   const bottomObserver = useRef<HTMLDivElement>(null)
-
-  const [searchValue, setSearchValue] = useState("")
 
   const handleGoSheetPage = () => {
     chrome.tabs.create({
@@ -82,36 +82,8 @@ export const SheetPanel = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const sheetData = useMemo(() => {
-    if (!data?.pages) return []
-
-    const keyword = searchValue.trim().toLowerCase()
-
-    if (!keyword) return data.pages
-
-    return data.pages.filter((memo) => {
-      const { title, content } = memo
-      let match = false
-
-      if (title?.toLowerCase().includes(keyword)) {
-        match = true
-      }
-
-      try {
-        const parsed = JSON.parse(content?.item ?? "{}")
-        const cellContents =
-          parsed?.data?.map((cell: any) => cell.payload?.content || "") || []
-        if (
-          cellContents.some((text: string) =>
-            text.toLowerCase().includes(keyword)
-          )
-        ) {
-          match = true
-        }
-      } catch (err) {}
-
-      return match
-    })
-  }, [data, searchValue])
+    return data?.pages ?? []
+  }, [data])
 
   const handleCreateSheet = async () => {
     try {
@@ -132,9 +104,10 @@ export const SheetPanel = () => {
     //   refetchSheetList()
     // } catch (e) {}
   }
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value)
-  }
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trimEnd().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 800)
 
   return (
     <div className="flex flex-col h-full">

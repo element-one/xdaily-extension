@@ -22,7 +22,7 @@ export const getMemoList = async ({
 }: GetMemoParams): Promise<GetMemoListResp> => {
   let url = `/users/memos?page=${page}&take=${take}`
   if (keywords) {
-    url += `&keywords=${keywords}`
+    url += `&keywords=${encodeURIComponent(keywords)}`
   }
   const response = await client.get(url)
   return response.data

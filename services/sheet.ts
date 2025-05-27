@@ -16,13 +16,18 @@ import type {
 
 export const getSheetList = async ({
   page,
-  take
+  take,
+  keywords
 }: GetSheetListParams): Promise<GetSheetListResp> => {
-  const response = await client.get(`/users/sheets?page=${page}&take=${take}`)
+  let url = `/users/sheets?page=${page}&take=${take}`
+  if (keywords) {
+    url += `&keywords=${encodeURIComponent(keywords)}`
+  }
+  const response = await client.get(url)
   return response.data
 }
 
-export const useSheetList = (take: number) => {
+export const useSheetList = (take: number, keywords?: string) => {
   const queryClient = useQueryClient()
 
   const infiniteQuery = useInfiniteQuery<
@@ -30,9 +35,9 @@ export const useSheetList = (take: number) => {
     Error,
     InfiniteData<SheetItem>
   >({
-    queryKey: ["sheet-list", take],
+    queryKey: ["sheet-list", take, keywords],
     queryFn: ({ pageParam = 1 }) =>
-      getSheetList({ page: pageParam as number, take }),
+      getSheetList({ page: pageParam as number, take, keywords }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
