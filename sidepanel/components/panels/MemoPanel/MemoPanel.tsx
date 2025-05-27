@@ -2,9 +2,7 @@ import {
   ChevronLeftIcon,
   EllipsisIcon,
   PlusIcon,
-  SearchIcon,
-  Trash2Icon,
-  XIcon
+  Trash2Icon
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
@@ -20,7 +18,6 @@ import {
 } from "~sidepanel/components/ui/DropdownMenu"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
-import { InputBox } from "~sidepanel/components/ui/InputBox"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import type { MemoItem } from "~types/memo"
@@ -70,7 +67,6 @@ export const MemoPanel = () => {
 
   const { mutateAsync: deleteMemo, isPending: isDeletingMemo } = useDeleteMemo()
 
-  const [showSearch, setShowSearch] = useState(false)
   const [searchValue, setSearchValue] = useState("")
 
   useEffect(() => {
@@ -154,13 +150,8 @@ export const MemoPanel = () => {
     return lines.join("\n")
   }
 
-  const toggleSearch = () => {
-    setShowSearch((prev) => !prev)
-    setSearchValue("")
-  }
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value)
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value)
   }
 
   const memos = useMemo(() => {
@@ -206,45 +197,22 @@ export const MemoPanel = () => {
           }
         />
       ) : (
-        <div className="relative">
-          <PanelHeader
-            title="Memo"
-            rightContent={
-              <div className="flex items-center gap-x-2">
-                <Button variant="ghost" className="!p-0" onClick={toggleSearch}>
-                  <SearchIcon className="w-5 h-5 text-text-default-regular" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  isDisabled={isCreatingMemo}
-                  className="p-0"
-                  onClick={handleCreateMemo}>
-                  <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                    <PlusIcon className="w-4 h-4" strokeWidth={4} />
-                  </div>
-                </Button>
+        <PanelHeader
+          title="Memo"
+          showSearchButton={true}
+          onSearchChange={handleSearchChange}
+          extraRightContent={
+            <Button
+              variant="ghost"
+              isDisabled={isCreatingMemo}
+              className="!p-0"
+              onClick={handleCreateMemo}>
+              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                <PlusIcon className="w-4 h-4" strokeWidth={4} />
               </div>
-            }
-          />
-          {showSearch && (
-            <div className="absolute inset-0 gap-2 flex items-center bg-fill-bg-deep z-10">
-              <InputBox
-                autoFocus
-                type="text"
-                value={searchValue}
-                onChange={handleSearchChange}
-                placeholder="Search memo"
-                className="!bg-fill-bg-deep h-6 border-none flex-1 min-w-0 !rounded-none"
-              />
-              <Button
-                variant="ghost"
-                onClick={toggleSearch}
-                className="!p-0 shrink-0">
-                <XIcon className="w-4 h-4 text-text-default-secondary" />
-              </Button>
-            </div>
-          )}
-        </div>
+            </Button>
+          }
+        />
       )}
       {selectedMemo ? (
         <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />

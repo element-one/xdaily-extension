@@ -63,7 +63,7 @@ export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
     <div className="flex flex-col h-full p-4">
       <PanelHeader
         title="Category"
-        rightContent={
+        extraRightContent={
           <Button variant="ghost" className="!p-0 h-fit" onClick={onFilter}>
             <svg
               width="20"
