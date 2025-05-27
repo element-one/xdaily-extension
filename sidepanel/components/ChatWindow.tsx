@@ -18,6 +18,7 @@ import {
 import { formatTweetDate } from "~libs/date"
 import {
   useChatHistory,
+  useGetChatModelInfo,
   useGetUserAgentModels,
   useGetUserAgents
 } from "~services/chat"
@@ -70,6 +71,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { data: modelsResp } = useGetUserAgentModels(
     userAgentsResp?.data[0]?.id ?? ""
   )
+  // const { data } = useGetChatModelInfo(screenName)
+
+  // console.log("testing", data)
+
   const [actModelId, setActModelId] = useState("")
 
   const models = useMemo(() => {

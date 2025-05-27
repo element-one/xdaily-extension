@@ -9,6 +9,7 @@ import {
 import client from "~libs/client"
 import type {
   ChatMessage,
+  ChatModelInfo,
   DetailedUserAgentModel,
   GetChatHistoryParams,
   GetChatHistoryResp,
@@ -117,5 +118,22 @@ export const useGetUserAgentModels = (id: string) => {
     queryKey: ["user-agent-models", id],
     queryFn: () => getUserAgentModels(id),
     enabled: !!id
+  })
+}
+
+export const getChatModelInfo = async (
+  screenName: string
+): Promise<ChatModelInfo> => {
+  const response = await client.get(`/users/chat/agent/${screenName}`)
+  return response.data
+}
+
+export const useGetChatModelInfo = (screenName: string) => {
+  return useQuery({
+    retry: 0,
+    refetchOnWindowFocus: false,
+    queryKey: ["user-chat-model-info", screenName],
+    queryFn: () => getChatModelInfo(screenName),
+    enabled: !!screenName
   })
 }

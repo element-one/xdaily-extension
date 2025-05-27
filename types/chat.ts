@@ -96,3 +96,22 @@ export interface DetailedUserAgentModel {
 export interface UserAgentModelResp {
   data: DetailedUserAgentModel[]
 }
+
+export interface ChatModelInfo {
+  agent: {
+    id: string
+    name: string
+    instructions: string
+    description?: string | null
+    createdAt: string
+  }
+  model: {
+    id: string
+    name: string
+    screenName: string
+    provider: string
+    iconUrl: string | null
+    creattedAt: string
+  }
+  isSelf: boolean
+}
