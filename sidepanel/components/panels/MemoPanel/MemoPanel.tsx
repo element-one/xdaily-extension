@@ -6,6 +6,7 @@ import {
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useCreateMemo, useDeleteMemo, useMemoList } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -52,6 +53,12 @@ const MemoPanelSkeleton = () => {
 
 export const MemoPanel = () => {
   const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
+  const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
+  const { mutateAsync: deleteMemo } = useDeleteMemo()
+  const [searchValue, setSearchValue] = useState("")
+
   const {
     data,
     fetchNextPage,
@@ -60,14 +67,7 @@ export const MemoPanel = () => {
     updateMemoList,
     refetch,
     isLoading
-  } = useMemoList(15)
-  const bottomObserver = useRef<HTMLDivElement>(null)
-
-  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
-
-  const { mutateAsync: deleteMemo, isPending: isDeletingMemo } = useDeleteMemo()
-
-  const [searchValue, setSearchValue] = useState("")
+  } = useMemoList(15, searchValue)
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -150,37 +150,14 @@ export const MemoPanel = () => {
     return lines.join("\n")
   }
 
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value)
-  }
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trim().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 500)
 
   const memos = useMemo(() => {
-    if (!data?.pages) return []
-
-    const keyword = searchValue.trim().toLowerCase()
-
-    if (!keyword) return data.pages
-
-    const match = (text: string) => text?.toLowerCase().includes(keyword)
-
-    const isMemoMatched = (memo: any) => {
-      if (match(memo.title)) return true
-
-      const document = memo.content?.document || []
-      for (const block of document) {
-        const contents = block.content || []
-        for (const c of contents) {
-          if (typeof c.text === "string" && match(c.text)) {
-            return true
-          }
-        }
-      }
-
-      return false
-    }
-
-    return data.pages.filter(isMemoMatched)
-  }, [data, searchValue])
+    return data?.pages ?? []
+  }, [data])
 
   return (
     <div className="flex flex-col h-full">

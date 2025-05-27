@@ -1,6 +1,7 @@
 export interface GetMemoParams {
   page: number
   take: number
+  keywords?: string
 }
 export interface MemoItem {
   content: { document?: any[] } // string or JSON string

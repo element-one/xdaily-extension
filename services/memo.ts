@@ -17,13 +17,18 @@ import type {
 
 export const getMemoList = async ({
   page,
-  take
+  take,
+  keywords
 }: GetMemoParams): Promise<GetMemoListResp> => {
-  const response = await client.get(`/users/memos?page=${page}&take=${take}`)
+  let url = `/users/memos?page=${page}&take=${take}`
+  if (keywords) {
+    url += `&keywords=${keywords}`
+  }
+  const response = await client.get(url)
   return response.data
 }
 
-export const useMemoList = (take: number) => {
+export const useMemoList = (take: number, keywords?: string) => {
   const queryClient = useQueryClient()
 
   const infiniteQuery = useInfiniteQuery<
@@ -31,9 +36,9 @@ export const useMemoList = (take: number) => {
     Error,
     InfiniteData<MemoItem>
   >({
-    queryKey: ["memo-list", take],
+    queryKey: ["memo-list", take, keywords],
     queryFn: ({ pageParam = 1 }) =>
-      getMemoList({ page: pageParam as number, take }),
+      getMemoList({ page: pageParam as number, take, keywords }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
