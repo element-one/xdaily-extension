@@ -1,4 +1,4 @@
-import { ClockIcon, FileTextIcon } from "lucide-react"
+import { CheckCheckIcon, ClockIcon, FileTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
 import { formatTweetDate } from "~libs/date"
@@ -44,8 +44,7 @@ const FileTabContentSkeleton = () => {
 export const FileTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
-      take: 15,
-      isSelected: true,
+      take: 50,
       notEqualsType: "text"
     })
   const bottomObserver = useRef<HTMLDivElement>(null)
@@ -101,14 +100,10 @@ export const FileTabContent = () => {
     })
   }, [data])
 
-  const handleOpen = (url?: string) => {
-    if (url) {
-      window.open(url, "_blank")
-    } else {
-      chrome.tabs.create({
-        url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
-      })
-    }
+  const handleOpen = () => {
+    chrome.tabs.create({
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
+    })
   }
 
   return (
@@ -117,16 +112,10 @@ export const FileTabContent = () => {
         <FileTabContentSkeleton />
       ) : collection?.length > 0 ? (
         <>
-          <div className="w-full flex items-centr justify-between text-text-default-primary text-xs">
-            <span>Selected Knowledge</span>
-            <span>{collection.length}</span>
-          </div>
           <section className="flex flex-col gap-2 py-3 overflow-y-scroll hide-scrollbar">
             {collection.map((item) => (
               <Card
-                onClick={() => {
-                  handleOpen(item.fileUrl)
-                }}
+                onClick={handleOpen}
                 key={item.id}
                 title={
                   <div className="flex items-center gap-2 w-full">
@@ -138,6 +127,11 @@ export const FileTabContent = () => {
                 }
                 footerIcon={<ClockIcon className="w-4 h-4 text-orange" />}
                 footerTitle={formatTweetDate(item.createdAt as any as string)}
+                footerOperation={
+                  item.isSelected && (
+                    <CheckCheckIcon className="text-primary-brand w-4 h-4" />
+                  )
+                }
               />
             ))}
           </section>

@@ -11,7 +11,8 @@ import {
   getTweetIdFromTweet,
   getUserIdFromTweet
 } from "~libs/tweet"
-import { X_SITE } from "~types/enum"
+import { useStore } from "~store/store"
+import { NavbarItemKey } from "~types/enum"
 import { MessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
@@ -96,13 +97,13 @@ const ToolbarButton: FC<ToolbarButtonProps> = ({
 }
 
 const Toolbar = () => {
+  const { setNavbarItemKey, setKolScreenName } = useStore()
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [tweet, setTweet] = useState<HTMLElement | null>(null)
   const isMouseInside = useRef(false)
 
   const [isCollecting, setIsCollecting] = useState(false)
-  const [isSubscribing, setIsSubscribing] = useState(false)
   const [isChatVisible, setIsChatVisible] = useState(false)
 
   useEffect(() => {
@@ -152,19 +153,26 @@ const Toolbar = () => {
   }
 
   const handleCollectTweet = async () => {
+    await sendToBackground({
+      name: "toggle-panel",
+      body: {
+        open: true
+      }
+    })
     if (!tweet || isCollecting) return
     const tweetId = getTweetIdFromTweet(tweet)
 
     if (!tweetId) {
       return
     }
-
     setIsCollecting(true)
     try {
       await sendToBackground({
         name: "save-tweet",
         body: { tweetId }
       })
+      setKolScreenName("")
+      setNavbarItemKey(NavbarItemKey.KNOWLEDGE)
     } catch (error) {
       console.error("Error saving tweet:", error)
     } finally {
@@ -172,29 +180,9 @@ const Toolbar = () => {
     }
   }
 
-  const handleSubscribeUser = async () => {
-    if (!tweet || isSubscribing) return
-    const userId = getUserIdFromTweet(tweet)
-
-    setIsSubscribing(true)
-    const resp = await sendToBackground({
-      name: "subscribe-user",
-      body: {
-        userId
-      }
-    })
-    if (resp) {
-      setIsSubscribing(false)
-    }
-  }
-
   const handleChatWithUser = async () => {
     if (!tweet) return
     const userId = getUserIdFromTweet(tweet)
-    const userProfileUrl = `${X_SITE}/${userId}`
-    if (window.location.href !== userProfileUrl) {
-      window.location.href = `${X_SITE}/${userId}`
-    }
     // open panel
     sendToBackground({
       name: "toggle-panel",
@@ -202,13 +190,15 @@ const Toolbar = () => {
         open: true
       }
     })
+    setTimeout(() => {
+      setKolScreenName(userId)
+    }, 500)
   }
 
   const handleQuoteTweet = async () => {
     if (!tweet) return
     const tweetInfo = extractTweetDataFromTweet(tweet)
     if (!tweetInfo) {
-      // TODO maybe a toast
       return
     }
     sendToBackground({
@@ -291,33 +281,6 @@ const Toolbar = () => {
           </svg>
         }
       />
-      {/* <ToolbarButton
-        onClick={handleSubscribeUser}
-        isLoading={isSubscribing}
-        tooltip="User"
-        icon={
-          <svg
-            className="text-primary-brand"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M9.60035 9.86596C9.8514 9.53171 10.0002 9.11623 10.0002 8.66602C10.0002 7.56145 9.10473 6.66602 8.00016 6.66602C6.89559 6.66602 6.00016 7.56145 6.00016 8.66602C6.00016 9.11623 6.14892 9.53171 6.39998 9.86596C5.75238 10.3525 5.3335 11.127 5.3335 11.9993V12.666H6.66683V11.9993C6.66683 11.263 7.26378 10.666 8.00016 10.666C8.73654 10.666 9.3335 11.263 9.3335 11.9993V12.666H10.6668V11.9993C10.6668 11.127 10.2479 10.3525 9.60035 9.86596ZM8.66683 8.66602C8.66683 9.03421 8.36835 9.33268 8.00016 9.33268C7.63197 9.33268 7.3335 9.03421 7.3335 8.66602C7.3335 8.29783 7.63197 7.99935 8.00016 7.99935C8.36835 7.99935 8.66683 8.29783 8.66683 8.66602Z"
-              fill="currentColor"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M6.81633 4.03623C6.68073 4.00368 6.52893 3.99939 6.00801 3.99939H5.20016C4.62911 3.99939 4.24091 3.99991 3.94086 4.02443C3.64858 4.04831 3.49911 4.09159 3.39484 4.14472C3.14396 4.27255 2.93999 4.47652 2.81215 4.7274C2.75903 4.83167 2.71574 4.98114 2.69186 5.27342C2.66735 5.57348 2.66683 5.96167 2.66683 6.53272V9.46606C2.66683 10.0371 2.66735 10.4253 2.69186 10.7254C2.71574 11.0176 2.75903 11.1671 2.81215 11.2714C2.93999 11.5223 3.14396 11.7262 3.39484 11.8541C3.49911 11.9072 3.64858 11.9505 3.94086 11.9744C4.24091 11.9989 4.62911 11.9994 5.20016 11.9994H10.8002C11.3712 11.9994 11.7594 11.9989 12.0595 11.9744C12.3517 11.9505 12.5012 11.9072 12.6055 11.8541C12.8564 11.7262 13.0603 11.5223 13.1882 11.2714C13.2413 11.1671 13.2846 11.0176 13.3085 10.7254C13.333 10.4253 13.3335 10.0371 13.3335 9.46606V7.86606C13.3335 7.295 13.333 6.90681 13.3085 6.60675C13.2846 6.31447 13.2413 6.165 13.1882 6.06074C13.0603 5.80985 12.8564 5.60588 12.6055 5.47805C12.5012 5.42492 12.3517 5.38164 12.0595 5.35776C11.7594 5.33324 11.3712 5.33272 10.8002 5.33272H8.66683C8.49002 5.33272 8.32045 5.26249 8.19543 5.13746L7.79935 4.74139C7.43101 4.37305 7.32064 4.26874 7.20173 4.19587C7.08244 4.12277 6.95238 4.06889 6.81633 4.03623ZM6.07593 2.66604C6.49926 2.66583 6.81913 2.66568 7.12759 2.73974C7.39969 2.80506 7.65981 2.91281 7.8984 3.05902C8.16888 3.22477 8.39495 3.45105 8.69415 3.75053C8.70994 3.76634 8.72594 3.78236 8.74216 3.79858L8.94297 3.99939L10.8277 3.99939C11.3643 3.99938 11.8073 3.99938 12.168 4.02885C12.5428 4.05947 12.8872 4.12518 13.2108 4.29004C13.7126 4.5457 14.1205 4.95365 14.3762 5.45542C14.541 5.77897 14.6067 6.12344 14.6374 6.49817C14.6668 6.85897 14.6668 7.30187 14.6668 7.83851V9.49361C14.6668 10.0302 14.6668 10.4731 14.6374 10.8339C14.6067 11.2087 14.541 11.5531 14.3762 11.8767C14.1205 12.3785 13.7126 12.7864 13.2108 13.0421C12.8872 13.2069 12.5428 13.2726 12.168 13.3033C11.8072 13.3327 11.3643 13.3327 10.8277 13.3327H5.17265C4.63599 13.3327 4.19308 13.3327 3.83228 13.3033C3.45755 13.2726 3.11308 13.2069 2.78952 13.0421C2.28776 12.7864 1.87981 12.3785 1.62415 11.8767C1.45929 11.5531 1.39358 11.2087 1.36296 10.8339C1.33348 10.4731 1.33349 10.0302 1.3335 9.49359V6.50519C1.33349 5.96854 1.33348 5.52564 1.36296 5.16484C1.39358 4.79011 1.45929 4.44564 1.62415 4.12208C1.87981 3.62032 2.28776 3.21237 2.78952 2.95671C3.11308 2.79185 3.45755 2.72614 3.83228 2.69552C4.19308 2.66604 4.63598 2.66605 5.17263 2.66606L6.00801 2.66606C6.03095 2.66606 6.05359 2.66605 6.07593 2.66604Z"
-              fill="currentColor"
-            />
-          </svg>
-        }
-      /> */}
       <ToolbarButton
         onClick={handleQuoteTweet}
         tooltip="Quote Tweet"

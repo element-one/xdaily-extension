@@ -1,11 +1,11 @@
 import clsx from "clsx"
-import { useEffect, useMemo, useRef, useState, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { useKolCollections } from "~services/collection"
 import { useStore } from "~store/store"
 import type { KolCollection } from "~types/collection"
 
-import { Avatar } from "./ui/Avatar"
+import { Avatar } from "../ui/Avatar"
 
 interface KolNavbarProps {}
 export const KolNavbar: FC<KolNavbarProps> = ({}) => {

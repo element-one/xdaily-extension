@@ -17,6 +17,7 @@ export interface ReminderItem {
 export interface GetRemindersParmas {
   page: number
   take?: number
+  keywords?: string
 }
 
 export interface GetRemindersResp {

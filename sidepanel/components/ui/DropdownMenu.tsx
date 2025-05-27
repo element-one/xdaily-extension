@@ -6,7 +6,17 @@ import * as React from "react"
 function DropdownMenu({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
+  return (
+    <DropdownMenuPrimitive.Root
+      data-slot="dropdown-menu"
+      onOpenChange={(open) => {
+        if (!open) {
+          document.body.style.pointerEvents = ""
+        }
+      }}
+      {...props}
+    />
+  )
 }
 
 function DropdownMenuPortal({
@@ -42,6 +52,14 @@ function DropdownMenuContent({
           "bg-fill-bg-light rounded-lg border-[0.5px] border-fill-bg-grey p-1 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 shadow-xs max-h-(--radix-dropdown-menu-content-available-height)",
           className
         )}
+        onInteractOutside={(event) => {
+          document.body.style.pointerEvents = ""
+          props.onInteractOutside?.(event)
+        }}
+        onEscapeKeyDown={(event) => {
+          document.body.style.pointerEvents = ""
+          props.onEscapeKeyDown?.(event)
+        }}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -65,6 +83,9 @@ function DropdownMenuItem({
   inset?: boolean
   variant?: "default" | "destructive"
 }) {
+  const handleSelect = (event: Event) => {
+    document.body.style.pointerEvents = ""
+  }
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
@@ -74,6 +95,7 @@ function DropdownMenuItem({
         "text-xs focus:bg-fill-bg-deep text-text-default-primary focus:text-text-default-primary relative flex cursor-pointer items-center gap-1 rounded p-1 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ",
         className
       )}
+      onSelect={handleSelect}
       {...props}
     />
   )

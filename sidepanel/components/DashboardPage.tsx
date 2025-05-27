@@ -7,7 +7,6 @@ import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
 import { MessageType, type QuoteTweetPayload } from "~types/message"
 
-import AddIcon from "./icons/AddIcon"
 import ExploreIcon from "./icons/ExploreIcon"
 import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
 import MemoIcon from "./icons/MemoIcon"
@@ -16,8 +15,9 @@ import ReminderIcon from "./icons/ReminderIcon"
 import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
 import { KolChatSection } from "./KolChatSection/KolChatSection"
-import { KolNavbar } from "./KolNavbar"
-import { MeNavbarItem } from "./MeNavbarItem"
+import { KolNavbar } from "./navbar/KolNavbar"
+import { MeNavbarItem } from "./navbar/MeNavbarItem"
+import { UserNavbarItem } from "./navbar/UserNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
 import { InvitePanel } from "./panels/InvitePanel/InvitePanel"
@@ -26,7 +26,6 @@ import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
 import { StudioSettingPanel } from "./panels/StudioSettingPanel/StudioSettingPanel"
-import { UserNavbarItem } from "./UserNavbarItem"
 
 // import { SettingPanel } from "./panels/SettingPanel"
 
@@ -130,9 +129,6 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => {
-    clearNavbar()
-    setKolScreenName("")
-
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
@@ -141,8 +137,18 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    return () => {
+
+    const cleanup = () => {
       chrome.runtime.onMessage.removeListener(messageListener)
+      clearNavbar()
+      setKolScreenName("")
+    }
+    window.addEventListener("unload", cleanup)
+    return () => {
+      window.removeEventListener("unload", cleanup)
+      chrome.runtime.onMessage.removeListener(messageListener)
+      clearNavbar()
+      setKolScreenName("")
     }
   }, [])
 

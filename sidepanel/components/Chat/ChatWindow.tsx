@@ -18,25 +18,25 @@ import {
 import { formatTweetDate } from "~libs/date"
 import {
   useChatHistory,
-  useGetUserAgentModels,
-  useGetUserAgents
+  useGetChatModelInfo,
+  useGetUserAgentModels
 } from "~services/chat"
 import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
 
-import MemoIcon from "./icons/MemoIcon"
-import ReminderIcon from "./icons/ReminderIcon"
-import SheetIcon from "./icons/SheetIcon"
-import { Avatar } from "./ui/Avatar"
-import { EmptyContent } from "./ui/EmptyContent"
+import MemoIcon from "../icons/MemoIcon"
+import ReminderIcon from "../icons/ReminderIcon"
+import SheetIcon from "../icons/SheetIcon"
+import { Avatar } from "../ui/Avatar"
+import { EmptyContent } from "../ui/EmptyContent"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./ui/Select"
-import { Tooltip } from "./ui/Tooltip"
+} from "../ui/Select"
+import { Tooltip } from "../ui/Tooltip"
 
 interface ChatWindowProps {
   screenName: string
@@ -56,7 +56,6 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { removeQuoteTweet, userInfo } = useStore()
-  const chatWithMyself = userInfo?.username === screenName
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -66,10 +65,11 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     isFetchingNextPage
   } = useChatHistory(screenName, 20)
 
-  const { data: userAgentsResp } = useGetUserAgents()
+  const { data: chatModelInfo } = useGetChatModelInfo(screenName)
   const { data: modelsResp } = useGetUserAgentModels(
-    userAgentsResp?.data[0]?.id ?? ""
+    chatModelInfo?.agent?.id ?? ""
   )
+
   const [actModelId, setActModelId] = useState("")
 
   const models = useMemo(() => {
@@ -78,11 +78,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   }, [modelsResp])
 
   useEffect(() => {
-    if (models.length > 0) {
-      const defaultModel = models.find((m) => m.name.toLowerCase() === "gpt-4o")
-      setActModelId(defaultModel?.id ?? "")
+    if (chatModelInfo) {
+      setActModelId(chatModelInfo.model.id ?? "")
     }
-  }, [models])
+  }, [chatModelInfo])
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
@@ -312,14 +311,14 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <Select
               value={actModelId}
               onValueChange={setActModelId}
-              disabled={!chatWithMyself}>
+              disabled={!chatModelInfo || !chatModelInfo.isSelf}>
               <SelectTrigger className="w-[176px]" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    {model.name}
+                    {model.screenName}
                   </SelectItem>
                 ))}
               </SelectContent>

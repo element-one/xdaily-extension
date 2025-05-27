@@ -1,6 +1,7 @@
 export interface GetSheetListParams {
   page: number
   take: number
+  keywords?: string
 }
 
 export interface SheetItem {

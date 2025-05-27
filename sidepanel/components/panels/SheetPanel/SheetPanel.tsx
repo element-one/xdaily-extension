@@ -1,6 +1,7 @@
-import { EllipsisIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { EllipsisIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useCreateSheet, useSheetList } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -42,6 +43,7 @@ const SheetPanelSkeleton = () => {
   )
 }
 export const SheetPanel = () => {
+  const [searchValue, setSearchValue] = useState("")
   const {
     data,
     isFetchingNextPage,
@@ -49,7 +51,7 @@ export const SheetPanel = () => {
     hasNextPage,
     refetch: refetchSheetList,
     isLoading
-  } = useSheetList(15)
+  } = useSheetList(15, searchValue)
   const { mutateAsync: createSheet, isPending: isCreatingSheet } =
     useCreateSheet()
   // const { mutateAsync: deleteSheet } = useDeleteSheet()
@@ -80,7 +82,7 @@ export const SheetPanel = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const sheetData = useMemo(() => {
-    return data?.pages ? data.pages : []
+    return data?.pages ?? []
   }, [data])
 
   const handleCreateSheet = async () => {
@@ -102,26 +104,27 @@ export const SheetPanel = () => {
     //   refetchSheetList()
     // } catch (e) {}
   }
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trimEnd().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 800)
 
   return (
     <div className="flex flex-col h-full">
       <PanelHeader
         title="Sheet"
-        rightContent={
-          <div className="flex items-center gap-x-2">
-            <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-              <SearchIcon className="w-5 h-5 text-text-default-regular" />
-            </button>
-            <Button
-              variant="ghost"
-              isDisabled={isCreatingSheet}
-              onClick={handleCreateSheet}
-              className="p-0">
-              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                <PlusIcon className="w-4 h-4" strokeWidth={4} />
-              </div>
-            </Button>
-          </div>
+        showSearchButton={true}
+        onSearchChange={handleSearchChange}
+        extraRightContent={
+          <Button
+            variant="ghost"
+            isDisabled={isCreatingSheet}
+            onClick={handleCreateSheet}
+            className="!p-0">
+            <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+              <PlusIcon className="w-4 h-4" strokeWidth={4} />
+            </div>
+          </Button>
         }
       />
       {isLoading ? (

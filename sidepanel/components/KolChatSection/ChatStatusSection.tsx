@@ -1,5 +1,5 @@
 import { useApplyKol, useCheckKolStatus } from "~services/chat"
-import { ChatWindow } from "~sidepanel/components/ChatWindow"
+import { ChatWindow } from "~sidepanel/components/Chat/ChatWindow"
 import { Button } from "~sidepanel/components/ui/Button"
 import { KolStatus } from "~types/enum"
 

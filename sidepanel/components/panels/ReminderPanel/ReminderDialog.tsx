@@ -69,22 +69,12 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
     const toAt = timeRange.toAt
     const from = dayjs(fromAt)
     const to = dayjs(toAt)
-    const now = dayjs()
 
     if (!title || !fromAt || !toAt) {
       toast("Please fill in all the information")
       return
     }
 
-    if (!from.isAfter(now)) {
-      toast("Start time must be later than now")
-      return
-    }
-
-    if (!to.isSame(from, "day")) {
-      toast("End time must be on the same day as start time")
-      return
-    }
     if (!to.isAfter(from)) {
       toast("End time must be later than start time")
       return

@@ -2,11 +2,11 @@ import {
   ChevronLeftIcon,
   EllipsisIcon,
   PlusIcon,
-  SearchIcon,
   Trash2Icon
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useCreateMemo, useDeleteMemo, useMemoList } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -53,6 +53,12 @@ const MemoPanelSkeleton = () => {
 
 export const MemoPanel = () => {
   const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
+  const bottomObserver = useRef<HTMLDivElement>(null)
+
+  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
+  const { mutateAsync: deleteMemo } = useDeleteMemo()
+  const [searchValue, setSearchValue] = useState("")
+
   const {
     data,
     fetchNextPage,
@@ -61,12 +67,7 @@ export const MemoPanel = () => {
     updateMemoList,
     refetch,
     isLoading
-  } = useMemoList(15)
-  const bottomObserver = useRef<HTMLDivElement>(null)
-
-  const { mutateAsync: createMemo, isPending: isCreatingMemo } = useCreateMemo()
-
-  const { mutateAsync: deleteMemo, isPending: isDeletingMemo } = useDeleteMemo()
+  } = useMemoList(15, searchValue)
 
   useEffect(() => {
     if (!hasNextPage) return
@@ -84,10 +85,6 @@ export const MemoPanel = () => {
 
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  const memos = useMemo(() => {
-    return data?.pages ? data.pages : []
-  }, [data])
 
   const handleCreateMemo = async () => {
     if (isCreatingMemo) return
@@ -153,6 +150,15 @@ export const MemoPanel = () => {
     return lines.join("\n")
   }
 
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trim().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 800)
+
+  const memos = useMemo(() => {
+    return data?.pages ?? []
+  }, [data])
+
   return (
     <div className="flex flex-col h-full">
       {selectedMemo ? (
@@ -170,21 +176,18 @@ export const MemoPanel = () => {
       ) : (
         <PanelHeader
           title="Memo"
-          rightContent={
-            <div className="flex items-center gap-x-2">
-              <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-                <SearchIcon className="w-5 h-5 text-text-default-regular" />
-              </button>
-              <Button
-                variant="ghost"
-                isDisabled={isCreatingMemo}
-                className="p-0"
-                onClick={handleCreateMemo}>
-                <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                  <PlusIcon className="w-4 h-4" strokeWidth={4} />
-                </div>
-              </Button>
-            </div>
+          showSearchButton={true}
+          onSearchChange={handleSearchChange}
+          extraRightContent={
+            <Button
+              variant="ghost"
+              isDisabled={isCreatingMemo}
+              className="!p-0"
+              onClick={handleCreateMemo}>
+              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                <PlusIcon className="w-4 h-4" strokeWidth={4} />
+              </div>
+            </Button>
           }
         />
       )}

@@ -41,7 +41,6 @@ export const ReminderDateTimeRangePicker: FC<Props> = ({
         type="datetime-local"
         value={fromAt}
         onChange={handleFromChange}
-        min={now.format("YYYY-MM-DDTHH:mm")}
       />
       <div className="text-xs text-text-default-secondary">|</div>
       <InputBox
@@ -49,11 +48,6 @@ export const ReminderDateTimeRangePicker: FC<Props> = ({
         value={toAt}
         onChange={handleToChange}
         min={fromAt}
-        max={
-          fromAt
-            ? dayjs(fromAt).endOf("day").format("YYYY-MM-DDTHH:mm")
-            : undefined
-        }
         disabled={!fromAt}
       />
     </div>

@@ -1,8 +1,9 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { PlusIcon, SearchIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useDeleteReminder, useReminders } from "~services/reminder"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Divider } from "~sidepanel/components/ui/Divider"
@@ -40,7 +41,8 @@ const ReminderPanelSkeleton = () => {
   )
 }
 export const ReminderPanel = () => {
-  const { data, isLoading, refetch } = useReminders() // do not use take
+  const [searchValue, setSearchValue] = useState("")
+  const { data, isLoading, refetch } = useReminders({ keywords: searchValue }) // do not use take
   const { mutateAsync: deleteReminder } = useDeleteReminder()
 
   const tabRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -149,22 +151,24 @@ export const ReminderPanel = () => {
     await refetch()
   }
 
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trim().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 800)
+
   return (
     <>
       <div className="flex flex-col h-full">
         <PanelHeader
           title="Reminder"
-          rightContent={
-            <div className="flex items-center gap-x-2">
-              <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-                <SearchIcon className="w-5 h-5 text-text-default-regular" />
-              </button>
-              <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
-                <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                  <PlusIcon className="w-4 h-4" strokeWidth={4} />
-                </div>
-              </Button>
-            </div>
+          showSearchButton={true}
+          onSearchChange={handleSearchChange}
+          extraRightContent={
+            <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
+              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                <PlusIcon className="w-4 h-4" strokeWidth={4} />
+              </div>
+            </Button>
           }
         />
         <main className="flex-1 min-h-0 flex flex-col overflow-hidden py-4">

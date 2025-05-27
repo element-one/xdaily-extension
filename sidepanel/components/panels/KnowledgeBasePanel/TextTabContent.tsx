@@ -1,5 +1,5 @@
-import { ClockIcon } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { CheckCheckIcon, ClockIcon } from "lucide-react"
+import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { formatTweetDate } from "~libs/date"
 import { useKnowledgeBaseCollections } from "~services/collection"
@@ -39,7 +39,6 @@ export const TextTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
       take: 15,
-      isSelected: true,
       equalsType: "text"
     })
   const bottomObserver = useRef<HTMLDivElement>(null)
@@ -81,10 +80,6 @@ export const TextTabContent = () => {
         <TextTabContentSkeleton />
       ) : collection?.length > 0 ? (
         <>
-          <div className="w-full flex items-centr justify-between text-text-default-primary text-xs">
-            <span>Selected Knowledge</span>
-            <span>{collection.length}</span>
-          </div>
           <section className="flex flex-col gap-2 py-3 overflow-y-scroll hide-scrollbar">
             {collection.map((item) => (
               <Card
@@ -101,6 +96,11 @@ export const TextTabContent = () => {
                 }
                 footerIcon={<ClockIcon className="w-4 h-4 text-orange" />}
                 footerTitle={formatTweetDate(item.createdAt as any as string)}
+                footerOperation={
+                  item.isSelected && (
+                    <CheckCheckIcon className="text-primary-brand w-4 h-4" />
+                  )
+                }
               />
             ))}
           </section>
