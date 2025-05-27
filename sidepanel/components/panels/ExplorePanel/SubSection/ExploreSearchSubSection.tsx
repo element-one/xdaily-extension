@@ -12,7 +12,6 @@ import {
 import { formatRelativeTime } from "~libs/date"
 import { useDebounce } from "~libs/debounce"
 import { userSearchExplore } from "~services/collection"
-import DesignTemplateIcon from "~sidepanel/components/icons/DesignTemplateIcon"
 import DocIcon from "~sidepanel/components/icons/DocIcon"
 import ExcelIcon from "~sidepanel/components/icons/ExcelIcon"
 import PdfIcon from "~sidepanel/components/icons/PdfIcon"

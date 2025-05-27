@@ -3,7 +3,8 @@ import {
   EllipsisIcon,
   PlusIcon,
   SearchIcon,
-  Trash2Icon
+  Trash2Icon,
+  XIcon
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
@@ -19,6 +20,7 @@ import {
 } from "~sidepanel/components/ui/DropdownMenu"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
+import { InputBox } from "~sidepanel/components/ui/InputBox"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 import type { MemoItem } from "~types/memo"
@@ -68,6 +70,9 @@ export const MemoPanel = () => {
 
   const { mutateAsync: deleteMemo, isPending: isDeletingMemo } = useDeleteMemo()
 
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchValue, setSearchValue] = useState("")
+
   useEffect(() => {
     if (!hasNextPage) return
 
@@ -84,10 +89,6 @@ export const MemoPanel = () => {
 
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  const memos = useMemo(() => {
-    return data?.pages ? data.pages : []
-  }, [data])
 
   const handleCreateMemo = async () => {
     if (isCreatingMemo) return
@@ -153,6 +154,43 @@ export const MemoPanel = () => {
     return lines.join("\n")
   }
 
+  const toggleSearch = () => {
+    setShowSearch((prev) => !prev)
+    setSearchValue("")
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value)
+  }
+
+  const memos = useMemo(() => {
+    if (!data?.pages) return []
+
+    const keyword = searchValue.trim().toLowerCase()
+
+    if (!keyword) return data.pages
+
+    const match = (text: string) => text?.toLowerCase().includes(keyword)
+
+    const isMemoMatched = (memo: any) => {
+      if (match(memo.title)) return true
+
+      const document = memo.content?.document || []
+      for (const block of document) {
+        const contents = block.content || []
+        for (const c of contents) {
+          if (typeof c.text === "string" && match(c.text)) {
+            return true
+          }
+        }
+      }
+
+      return false
+    }
+
+    return data.pages.filter(isMemoMatched)
+  }, [data, searchValue])
+
   return (
     <div className="flex flex-col h-full">
       {selectedMemo ? (
@@ -168,25 +206,45 @@ export const MemoPanel = () => {
           }
         />
       ) : (
-        <PanelHeader
-          title="Memo"
-          rightContent={
-            <div className="flex items-center gap-x-2">
-              <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-                <SearchIcon className="w-5 h-5 text-text-default-regular" />
-              </button>
+        <div className="relative">
+          <PanelHeader
+            title="Memo"
+            rightContent={
+              <div className="flex items-center gap-x-2">
+                <Button variant="ghost" className="!p-0" onClick={toggleSearch}>
+                  <SearchIcon className="w-5 h-5 text-text-default-regular" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  isDisabled={isCreatingMemo}
+                  className="p-0"
+                  onClick={handleCreateMemo}>
+                  <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                    <PlusIcon className="w-4 h-4" strokeWidth={4} />
+                  </div>
+                </Button>
+              </div>
+            }
+          />
+          {showSearch && (
+            <div className="absolute inset-0 gap-2 flex items-center bg-fill-bg-deep z-10">
+              <InputBox
+                autoFocus
+                type="text"
+                value={searchValue}
+                onChange={handleSearchChange}
+                placeholder="Search memo"
+                className="!bg-fill-bg-deep h-6 border-none flex-1 min-w-0 !rounded-none"
+              />
               <Button
                 variant="ghost"
-                isDisabled={isCreatingMemo}
-                className="p-0"
-                onClick={handleCreateMemo}>
-                <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                  <PlusIcon className="w-4 h-4" strokeWidth={4} />
-                </div>
+                onClick={toggleSearch}
+                className="!p-0 shrink-0">
+                <XIcon className="w-4 h-4 text-text-default-secondary" />
               </Button>
             </div>
-          }
-        />
+          )}
+        </div>
       )}
       {selectedMemo ? (
         <MemoEditor memo={selectedMemo} onSave={handleMemoUpdate} />
