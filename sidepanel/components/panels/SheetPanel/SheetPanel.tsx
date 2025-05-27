@@ -147,7 +147,7 @@ export const SheetPanel = () => {
             variant="ghost"
             isDisabled={isCreatingSheet}
             onClick={handleCreateSheet}
-            className="p-0">
+            className="!p-0">
             <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
               <PlusIcon className="w-4 h-4" strokeWidth={4} />
             </div>
