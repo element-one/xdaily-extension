@@ -16,7 +16,6 @@ import {
 } from "react"
 
 import { formatTweetDate } from "~libs/date"
-import { all } from "~node_modules/axios"
 import {
   useChatHistory,
   useGetChatModelInfo,
@@ -25,19 +24,19 @@ import {
 import { useStore } from "~store/store"
 import type { TweetData } from "~types/tweet"
 
-import MemoIcon from "./icons/MemoIcon"
-import ReminderIcon from "./icons/ReminderIcon"
-import SheetIcon from "./icons/SheetIcon"
-import { Avatar } from "./ui/Avatar"
-import { EmptyContent } from "./ui/EmptyContent"
+import MemoIcon from "../icons/MemoIcon"
+import ReminderIcon from "../icons/ReminderIcon"
+import SheetIcon from "../icons/SheetIcon"
+import { Avatar } from "../ui/Avatar"
+import { EmptyContent } from "../ui/EmptyContent"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./ui/Select"
-import { Tooltip } from "./ui/Tooltip"
+} from "../ui/Select"
+import { Tooltip } from "../ui/Tooltip"
 
 interface ChatWindowProps {
   screenName: string

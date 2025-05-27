@@ -3,7 +3,7 @@ import { UserIcon } from "lucide-react"
 
 import { useStore } from "~store/store"
 
-import { Avatar } from "./ui/Avatar"
+import { Avatar } from "../ui/Avatar"
 
 export const UserNavbarItem = () => {
   const userInfo = useStore((state) => state.userInfo)

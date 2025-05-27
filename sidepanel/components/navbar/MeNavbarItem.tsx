@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import type { FC } from "react"
 
-import { Tooltip } from "./ui/Tooltip"
+import { Tooltip } from "../ui/Tooltip"
 
 interface MeNavbarItemProps {
   handleClick?: () => void
