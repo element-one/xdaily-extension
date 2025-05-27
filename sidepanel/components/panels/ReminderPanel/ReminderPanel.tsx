@@ -1,8 +1,9 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { PlusIcon, SearchIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { useDebounce } from "~libs/debounce"
 import { useDeleteReminder, useReminders } from "~services/reminder"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Divider } from "~sidepanel/components/ui/Divider"
@@ -40,7 +41,8 @@ const ReminderPanelSkeleton = () => {
   )
 }
 export const ReminderPanel = () => {
-  const { data, isLoading, refetch } = useReminders() // do not use take
+  const [searchValue, setSearchValue] = useState("")
+  const { data, isLoading, refetch } = useReminders({ keywords: searchValue }) // do not use take
   const { mutateAsync: deleteReminder } = useDeleteReminder()
 
   const tabRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -53,28 +55,9 @@ export const ReminderPanel = () => {
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<ReminderItem | null>(null)
 
-  const [searchValue, setSearchValue] = useState("")
-
   const reminderData = useMemo(() => {
-    if (!data?.pages) return []
-    const keywords = searchValue.trim().toLowerCase()
-
-    const reminders = data.pages
-    return reminders
-      .map((group) => {
-        const filteredItems = group.items.filter((item) => {
-          return (
-            item.title?.toLowerCase().includes(keywords) ||
-            item.description?.toLowerCase().includes(keywords)
-          )
-        })
-
-        return filteredItems.length > 0
-          ? { ...group, items: filteredItems }
-          : null
-      })
-      .filter(Boolean)
-  }, [data, searchValue])
+    return data?.pages ?? []
+  }, [data])
 
   useEffect(() => {
     const firstItem = reminderData[0]
@@ -168,9 +151,10 @@ export const ReminderPanel = () => {
     await refetch()
   }
 
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value)
-  }
+  const handleSearchChange = useDebounce((value: string) => {
+    const keyword = value.trim().toLowerCase()
+    setSearchValue(keyword ?? "")
+  }, 800)
 
   return (
     <>

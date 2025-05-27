@@ -17,17 +17,27 @@ import type {
 
 export const getReminders = async ({
   page,
-  take
+  take,
+  keywords
 }: GetRemindersParmas): Promise<GetRemindersResp> => {
   let url = `/users/reminders?page=${page}`
   if (take) {
     url += `&take=${take}`
   }
+  if (keywords) {
+    url += `&keywords=${encodeURIComponent(keywords)}`
+  }
   const response = await client.get(url)
   return response.data
 }
 
-export const useReminders = (take?: number) => {
+export const useReminders = ({
+  take,
+  keywords
+}: {
+  take?: number
+  keywords?: string
+}) => {
   return useInfiniteQuery<
     GetRemindersResp,
     Error,
@@ -39,9 +49,9 @@ export const useReminders = (take?: number) => {
       pageParams: number[]
     }
   >({
-    queryKey: ["user-collections", take],
+    queryKey: ["user-collections", take, keywords],
     queryFn: ({ pageParam = 1 }) =>
-      getReminders({ page: pageParam as number, take }),
+      getReminders({ page: pageParam as number, take, keywords }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
