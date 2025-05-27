@@ -130,9 +130,6 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => {
-    clearNavbar()
-    setKolScreenName("")
-
     const messageListener = (message: QuoteTweetPayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
@@ -141,9 +138,19 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
-    return () => {
-      chrome.runtime.onMessage.removeListener(messageListener)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        cleanup()
+      }
     }
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    const cleanup = () => {
+      chrome.runtime.onMessage.removeListener(messageListener)
+      clearNavbar()
+      setKolScreenName("")
+    }
+    return cleanup
   }, [])
 
   return (
