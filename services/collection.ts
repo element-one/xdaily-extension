@@ -149,7 +149,10 @@ export const getKnowledgeBaseCollections = async ({
   notEqualsType,
   equalsType
 }: GetKnowledgeBaseCollectionParams): Promise<GetFileCollectionResp> => {
-  let url = `/users/knowledge-bases?page=${page}&take=${take}&isSelected]${!!isSelected}`
+  let url = `/users/knowledge-bases?page=${page}&take=${take}`
+  if (typeof isSelected === "boolean") {
+    url += `&isSelected=${isSelected}`
+  }
   if (notEqualsType) {
     url += `&notEqualsType=${notEqualsType}`
   }
@@ -173,7 +176,8 @@ export const useKnowledgeBaseCollections = (
       "knowledge-collections",
       params.take,
       params.equalsType,
-      params.notEqualsType
+      params.notEqualsType,
+      !!params.isSelected
     ],
     queryFn: ({ pageParam = 1 }) =>
       getKnowledgeBaseCollections({ page: pageParam as number, ...params }),
