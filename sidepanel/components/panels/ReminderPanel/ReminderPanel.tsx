@@ -53,9 +53,28 @@ export const ReminderPanel = () => {
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<ReminderItem | null>(null)
 
+  const [searchValue, setSearchValue] = useState("")
+
   const reminderData = useMemo(() => {
-    return data?.pages ?? []
-  }, [data])
+    if (!data?.pages) return []
+    const keywords = searchValue.trim().toLowerCase()
+
+    const reminders = data.pages
+    return reminders
+      .map((group) => {
+        const filteredItems = group.items.filter((item) => {
+          return (
+            item.title?.toLowerCase().includes(keywords) ||
+            item.description?.toLowerCase().includes(keywords)
+          )
+        })
+
+        return filteredItems.length > 0
+          ? { ...group, items: filteredItems }
+          : null
+      })
+      .filter(Boolean)
+  }, [data, searchValue])
 
   useEffect(() => {
     const firstItem = reminderData[0]
@@ -149,22 +168,23 @@ export const ReminderPanel = () => {
     await refetch()
   }
 
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value)
+  }
+
   return (
     <>
       <div className="flex flex-col h-full">
         <PanelHeader
           title="Reminder"
-          rightContent={
-            <div className="flex items-center gap-x-2">
-              <button className="w-5 h-5 flex items-center justify-center focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50">
-                <SearchIcon className="w-5 h-5 text-text-default-regular" />
-              </button>
-              <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
-                <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
-                  <PlusIcon className="w-4 h-4" strokeWidth={4} />
-                </div>
-              </Button>
-            </div>
+          showSearchButton={true}
+          onSearchChange={handleSearchChange}
+          extraRightContent={
+            <Button variant="ghost" className="!p-0" onClick={handleAddClick}>
+              <div className="text-primary-brand border-[2px] rounded-md border-primary-brand w-4 h-4 flex items-center justify-center">
+                <PlusIcon className="w-4 h-4" strokeWidth={4} />
+              </div>
+            </Button>
           }
         />
         <main className="flex-1 min-h-0 flex flex-col overflow-hidden py-4">
