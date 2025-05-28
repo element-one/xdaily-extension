@@ -1,8 +1,8 @@
-# xdaily-extension
+# xDaily-extension
 
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+AI Assistant for daily X tasks
 
-## use node >= 20
+## node >= 20
 
 ```bash
 nvm use
@@ -10,7 +10,13 @@ nvm use
 
 ## Getting Started
 
-First, run the development server:
+Install packages
+
+```bash
+yarn install
+```
+
+Run the development server:
 
 ```bash
 yarn dev
@@ -21,7 +27,7 @@ Open your browser and load the appropriate development build. For example, if yo
 - You can start editing the sidepanel by modifying `sidepanel/index.tsx`. It should auto-update as you make changes.
 - `background.ts` is for service_worker
 - Likewise to add a content page, add file inside `content`, importing some module and do some logic, then reload the extension on your browser.
-- [TailwindCss](https://tailwindcss.com/) is supported, just visit [Quickstart with TailwindCss](https://docs.plasmo.com/quickstarts/with-tailwindcss)
+- [TailwindCSS](https://tailwindcss.com/) is supported, just visit [Quickstart with TailwindCss](https://docs.plasmo.com/quickstarts/with-tailwindcss)
 
 For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 
