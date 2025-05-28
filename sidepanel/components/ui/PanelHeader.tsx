@@ -6,7 +6,6 @@ import { InputBox } from "./InputBox"
 
 interface PanelHeaderProps {
   title: React.ReactNode | string
-  rightContent?: React.ReactNode
   showSearchButton?: boolean
   onSearchChange?: (value: string) => void
   extraRightContent?: React.ReactNode
@@ -49,7 +48,7 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
             type="text"
             value={searchValue}
             onChange={handleSearchChange}
-            placeholder="Search memo"
+            placeholder="Search..."
             className="!bg-fill-bg-deep h-6 border-none flex-1 min-w-0 !rounded-none"
           />
           <Button
