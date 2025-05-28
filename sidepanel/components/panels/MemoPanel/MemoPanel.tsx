@@ -21,6 +21,7 @@ import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
+import { useToast } from "~sidepanel/components/ui/Toast"
 import type { MemoItem } from "~types/memo"
 
 import { MemoEditor } from "./MemoEditor"
@@ -69,6 +70,8 @@ export const MemoPanel = () => {
     isLoading
   } = useMemoList(15, searchValue)
 
+  const { showToast } = useToast()
+
   useEffect(() => {
     if (!hasNextPage) return
 
@@ -88,13 +91,21 @@ export const MemoPanel = () => {
 
   const handleCreateMemo = async () => {
     if (isCreatingMemo) return
-    await createMemo({
-      title: "untitled",
-      content: {
-        document: []
-      }
-    })
-    refetch()
+    try {
+      await createMemo({
+        title: "untitled",
+        content: {
+          document: []
+        }
+      })
+      refetch()
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
 
   const handleSelectMemo = (memo: MemoItem) => {
@@ -115,7 +126,13 @@ export const MemoPanel = () => {
     try {
       await deleteMemo({ id: memo.id })
       refetch()
-    } catch (e) {}
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
 
   const getFirstImageUrl = (memo: MemoItem) => {

@@ -2,7 +2,7 @@ import { EllipsisIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useDebounce } from "~libs/debounce"
-import { useCreateSheet, useSheetList } from "~services/sheet"
+import { useCreateSheet, useDeleteSheet, useSheetList } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
 import { Divider } from "~sidepanel/components/ui/Divider"
@@ -15,6 +15,7 @@ import {
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
+import { useToast } from "~sidepanel/components/ui/Toast"
 import type { SheetItem } from "~types/sheet"
 
 const SheetPanelSkeleton = () => {
@@ -54,7 +55,8 @@ export const SheetPanel = () => {
   } = useSheetList(15, searchValue)
   const { mutateAsync: createSheet, isPending: isCreatingSheet } =
     useCreateSheet()
-  // const { mutateAsync: deleteSheet } = useDeleteSheet()
+  const { mutateAsync: deleteSheet } = useDeleteSheet()
+  const { showToast } = useToast()
 
   const bottomObserver = useRef<HTMLDivElement>(null)
 
@@ -95,14 +97,26 @@ export const SheetPanel = () => {
         }
       })
       refetchSheetList()
-    } catch (e) {}
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
 
   const handleDeleteSheet = async (sheet: SheetItem) => {
-    // try {
-    //   await deleteSheet({ id: sheet.id })
-    //   refetchSheetList()
-    // } catch (e) {}
+    try {
+      await deleteSheet({ id: sheet.id })
+      refetchSheetList()
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
   const handleSearchChange = useDebounce((value: string) => {
     const keyword = value.trimEnd().toLowerCase()

@@ -10,6 +10,7 @@ import { Divider } from "~sidepanel/components/ui/Divider"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
+import { useToast } from "~sidepanel/components/ui/Toast"
 import type { ReminderItem } from "~types/reminder"
 
 import { ReminderDialog } from "./ReminderDialog"
@@ -54,6 +55,8 @@ export const ReminderPanel = () => {
 
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<ReminderItem | null>(null)
+
+  const { showToast } = useToast()
 
   const reminderData = useMemo(() => {
     return data?.pages ?? []
@@ -137,7 +140,13 @@ export const ReminderPanel = () => {
     try {
       await deleteReminder({ id })
       refetch()
-    } catch (e) {}
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
 
   const onDialogComplete = async () => {
