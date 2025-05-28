@@ -14,6 +14,7 @@ import {
   type FC,
   type FormEvent
 } from "react"
+import robotImg from "url:/assets/robot.png" // strange
 
 import { formatTweetDate } from "~libs/date"
 import {
@@ -29,6 +30,7 @@ import ReminderIcon from "../icons/ReminderIcon"
 import SheetIcon from "../icons/SheetIcon"
 import { Avatar } from "../ui/Avatar"
 import { EmptyContent } from "../ui/EmptyContent"
+import { ImageWithFallback } from "../ui/ImageWithFallback"
 import {
   Select,
   SelectContent,
@@ -55,7 +57,7 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 }
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
-  const { removeQuoteTweet, userInfo } = useStore()
+  const { removeQuoteTweet } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -274,6 +276,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                     ? "bg-primary-brand text-text-inverse-primary"
                     : "bg-fill-bg-light text-text-default-primary"
                 }`}>
+                {m.role !== "user" && chatModelInfo?.isSelf && (
+                  <div className="mb-2 flex items-center text-xs font-semibold gap-x-1">
+                    <ImageWithFallback
+                      src={robotImg}
+                      alt={m.role}
+                      className="w-5 h-5 rounded-full object-contain"
+                      fallbackClassName="w-5 h-5 rounded-full"
+                    />
+                    xDaily
+                  </div>
+                )}
                 <Markdown>{m.content}</Markdown>
               </div>
             </div>

@@ -5,12 +5,7 @@ import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
-import {
-  MessageType,
-  type AddTweetCollectionPayload,
-  type ChatWithUserPayload,
-  type QuoteTweetPayload
-} from "~types/message"
+import { MessageType, type MessagePayload } from "~types/message"
 
 import ExploreIcon from "./icons/ExploreIcon"
 import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
@@ -135,12 +130,7 @@ export const DashboardPage = () => {
     clearNavbar()
     setKolScreenName("")
 
-    const messageListener = (
-      message:
-        | QuoteTweetPayload
-        | AddTweetCollectionPayload
-        | ChatWithUserPayload
-    ) => {
+    const messageListener = (message: MessagePayload) => {
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)

@@ -40,3 +40,10 @@ export type ChatWithUserPayload = {
     kolScreenName: string
   }
 }
+
+export type MessagePayload =
+  | InpageToastPayload
+  | AddTweetCollectionPayload
+  | AddUserCollectionPayload
+  | QuoteTweetPayload
+  | ChatWithUserPayload
