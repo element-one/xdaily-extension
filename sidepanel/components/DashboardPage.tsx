@@ -5,7 +5,12 @@ import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
-import { MessageType, type QuoteTweetPayload } from "~types/message"
+import {
+  MessageType,
+  type AddTweetCollectionPayload,
+  type ChatWithUserPayload,
+  type QuoteTweetPayload
+} from "~types/message"
 
 import ExploreIcon from "./icons/ExploreIcon"
 import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
@@ -127,26 +132,31 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => {
-    const messageListener = (message: QuoteTweetPayload) => {
+    clearNavbar()
+    setKolScreenName("")
+
+    const messageListener = (
+      message:
+        | QuoteTweetPayload
+        | AddTweetCollectionPayload
+        | ChatWithUserPayload
+    ) => {
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)
+      }
+      if (message.type === MessageType.ADD_COLLECTION) {
+        toggleDrawer(NavbarItemKey.KNOWLEDGE)
+      }
+      if (message.type === MessageType.CHAT_WITH_USER) {
+        setKolScreenName(message.data?.kolScreenName ?? "")
       }
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
 
-    const cleanup = () => {
-      chrome.runtime.onMessage.removeListener(messageListener)
-      clearNavbar()
-      setKolScreenName("")
-    }
-    window.addEventListener("unload", cleanup)
     return () => {
-      window.removeEventListener("unload", cleanup)
       chrome.runtime.onMessage.removeListener(messageListener)
-      clearNavbar()
-      setKolScreenName("")
     }
   }, [])
 

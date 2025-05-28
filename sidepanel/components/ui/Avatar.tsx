@@ -1,6 +1,8 @@
 import clsx from "clsx"
 import type { FC } from "react"
 
+import { ImageWithFallback } from "./ImageWithFallback"
+
 interface AvatarProps {
   url: string
   alt?: string
@@ -14,10 +16,11 @@ export const Avatar: FC<AvatarProps> = ({ url, alt, className }) => {
   }
   return (
     <div className={clsx(wrapperClassName, className)}>
-      <img
+      <ImageWithFallback
         src={url}
         alt={alt || "user avatar"}
-        className="size-full object-contain"
+        className="size-full object-contain rounded-full"
+        fallbackClassName="size-full rounded-full"
       />
     </div>
   )

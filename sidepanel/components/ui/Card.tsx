@@ -30,7 +30,7 @@ export const Card: FC<CardProps> = ({
         {title}
       </div>
       {content && (
-        <div className="text-text-default-secondary text-sm font-medium line-clamp-4 px-3">
+        <div className="text-text-default-secondary text-sm font-medium line-clamp-4 px-3 w-full">
           {content}
         </div>
       )}

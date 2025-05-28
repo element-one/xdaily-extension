@@ -20,7 +20,7 @@ export const ChatStatusSection = ({ screenName }: { screenName: string }) => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col w-full h-full items-center justify-center gap-4">
+      <div className="flex flex-col w-full h-full items-center justify-center gap-4 text-primary-brand">
         loading...
       </div>
     )

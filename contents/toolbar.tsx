@@ -11,8 +11,6 @@ import {
   getTweetIdFromTweet,
   getUserIdFromTweet
 } from "~libs/tweet"
-import { useStore } from "~store/store"
-import { NavbarItemKey } from "~types/enum"
 import { MessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
@@ -97,7 +95,6 @@ const ToolbarButton: FC<ToolbarButtonProps> = ({
 }
 
 const Toolbar = () => {
-  const { setNavbarItemKey, setKolScreenName } = useStore()
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [tweet, setTweet] = useState<HTMLElement | null>(null)
@@ -171,8 +168,6 @@ const Toolbar = () => {
         name: "save-tweet",
         body: { tweetId }
       })
-      setKolScreenName("")
-      setNavbarItemKey(NavbarItemKey.KNOWLEDGE)
     } catch (error) {
       console.error("Error saving tweet:", error)
     } finally {
@@ -191,7 +186,12 @@ const Toolbar = () => {
       }
     })
     setTimeout(() => {
-      setKolScreenName(userId)
+      chrome.runtime.sendMessage({
+        type: MessageType.CHAT_WITH_USER,
+        data: {
+          kolScreenName: userId
+        }
+      })
     }, 500)
   }
 
