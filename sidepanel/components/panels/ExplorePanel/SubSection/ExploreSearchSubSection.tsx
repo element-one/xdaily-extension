@@ -232,7 +232,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
           <XIcon className="w-4 h-4 text-text-default-secondary" />
         </button>
       </div>
-      <div className="pl-4 flex gap-3 min-w-0 w-full overflow-y-auto hide-scrollbar shrink-0">
+      <div className="px-4 flex gap-3 min-w-0 w-full overflow-x-auto hide-scrollbar shrink-0">
         {Filters.map((filter) => (
           <Button
             ref={(el) => (tabRefs.current[filter.type] = el)}
