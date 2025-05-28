@@ -10,7 +10,8 @@ export enum MessageType {
   ADD_COLLECTION = "add_tweet_collection",
   ADD_USER_COLLECTION = "add_user_collection",
   REQUEST_TWEET_DETAILS = "request_tweet_detail_from_page",
-  QUOTE_TWEET = "quote_tweet_to_chat_with_bot"
+  QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
+  CHAT_WITH_USER = "chat_with_user"
 }
 
 export type InpageToastPayload = {
@@ -32,3 +33,17 @@ export type QuoteTweetPayload = {
   type: MessageType.QUOTE_TWEET
   data: TweetData
 }
+
+export type ChatWithUserPayload = {
+  type: MessageType.CHAT_WITH_USER
+  data: {
+    kolScreenName: string
+  }
+}
+
+export type MessagePayload =
+  | InpageToastPayload
+  | AddTweetCollectionPayload
+  | AddUserCollectionPayload
+  | QuoteTweetPayload
+  | ChatWithUserPayload

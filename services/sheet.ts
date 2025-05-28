@@ -88,14 +88,14 @@ export const useCreateSheet = (
   })
 }
 
-// export const deleteSheet = async ({ id }: { id: string }) => {
-//   const response = await client.delete(`/users/sheets/${id}`)
-//   return response.data
-// }
+export const deleteSheet = async ({ id }: { id: string }) => {
+  const response = await client.delete(`/users/sheets/${id}`)
+  return response.data
+}
 
-// export const useDeleteSheet = () => {
-//   return useMutation({
-//     mutationKey: ["delete-sheet"],
-//     mutationFn: deleteSheet
-//   })
-// }
+export const useDeleteSheet = () => {
+  return useMutation({
+    mutationKey: ["delete-sheet"],
+    mutationFn: deleteSheet
+  })
+}

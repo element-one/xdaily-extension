@@ -13,10 +13,12 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       showToastInWebPage({
         message: `Save tweet ${tweetId} success`
       })
-      chrome.runtime.sendMessage({
-        type: MessageType.ADD_COLLECTION,
-        data: res
-      })
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          type: MessageType.ADD_COLLECTION,
+          data: res
+        })
+      }, 500)
     }
   } catch (e) {
     console.log(e)

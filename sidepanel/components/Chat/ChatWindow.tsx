@@ -14,6 +14,7 @@ import {
   type FC,
   type FormEvent
 } from "react"
+import robotImg from "url:/assets/robot.png" // strange
 
 import { formatTweetDate } from "~libs/date"
 import {
@@ -29,6 +30,7 @@ import ReminderIcon from "../icons/ReminderIcon"
 import SheetIcon from "../icons/SheetIcon"
 import { Avatar } from "../ui/Avatar"
 import { EmptyContent } from "../ui/EmptyContent"
+import { ImageWithFallback } from "../ui/ImageWithFallback"
 import {
   Select,
   SelectContent,
@@ -65,6 +67,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     isFetchingNextPage
   } = useChatHistory(screenName, 20)
 
+  const isSelf = userInfo.username === screenName
+
   const { data: chatModelInfo } = useGetChatModelInfo(screenName)
   const { data: modelsResp } = useGetUserAgentModels(
     chatModelInfo?.agent?.id ?? ""
@@ -88,7 +92,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { messages, input, handleInputChange, status, append, setInput } =
     useChat({
       id: screenName, // as different session
-      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+      api: isSelf
+        ? `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`
+        : `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
       streamProtocol: "text",
       fetch: async (url, options) => {
         const data = JSON.parse(options.body as string)
@@ -244,8 +250,20 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   return (
     <div className="flex gap-y-6 rounded-md flex-col h-full flex-1 min-h-0">
-      <div className="text-xs font-semibold h-[18px] flex items-center text-primary-brand">
-        {screenName ? `@${screenName}` : "Bot"}
+      <div className="text-xs font-semibold min-h-[18px] flex items-center text-primary-brand">
+        {!isSelf && screenName ? (
+          `@${screenName}`
+        ) : (
+          <div className="mb-2 flex items-center text-xs font-semibold gap-x-1 text-text-default-primary">
+            <ImageWithFallback
+              src={robotImg}
+              alt="robot"
+              className="w-5 h-5 rounded-full object-contain"
+              fallbackClassName="w-5 h-5 rounded-full"
+            />
+            xDaily
+          </div>
+        )}
       </div>
       <div
         className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll"
@@ -274,6 +292,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                     ? "bg-primary-brand text-text-inverse-primary"
                     : "bg-fill-bg-light text-text-default-primary"
                 }`}>
+                {m.role !== "user" && isSelf && (
+                  <div className="mb-2 flex items-center text-xs font-semibold gap-x-1">
+                    <ImageWithFallback
+                      src={robotImg}
+                      alt={m.role}
+                      className="w-5 h-5 rounded-full object-contain"
+                      fallbackClassName="w-5 h-5 rounded-full"
+                    />
+                    xDaily
+                  </div>
+                )}
                 <Markdown>{m.content}</Markdown>
               </div>
             </div>
@@ -311,7 +340,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <Select
               value={actModelId}
               onValueChange={setActModelId}
-              disabled={!chatModelInfo || !chatModelInfo.isSelf}>
+              disabled={!isSelf}>
               <SelectTrigger className="w-[176px]" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
@@ -326,17 +355,19 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           ) : (
             <div />
           )}
-          <div className="flex gap-4 items-center">
-            {Tools.map((tool) => (
-              <Tooltip key={tool.type} content={tool.tooltip}>
-                <div
-                  onClick={() => handleClickToolButton(tool.magicWord)}
-                  className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
-                  {tool.icon}
-                </div>
-              </Tooltip>
-            ))}
-          </div>
+          {isSelf && (
+            <div className="flex gap-4 items-center">
+              {Tools.map((tool) => (
+                <Tooltip key={tool.type} content={tool.tooltip}>
+                  <div
+                    onClick={() => handleClickToolButton(tool.magicWord)}
+                    className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
+                    {tool.icon}
+                  </div>
+                </Tooltip>
+              ))}
+            </div>
+          )}
         </div>
         <form
           className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"

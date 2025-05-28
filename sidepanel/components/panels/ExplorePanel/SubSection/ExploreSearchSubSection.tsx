@@ -56,7 +56,7 @@ const Filters = [
 
 const ExploreSearchSkeleton = () => {
   return (
-    <div className="flex flex-col gap-2 px-4">
+    <div className="flex flex-col gap-2 pl-4">
       <Skeleton className="h-[18px] w-12" />
       <div className="flex flex-col gap-2">
         {[1, 2, 3].map((item) => (
@@ -215,7 +215,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-fill-bg-deep gap-4">
-      <div className="px-4 pb-3 flex w-full items-center justify-between border-b border-fill-bg-input shrink-0">
+      <div className="pl-4 pb-3 flex w-full items-center justify-between border-b border-fill-bg-input shrink-0">
         <div className="relative flex-1 gap-2 flex items-center">
           <SearchIcon className="w-5 h-5 text-text-default-regular shrink-0" />
           <InputBox
@@ -232,7 +232,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
           <XIcon className="w-4 h-4 text-text-default-secondary" />
         </button>
       </div>
-      <div className="px-4 flex gap-3 min-w-0 w-full overflow-y-auto hide-scrollbar shrink-0">
+      <div className="ml-4 flex gap-3 overflow-x-auto hide-scrollbar shrink-0">
         {Filters.map((filter) => (
           <Button
             ref={(el) => (tabRefs.current[filter.type] = el)}

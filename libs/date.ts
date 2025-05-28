@@ -27,8 +27,11 @@ export const formatRelativeTime = (datetimeStr: string) => {
   }
 }
 
-//from 2025-05-23T02:09:00.000Z
-// to YYYY-MM-DDTHH:mm
+/**
+ *
+ * @param utcString utc string 2025-05-23T02:09:00.000Z
+ * @returns eg. YYYY-MM-DDTHH:mm
+ */
 export const utcToLocalInput = (utcString: string) => {
   if (!utcString) return ""
   const date = new Date(utcString)
