@@ -50,7 +50,7 @@ export const ReminderPanel = () => {
   const listWrapperRef = useRef<HTMLDivElement | null>(null)
 
   const [selectedId, setSelectedId] = useState("")
-  const [isScrollable, setIsScrollable] = useState(false)
+  const isProgrammaticScroll = useRef(false)
 
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<ReminderItem | null>(null)
@@ -70,64 +70,57 @@ export const ReminderPanel = () => {
     const wrapper = listWrapperRef.current
     if (!wrapper) return
 
-    const checkScrollable = () => {
-      setIsScrollable(wrapper.scrollHeight > wrapper.clientHeight)
-    }
+    let ticking = false
 
-    checkScrollable()
-
-    window.addEventListener("resize", checkScrollable)
-    return () => {
-      window.removeEventListener("resize", checkScrollable)
-    }
-  }, [reminderData])
-
-  useEffect(() => {
-    if (!isScrollable) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting)
-        if (visible) {
-          const visibleId = visible.target.getAttribute("data-id")
-          if (visibleId && visibleId !== selectedId) {
-            setSelectedId(visibleId)
-          }
+    const handleScroll = () => {
+      if (ticking || isProgrammaticScroll.current) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const { scrollTop, scrollHeight, clientHeight } = wrapper
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10
+        if (isAtBottom) {
+          ticking = false
+          return
         }
-      },
-      {
-        root: listWrapperRef.current,
-        threshold: 0.5
-      }
-    )
+        const wrapperTop = wrapper.getBoundingClientRect().top
+        let closestId = ""
+        let minDistance = Infinity
 
-    Object.values(sectionRefs.current).forEach((el) => {
-      if (el) observer.observe(el)
-    })
-
-    return () => observer.disconnect()
-  }, [isScrollable, selectedId])
-
-  useEffect(() => {
-    const currentTab = tabRefs.current[selectedId]
-    if (currentTab) {
-      currentTab.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest"
+        Object.entries(sectionRefs.current).forEach(([id, el]) => {
+          if (!el) return
+          const rect = el.getBoundingClientRect()
+          const distance = Math.abs(rect.top - wrapperTop)
+          if (distance < minDistance) {
+            closestId = id
+            minDistance = distance
+          }
+        })
+        if (closestId && closestId !== selectedId) {
+          setSelectedId(closestId)
+        }
+        ticking = false
       })
     }
+
+    wrapper.addEventListener("scroll", handleScroll)
+    return () => wrapper.removeEventListener("scroll", handleScroll)
   }, [selectedId])
 
   const handleSelectTab = (id: string) => {
-    const section = sectionRefs.current[id]
     setSelectedId(id)
-    if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      })
-    }
+    const section = sectionRefs.current[id]
+    if (!section) return
+
+    isProgrammaticScroll.current = true
+
+    section.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    })
+
+    setTimeout(() => {
+      isProgrammaticScroll.current = false
+    }, 400)
   }
 
   const handleAddClick = () => {
