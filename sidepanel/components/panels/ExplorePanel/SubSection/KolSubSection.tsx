@@ -6,7 +6,7 @@ import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
 
-import { KolItem } from "../KolItem"
+import { KolItem } from "./KolItem"
 
 const allCategory = {
   id: "",
@@ -60,9 +60,9 @@ export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
   }, [data])
 
   return (
-    <div className="flex flex-col h-full p-4">
+    <div className="flex flex-col h-full pl-4">
       <PanelHeader
-        title="Category"
+        title="Explore"
         extraRightContent={
           <Button variant="ghost" className="!p-0 h-fit" onClick={onFilter}>
             <svg

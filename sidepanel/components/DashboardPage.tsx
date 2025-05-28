@@ -27,8 +27,6 @@ import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
 import { StudioSettingPanel } from "./panels/StudioSettingPanel/StudioSettingPanel"
 
-// import { SettingPanel } from "./panels/SettingPanel"
-
 type NavbarItem = {
   key: NavbarItemKey
   icon: FC<{
@@ -169,7 +167,7 @@ export const DashboardPage = () => {
           <KolChatSection />
         </div>
       </div>
-      <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px] bg-text-inverse-primary">
+      <aside className="max-w-[68px] p-4 flex flex-col items-center gap-4 h-full w-[68px] bg-fill-bg-deep">
         {/* top tabs */}
         <div className="flex-grow flex items-center overflow-y-auto gap-4 flex-col">
           <img
