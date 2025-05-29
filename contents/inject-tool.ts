@@ -29,7 +29,9 @@ const getSpinnerIcon = () => `
 const observeTweets = () => {
   const observer = new MutationObserver(() => {
     document.querySelectorAll("article").forEach((tweet) => {
-      if (!tweet.querySelector(`.${COLLECT_BUTTON_CONT}`)) {
+      const hasCollectButton = tweet.querySelector(`.${COLLECT_BUTTON_CONT}`)
+      const hasBookmark = tweet.querySelector('[data-testid="bookmark"]')
+      if (!hasCollectButton && hasBookmark) {
         injectButton(tweet)
       }
     })
@@ -72,9 +74,16 @@ const injectButton = (tweet: Element) => {
     button.style.backgroundColor = "transparent"
   })
 
-  const tweetHeader = tweet.querySelector("div[role='group']")
-  if (tweetHeader) {
-    tweetHeader.insertBefore(cont, tweetHeader.firstChild)
+  const tweetActions = tweet.querySelector("div[role='group']")
+  if (!tweetActions) return
+
+  const bookmarkButton = tweetActions.querySelector(
+    "button[data-testid='bookmark']"
+  )
+  if (bookmarkButton && bookmarkButton.parentElement) {
+    bookmarkButton.parentElement.insertBefore(cont, bookmarkButton)
+  } else {
+    tweetActions.appendChild(cont)
   }
 }
 
@@ -104,19 +113,9 @@ const collectTweet = async (tweet: HTMLElement, button: HTMLElement) => {
   } catch (error) {
     console.error("Error saving tweet:", error)
   } finally {
-    // setIsCollecting(false)
     loadingTweets.delete(tweetId)
     button.innerHTML = getCollectIcon()
   }
-  // const linkElement = tweet.querySelector("a[href*='/status/']")
-  // const tweetId = linkElement
-  //   ? linkElement.getAttribute("href")?.split("/status/")[1]
-  //   : ""
-
-  // chrome.runtime.sendMessage({
-  //   type: "save_tweet",
-  //   tweetId
-  // })
 }
 
 observeTweets()
