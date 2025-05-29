@@ -9,7 +9,6 @@ export enum MessageType {
   INPAGE_TOAST = "show_toast_in_page",
   ADD_COLLECTION = "add_tweet_collection",
   ADD_USER_COLLECTION = "add_user_collection",
-  REQUEST_TWEET_DETAILS = "request_tweet_detail_from_page",
   QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
   CHAT_WITH_USER = "chat_with_user"
 }

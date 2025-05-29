@@ -92,9 +92,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { messages, input, handleInputChange, status, append, setInput } =
     useChat({
       id: screenName, // as different session
-      api: isSelf
-        ? `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat`
-        : `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
       streamProtocol: "text",
       fetch: async (url, options) => {
         const data = JSON.parse(options.body as string)
