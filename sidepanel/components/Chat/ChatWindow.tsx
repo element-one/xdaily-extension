@@ -22,6 +22,7 @@ import {
   useGetUserAgentModels
 } from "~services/chat"
 import { useStore } from "~store/store"
+import { ChatType } from "~types/chat"
 import type { TweetData } from "~types/tweet"
 
 import MemoIcon from "../icons/MemoIcon"
@@ -100,6 +101,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
         const quoteContent = msg.data?.tweet?.tweetText
+        const type = msg.data?.type
 
         const response = await fetch(url, {
           method: "POST",
@@ -110,7 +112,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           body: JSON.stringify({
             message: userMessage,
             tweetId,
-            quote: quoteContent
+            quote: quoteContent,
+            type
           })
         })
         return response
@@ -213,29 +216,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const Tools = [
     {
-      type: "memo",
+      type: ChatType.MEMO,
       icon: <MemoIcon className="size-5" />,
       tooltip: "Save as Memo",
       magicWord: "Save as Memo"
     },
     {
-      type: "sheet",
+      type: ChatType.SHEET,
       icon: <SheetIcon className="size-5" />,
       tooltip: "Save as Sheet",
       magicWord: "Save as Sheet"
     },
     {
-      type: "reminder",
+      type: ChatType.REMINDER,
       icon: <ReminderIcon className="size-5" />,
       tooltip: "Remind later",
       magicWord: "Remind me later"
     }
   ]
 
-  const handleClickToolButton = async (magicWord: string) => {
+  const handleClickToolButton = async (magicWord: string, type: ChatType) => {
     if (isDisable) return
 
-    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+    const data = quoteTweet ? { tweet: { ...quoteTweet }, type } : undefined
 
     removeQuoteTweet() // in case repeatedly send and make sure user can retry
     setInput("")
@@ -351,7 +354,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
               {Tools.map((tool) => (
                 <Tooltip key={tool.type} content={tool.tooltip}>
                   <div
-                    onClick={() => handleClickToolButton(tool.magicWord)}
+                    onClick={() =>
+                      handleClickToolButton(tool.magicWord, tool.type)
+                    }
                     className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
                     {tool.icon}
                   </div>

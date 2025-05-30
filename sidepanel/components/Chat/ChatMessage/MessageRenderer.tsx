@@ -1,15 +1,19 @@
-// import { ErrorMessageData, MemoMessageData, SheetMessageData } from '../types'
+import type { PartialBlock } from "@blocknote/core"
 import { CopyPlusIcon, SaveIcon } from "lucide-react"
-import type { FC, ReactNode } from "react"
+import { useMemo, type FC, type ReactNode } from "react"
 
+import { extractAllTextWithLineBreaks } from "~libs/memo"
+import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
-import { Divider } from "~sidepanel/components/ui/Divider"
+import { useToast } from "~sidepanel/components/ui/Toast"
 import { Tooltip } from "~sidepanel/components/ui/Tooltip"
 import type {
   ErrorMessageData,
   MemoMessageData,
   SheetMessageData
 } from "~types/chat"
+
+import { ActionButton } from "./ActionButton"
 
 const BasicRenderer: FC<{
   title?: string
@@ -18,9 +22,8 @@ const BasicRenderer: FC<{
 }> = ({ title, children, actions }) => {
   return (
     <div className="bg-fill-bg-light rounded-xl border border-fill-bg-input p-3 w-full flex flex-col gap-2">
-      <h3 className="font-semibold text-primary-brand">{title}</h3>
+      <h3 className="font-semibold text-primary-brand line-clamp-2">{title}</h3>
       <div className="space-y-2">{children}</div>
-      <Divider />
       <div className="flex gap-2 items-center justify-end">{actions}</div>
     </div>
   )
@@ -29,41 +32,92 @@ const BasicRenderer: FC<{
 export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   data
 }) => {
+  const {
+    mutateAsync: createMemo,
+    isPending: isCreatingMemo,
+    isSuccess: isCreatingSuccess
+  } = useCreateMemo()
+  const {
+    mutateAsync: updateMemo,
+    isPending: isUpdatingMemo,
+    isSuccess: isUpdatingSuccess
+  } = useUpdateMemo()
+  const { showToast } = useToast()
+
+  const { data: memoPages, refetch, isFetching } = useMemoList(1)
+
+  const latestMemo = useMemo(() => {
+    return (memoPages?.pages ?? [])[0]
+  }, [memoPages])
+
+  const handleCreateMemo = async (title: string, document: PartialBlock[]) => {
+    if (isCreatingMemo) return
+    try {
+      await createMemo({
+        title,
+        content: {
+          document
+        }
+      })
+      refetch()
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
+  }
+
+  const handleAppendMemo = async (document: PartialBlock[]) => {
+    if (!latestMemo) return
+
+    try {
+      await updateMemo({
+        id: latestMemo.id,
+        data: {
+          title: latestMemo.title,
+          content: {
+            document: [...latestMemo.content?.document, ...document]
+          }
+        }
+      })
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
+  }
   return (
     <BasicRenderer
       title={data.title}
       actions={
         <>
-          <Tooltip content="Save as new memo">
-            <Button variant="ghost" className="!p-0">
-              <SaveIcon className="w-4 h-4 text-primary-brand" />
-            </Button>
-          </Tooltip>
-          <Tooltip content="Append to latest memo">
-            <Button variant="ghost" className="!p-0">
-              <CopyPlusIcon className="w-4 h-4 text-white" />
-            </Button>
-          </Tooltip>
+          <ActionButton
+            tooltip="Save as new memo"
+            successTooltip="Create success"
+            isLoading={isCreatingMemo}
+            isDisabled={isCreatingMemo}
+            isSuccess={isCreatingSuccess}
+            onClick={() => handleCreateMemo(data.title, data.content)}
+            icon={<SaveIcon className="w-4 h-4 text-primary-brand" />}
+          />
+          {latestMemo && (
+            <ActionButton
+              tooltip="Append to latest memo"
+              successTooltip="Append success"
+              isLoading={isUpdatingMemo}
+              isDisabled={isUpdatingMemo || isFetching}
+              isSuccess={isUpdatingSuccess}
+              onClick={() => handleAppendMemo(data.content)}
+              icon={<CopyPlusIcon className="w-4 h-4 text-white" />}
+            />
+          )}
         </>
       }>
-      {data.content.map((item, index) => {
-        if (item.type === "paragraph") {
-          return (
-            <p key={index} className="text-sm">
-              {item.content}
-            </p>
-          )
-        } else if (item.type === "quote") {
-          return (
-            <blockquote
-              key={index}
-              className="border-l-2 border-gray-300 pl-3 italic">
-              {item.content}
-            </blockquote>
-          )
-        }
-        return null
-      })}
+      {extractAllTextWithLineBreaks(data.content)}
     </BasicRenderer>
   )
 }

@@ -1,3 +1,5 @@
+import type { PartialBlock } from "@blocknote/core"
+
 import type { KolStatus } from "./enum"
 
 export interface ChatMessage {
@@ -123,27 +125,27 @@ export interface BaseMessageData {
   error?: string
 }
 
-// Memo type message data
-export interface ChatMemoContent {
-  type: string
-  content: string
+export enum ChatType {
+  MEMO = "memo",
+  SHEET = "sheet",
+  REMINDER = "reminder"
 }
 export interface MemoMessageData extends BaseMessageData {
-  type: "memo"
+  type: ChatType.MEMO
   title: string
-  content: ChatMemoContent[]
+  content: PartialBlock[]
 }
 
 // Sheet type message data
 export interface SheetMessageData extends BaseMessageData {
-  type: "sheet"
+  type: ChatType.SHEET
   title: string
   content: string
 }
 
 // Reminder type message data
 export interface ReminderMessageData extends BaseMessageData {
-  type: "reminder"
+  type: ChatType.REMINDER
 }
 
 // Error message data

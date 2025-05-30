@@ -1,10 +1,12 @@
+import type { PartialBlock } from "@blocknote/core"
+
 export interface GetMemoParams {
   page: number
   take: number
   keywords?: string
 }
 export interface MemoItem {
-  content: { document?: any[] } // string or JSON string
+  content: { document?: PartialBlock[] }
   id: string
   postedAt: Date
   title: string
@@ -24,7 +26,7 @@ export interface GetMemoListResp {
 export interface PostMemoParams {
   title: string
   content: {
-    document: any[]
+    document: PartialBlock[]
   }
 }
 
@@ -32,7 +34,7 @@ export interface UpdateMemoParams {
   data: {
     title: string
     content: {
-      document: any[]
+      document: PartialBlock[]
     }
   }
   id: string
