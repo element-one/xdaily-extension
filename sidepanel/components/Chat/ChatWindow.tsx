@@ -5,7 +5,6 @@ import {
 } from "@ai-sdk/react"
 import clsx from "clsx"
 import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
-import Markdown from "markdown-to-jsx"
 import {
   useEffect,
   useMemo,
