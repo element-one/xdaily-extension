@@ -124,7 +124,6 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
   }
 
   const handleCreateReminder = () => {
-    console.log("testing")
     createReminder(
       {
         title,
