@@ -333,19 +333,27 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
       {/* input and send message button */}
       <div className="py-2 flex flex-col gap-1 relative shrink-0">
-        <div className="flex mb-2 items-center justify-between gap-10">
+        <div className="flex mb-2 items-center justify-between gap-2">
           {!!models.length ? (
             <Select
               value={actModelId}
               onValueChange={setActModelId}
               disabled={!isSelf}>
-              <SelectTrigger className="w-[176px]" size="sm">
+              <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    {model.screenName}
+                    <div className="flex gap-1 items-center">
+                      <ImageWithFallback
+                        src={model.iconUrl}
+                        alt={model.id}
+                        className="w-4 h-4 rounded-full bg-fill-bg-grey"
+                        fallbackClassName="w-4 h-4 rounded-full bg-fill-bg-grey"
+                      />
+                      {model.screenName}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -354,7 +362,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <div />
           )}
           {isSelf && (
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center shrink-0">
               {Tools.map((tool) => (
                 <Tooltip key={tool.type} content={tool.tooltip}>
                   <div
