@@ -1,18 +1,19 @@
 import type { PartialBlock } from "@blocknote/core"
-import { CopyPlusIcon, SaveIcon } from "lucide-react"
-import { useMemo, type FC, type ReactNode } from "react"
+import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
+import { useMemo, useState, type FC, type ReactNode } from "react"
 
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
-import { Button } from "~sidepanel/components/ui/Button"
+import { ReminderDialog } from "~sidepanel/components/panels/ReminderPanel/ReminderDialog"
 import { useToast } from "~sidepanel/components/ui/Toast"
-import { Tooltip } from "~sidepanel/components/ui/Tooltip"
 import type {
   ErrorMessageData,
   MemoMessageData,
+  ReminderMessageData,
   SheetMessageData
 } from "~types/chat"
+import type { DialogReminderItem, ReminderItem } from "~types/reminder"
 import type { SparseFormat } from "~types/sheet"
 
 import { ActionButton } from "./ActionButton"
@@ -269,7 +270,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           {latestSheet && (
             <ActionButton
               tooltip="Append to latest sheet"
-              successTooltip="Append Success"
+              successTooltip="Append success"
               isLoading={isUpdatingSheet}
               isDisabled={isUpdatingSheet || isFetching}
               isSuccess={isUpdatingSuccess}
@@ -284,26 +285,50 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
   )
 }
 
-export const ReminderMessageRenderer: FC = () => {
+export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
+  data
+}) => {
+  const [isDialogOpen, onDialogChange] = useState(false)
+  const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
+    null
+  )
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const handleCreateReminder = () => {
+    setEditingItem({
+      title: data.title,
+      description: data.description,
+      fromAt: data.start_at,
+      toAt: data.end_at
+    })
+    onDialogChange(true)
+  }
   return (
-    <BasicRenderer
-      title="Reminder"
-      actions={
-        <>
-          <Tooltip content="Save as new reminder">
-            <Button variant="ghost" className="!p-0">
-              <SaveIcon className="w-4 h-4 text-primary-brand" />
-            </Button>
-          </Tooltip>
-          <Tooltip content="Append to latest reminder">
-            <Button variant="ghost" className="!p-0">
-              <CopyPlusIcon className="w-4 h-4 text-white" />
-            </Button>
-          </Tooltip>
-        </>
-      }>
-      This is a reminder
-    </BasicRenderer>
+    <>
+      <BasicRenderer
+        title={data.title}
+        actions={
+          <>
+            <ActionButton
+              tooltip="Create a reminder"
+              successTooltip="Create success"
+              isLoading={false}
+              isDisabled={false}
+              isSuccess={isSuccess}
+              icon={<ClockIcon className="w-4 h-4 text-purple" />}
+              onClick={handleCreateReminder}
+            />
+          </>
+        }>
+        {data.description}
+      </BasicRenderer>
+      <ReminderDialog
+        open={isDialogOpen}
+        onOpenChange={onDialogChange}
+        reminderItem={editingItem}
+        onComplete={() => setIsSuccess(true)}
+      />
+    </>
   )
 }
 

@@ -146,6 +146,10 @@ export interface SheetMessageData extends BaseMessageData {
 // Reminder type message data
 export interface ReminderMessageData extends BaseMessageData {
   type: ChatType.REMINDER
+  title: string
+  description: string
+  start_at: string
+  end_at: string
 }
 
 // Error message data

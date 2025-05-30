@@ -8,6 +8,7 @@ import type {
   ChatMessageData,
   ErrorMessageData,
   MemoMessageData,
+  ReminderMessageData,
   SheetMessageData
 } from "~types/chat"
 
@@ -40,8 +41,9 @@ export const ChatMessage: FC<ChatMessageProps> = ({
     } else if (jsonData.type === "sheet") {
       return <SheetMessageRenderer data={jsonData as SheetMessageData} />
     } else if (jsonData.type === "reminder") {
-      return <ReminderMessageRenderer />
+      return <ReminderMessageRenderer data={jsonData as ReminderMessageData} />
     }
+    return <ErrorMessageRenderer errorData={jsonData as ErrorMessageData} />
   }
 
   if (!jsonData) {
