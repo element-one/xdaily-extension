@@ -4,6 +4,7 @@ import { useMemo, type FC, type ReactNode } from "react"
 
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
+import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
 import { useToast } from "~sidepanel/components/ui/Toast"
 import { Tooltip } from "~sidepanel/components/ui/Tooltip"
@@ -12,6 +13,7 @@ import type {
   MemoMessageData,
   SheetMessageData
 } from "~types/chat"
+import type { SparseFormat } from "~types/sheet"
 
 import { ActionButton } from "./ActionButton"
 
@@ -125,24 +127,159 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
 export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
   data
 }) => {
+  const HEADER_NAME = "content"
+  const { showToast } = useToast()
+  const { data: sheetPages, refetch, isFetching } = useSheetList(1)
+
+  const latestSheet = useMemo(() => {
+    return (sheetPages?.pages ?? [])[0]
+  }, [sheetPages])
+
+  const {
+    mutateAsync: createSheet,
+    isPending: isCreatingSheet,
+    isSuccess: isCreatingSuccess
+  } = useCreateSheet()
+  const {
+    mutateAsync: updateSheet,
+    isPending: isUpdatingSheet,
+    isSuccess: isUpdatingSuccess
+  } = useUpdateSheet()
+
+  const handleCreateSheet = async (title: string, content: string) => {
+    try {
+      const newSheet: SparseFormat = {
+        uid: `+new Date()`,
+        columns: [
+          {
+            title: HEADER_NAME,
+            id: "content",
+            index: 0
+          }
+        ],
+        data: [
+          {
+            row_index: 0,
+            column_index: 0,
+            payload: {
+              content: content,
+              labels: []
+            }
+          }
+        ]
+      }
+      await createSheet({
+        title,
+        content: {
+          item: JSON.stringify(newSheet)
+        }
+      })
+      refetch()
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
+  }
+
+  const handleAppendSheet = async (content: string) => {
+    if (!latestSheet) return
+    try {
+      const raw = latestSheet.content.item
+      const parsed = JSON.parse(raw)
+      const isEmptyObject = raw.trim() === "{}"
+
+      const sheet: SparseFormat = isEmptyObject
+        ? {
+            uid: latestSheet.id,
+            columns: [],
+            data: []
+          }
+        : parsed
+
+      // make sure column
+      let columnIndex: number
+      const existing = sheet.columns.find((col) => col.title === HEADER_NAME)
+      if (existing) {
+        columnIndex = existing.index
+      } else {
+        columnIndex = sheet.columns.length
+        sheet.columns.push({
+          title: HEADER_NAME,
+          id: "content",
+          index: columnIndex
+        })
+      }
+
+      // find empty row
+      const nextRowIndex = getNextRowIndex(sheet, columnIndex)
+
+      sheet.data.push({
+        row_index: nextRowIndex,
+        column_index: columnIndex,
+        payload: {
+          content,
+          labels: []
+        }
+      })
+
+      // updated item
+      const updatedItem = JSON.stringify(sheet, null, 2)
+      await updateSheet({
+        id: latestSheet.id,
+        data: {
+          title: latestSheet.title,
+          content: {
+            item: updatedItem
+          }
+        }
+      })
+    } catch (err) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
+
+    function getNextRowIndex(sheet: SparseFormat, columnIndex: number): number {
+      const rowsInColumn = sheet.data
+        .filter((cell) => cell.column_index === columnIndex)
+        .map((cell) => cell.row_index)
+
+      return rowsInColumn.length > 0 ? Math.max(...rowsInColumn) + 1 : 0
+    }
+  }
   return (
     <BasicRenderer
       title={data.title}
       actions={
         <>
-          <Tooltip content="Save as new sheet">
-            <Button variant="ghost" className="!p-0">
-              <SaveIcon className="w-4 h-4 text-primary-brand" />
-            </Button>
-          </Tooltip>
-          <Tooltip content="Append to latest sheet">
-            <Button variant="ghost" className="!p-0">
-              <CopyPlusIcon className="w-4 h-4 text-white" />
-            </Button>
-          </Tooltip>
+          <ActionButton
+            tooltip="Save as new sheet"
+            successTooltip="Create success"
+            isLoading={isCreatingSheet}
+            isDisabled={isCreatingSheet}
+            isSuccess={isCreatingSuccess}
+            onClick={() => handleCreateSheet(data.title, data.content)}
+            icon={<SaveIcon className="w-4 h-4 text-primary-brand" />}
+          />
+          {latestSheet && (
+            <ActionButton
+              tooltip="Append to latest sheet"
+              successTooltip="Append Success"
+              isLoading={isUpdatingSheet}
+              isDisabled={isUpdatingSheet || isFetching}
+              isSuccess={isUpdatingSuccess}
+              icon={<CopyPlusIcon className="w-4 h-4 text-white" />}
+              onClick={() => handleAppendSheet(data.content)}
+            />
+          )}
         </>
       }>
-      This is a sheet
+      {data.content}
     </BasicRenderer>
   )
 }
