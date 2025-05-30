@@ -39,6 +39,7 @@ import {
   SelectValue
 } from "../ui/Select"
 import { Tooltip } from "../ui/Tooltip"
+import { ChatMessage } from "./ChatMessage/ChatMessage"
 
 interface ChatWindowProps {
   screenName: string
@@ -145,7 +146,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     )
     return [...historyMessages, ...messages]
   }, [messages, history])
-  const showGreeting = allMessages.length === 0
+
+  const showGreeting = allMessages.length === 0 && !quoteTweet
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -282,28 +284,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             {m.data?.tweet && (
               <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
             )}
-            <div
-              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`prose prose-sm break-words wrap w-fit max-w-[92%] p-3 rounded-lg message-item font-light text-sm border border-fill-bg-input ${
-                  m.role === "user"
-                    ? "bg-primary-brand text-text-inverse-primary"
-                    : "bg-fill-bg-light text-text-default-primary"
-                }`}>
-                {m.role !== "user" && isSelf && (
-                  <div className="mb-2 flex items-center text-xs font-semibold gap-x-1">
-                    <ImageWithFallback
-                      src={robotImg}
-                      alt={m.role}
-                      className="w-5 h-5 rounded-full object-contain"
-                      fallbackClassName="w-5 h-5 rounded-full"
-                    />
-                    xDaily
-                  </div>
-                )}
-                <Markdown>{m.content}</Markdown>
-              </div>
-            </div>
+            <ChatMessage
+              content={m.content}
+              role={m.role}
+              isSelf={isSelf}
+              key={m.id}
+            />
           </div>
         ))}
 
