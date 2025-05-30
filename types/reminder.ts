@@ -14,6 +14,11 @@ export interface ReminderItem {
   status: ReminderStatus
 }
 
+export type DialogReminderItem = Omit<ReminderItem, "id" | "status"> & {
+  id?: string
+  status?: string
+}
+
 export interface GetRemindersParmas {
   page: number
   take?: number

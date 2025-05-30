@@ -11,7 +11,8 @@ import type {
   GetSheetListParams,
   GetSheetListResp,
   PostSheetDataParam,
-  SheetItem
+  SheetItem,
+  UpdateSheetDataParam
 } from "~types/sheet"
 
 export const getSheetList = async ({
@@ -97,5 +98,23 @@ export const useDeleteSheet = () => {
   return useMutation({
     mutationKey: ["delete-sheet"],
     mutationFn: deleteSheet
+  })
+}
+
+export const updateSheetData = async ({
+  id,
+  data
+}: UpdateSheetDataParam): Promise<SheetItem> => {
+  const response = await client.put(`/users/sheets/${id}`, data)
+  return response.data
+}
+
+export const useUpdateSheet = (
+  options?: Partial<UseMutationOptions<SheetItem, Error, UpdateSheetDataParam>>
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["update-sheet"],
+    mutationFn: updateSheetData
   })
 }

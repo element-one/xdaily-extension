@@ -6,11 +6,7 @@ import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import {
-  extractTweetDataFromTweet,
-  getTweetIdFromTweet,
-  getUserIdFromTweet
-} from "~libs/tweet"
+import { extractTweetDataFromTweet, getUserIdFromTweet } from "~libs/tweet"
 import { MessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {

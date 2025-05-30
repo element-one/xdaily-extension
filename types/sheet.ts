@@ -4,8 +4,28 @@ export interface GetSheetListParams {
   keywords?: string
 }
 
+export interface SparseFormat {
+  uid: string
+  data: {
+    row_index: number
+    column_index: number
+    payload: {
+      content: string
+      labels: string[]
+    }
+  }[]
+  columns: {
+    title: string
+    id: string
+    index: number
+  }[]
+}
 export interface SheetItem {
-  content: { item: string } // string or JSON string
+  /**
+   * JSON.stringify(SparseFormat)
+   * or JSON.stringify({})
+   */
+  content: { item: string }
   id: string
   postedAt: Date
   title: string
@@ -21,10 +41,18 @@ export interface GetSheetListResp {
     hasNextPage: number
   }
 }
-
 export interface PostSheetDataParam {
   title: string
   content: {
-    item: string // string or JSON string
+    /**
+     * JSON.stringify(SparseFormat)
+     * or JSON.stringify({})
+     */
+    item: string
   }
+}
+
+export interface UpdateSheetDataParam {
+  data: PostSheetDataParam
+  id: string
 }

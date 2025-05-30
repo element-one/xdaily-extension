@@ -7,14 +7,14 @@ import { useCreateReminder, useUpdateReminder } from "~services/reminder"
 import { Button } from "~sidepanel/components/ui/Button"
 import { InputBox } from "~sidepanel/components/ui/InputBox"
 import { useToast } from "~sidepanel/components/ui/Toast"
-import type { ReminderItem } from "~types/reminder"
+import type { DialogReminderItem } from "~types/reminder"
 
 import { ReminderDateTimeRangePicker } from "./ReminderDateTimePicker"
 
 interface ReminderDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  reminderItem: ReminderItem | null
+  reminderItem: DialogReminderItem | null
   onComplete?: () => void
 }
 
@@ -32,6 +32,8 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
     toAt: ""
   })
   const { showToast } = useToast()
+
+  const isUpdateMode = !!reminderItem?.id
 
   const toast = (msg: string) => {
     showToast({
@@ -80,7 +82,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
       return
     }
 
-    if (reminderItem) {
+    if (isUpdateMode) {
       handleUpdateReminder()
     } else {
       handleCreateReminder()
@@ -98,7 +100,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
   }
 
   const handleUpdateReminder = () => {
-    if (!reminderItem) return
+    if (!isUpdateMode) return
     updateReminder(
       {
         id: reminderItem.id,
@@ -155,7 +157,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
         <Dialog.Overlay className="fixed inset-0 bg-black/40" />
         <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
           <Dialog.Title className="text-base">
-            {reminderItem ? "Edit Reminder" : "New Reminder"}
+            {isUpdateMode ? "Edit Reminder" : "New Reminder"}
           </Dialog.Title>
           <div className="space-y-2">
             <InputBox
@@ -182,7 +184,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={isOperating}>
-              {reminderItem
+              {isUpdateMode
                 ? isOperating
                   ? "Updating"
                   : "Update"
