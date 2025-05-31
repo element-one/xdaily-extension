@@ -7,6 +7,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useDebounce } from "~libs/debounce"
+import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useDeleteMemo, useMemoList } from "~services/memo"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -140,31 +141,8 @@ export const MemoPanel = () => {
     const imageBlock = document.find(
       (block: any) => block.type === "image" && block.props?.url
     )
+    // @ts-ignore
     return imageBlock?.props?.url ?? null
-  }
-
-  const extractAllTextWithLineBreaks = (memo: MemoItem) => {
-    const lines: string[] = []
-    const document = memo?.content?.document ?? []
-    const MAX_LINE = 5
-
-    for (const block of document) {
-      if (lines.length >= MAX_LINE) break
-      if (Array.isArray(block.content)) {
-        const line = block.content
-          .filter(
-            (item: any) => item.type === "text" && typeof item.text === "string"
-          )
-          .map((item: any) => item.text)
-          .join("")
-
-        if (line.trim()) {
-          lines.push(line)
-        }
-      }
-    }
-
-    return lines.join("\n")
   }
 
   const handleSearchChange = useDebounce((value: string) => {
@@ -223,7 +201,7 @@ export const MemoPanel = () => {
                   content={
                     <div className="flex w-full items-start justify-between gap-2">
                       <div className="text-text-default-secondary line-clamp-4 min-h-0 flex-1 text-sm font-medium">
-                        {extractAllTextWithLineBreaks(memo)}
+                        {extractAllTextWithLineBreaks(memo.content?.document)}
                       </div>
                       {getFirstImageUrl(memo) && (
                         <ImageWithFallback

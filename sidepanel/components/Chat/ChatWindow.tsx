@@ -5,7 +5,6 @@ import {
 } from "@ai-sdk/react"
 import clsx from "clsx"
 import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
-import Markdown from "markdown-to-jsx"
 import {
   useEffect,
   useMemo,
@@ -23,6 +22,7 @@ import {
   useGetUserAgentModels
 } from "~services/chat"
 import { useStore } from "~store/store"
+import { ChatType } from "~types/chat"
 import type { TweetData } from "~types/tweet"
 
 import MemoIcon from "../icons/MemoIcon"
@@ -39,6 +39,7 @@ import {
   SelectValue
 } from "../ui/Select"
 import { Tooltip } from "../ui/Tooltip"
+import { ChatMessage } from "./ChatMessage/ChatMessage"
 
 interface ChatWindowProps {
   screenName: string
@@ -100,6 +101,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
         const quoteContent = msg.data?.tweet?.tweetText
+        const type = msg.data?.type
 
         const response = await fetch(url, {
           method: "POST",
@@ -110,7 +112,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           body: JSON.stringify({
             message: userMessage,
             tweetId,
-            quote: quoteContent
+            quote: quoteContent,
+            type
           })
         })
         return response
@@ -145,7 +148,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     )
     return [...historyMessages, ...messages]
   }, [messages, history])
-  const showGreeting = allMessages.length === 0
+
+  const showGreeting = allMessages.length === 0 && !quoteTweet
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -212,29 +216,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const Tools = [
     {
-      type: "memo",
+      type: ChatType.MEMO,
       icon: <MemoIcon className="size-5" />,
       tooltip: "Save as Memo",
       magicWord: "Save as Memo"
     },
     {
-      type: "sheet",
+      type: ChatType.SHEET,
       icon: <SheetIcon className="size-5" />,
       tooltip: "Save as Sheet",
       magicWord: "Save as Sheet"
     },
     {
-      type: "reminder",
+      type: ChatType.REMINDER,
       icon: <ReminderIcon className="size-5" />,
       tooltip: "Remind later",
       magicWord: "Remind me later"
     }
   ]
 
-  const handleClickToolButton = async (magicWord: string) => {
+  const handleClickToolButton = async (magicWord: string, type: ChatType) => {
     if (isDisable) return
 
-    const data = quoteTweet ? { tweet: { ...quoteTweet } } : undefined
+    const data = quoteTweet ? { tweet: { ...quoteTweet }, type } : undefined
 
     removeQuoteTweet() // in case repeatedly send and make sure user can retry
     setInput("")
@@ -282,28 +286,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             {m.data?.tweet && (
               <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
             )}
-            <div
-              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`prose prose-sm break-words wrap w-fit max-w-[92%] p-3 rounded-lg message-item font-light text-sm border border-fill-bg-input ${
-                  m.role === "user"
-                    ? "bg-primary-brand text-text-inverse-primary"
-                    : "bg-fill-bg-light text-text-default-primary"
-                }`}>
-                {m.role !== "user" && isSelf && (
-                  <div className="mb-2 flex items-center text-xs font-semibold gap-x-1">
-                    <ImageWithFallback
-                      src={robotImg}
-                      alt={m.role}
-                      className="w-5 h-5 rounded-full object-contain"
-                      fallbackClassName="w-5 h-5 rounded-full"
-                    />
-                    xDaily
-                  </div>
-                )}
-                <Markdown>{m.content}</Markdown>
-              </div>
-            </div>
+            <ChatMessage
+              content={m.content}
+              role={m.role}
+              isSelf={isSelf}
+              key={m.id}
+            />
           </div>
         ))}
 
@@ -333,19 +321,27 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
       {/* input and send message button */}
       <div className="py-2 flex flex-col gap-1 relative shrink-0">
-        <div className="flex mb-2 items-center justify-between gap-10">
+        <div className="flex mb-2 items-center justify-between gap-2">
           {!!models.length ? (
             <Select
               value={actModelId}
               onValueChange={setActModelId}
               disabled={!isSelf}>
-              <SelectTrigger className="w-[176px]" size="sm">
+              <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    {model.screenName}
+                    <div className="flex gap-1 items-center">
+                      <ImageWithFallback
+                        src={model.iconUrl}
+                        alt={model.id}
+                        className="w-4 h-4 rounded-full bg-fill-bg-grey"
+                        fallbackClassName="w-4 h-4 rounded-full bg-fill-bg-grey"
+                      />
+                      {model.screenName}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -354,11 +350,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <div />
           )}
           {isSelf && (
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center shrink-0">
               {Tools.map((tool) => (
                 <Tooltip key={tool.type} content={tool.tooltip}>
                   <div
-                    onClick={() => handleClickToolButton(tool.magicWord)}
+                    onClick={() =>
+                      handleClickToolButton(tool.magicWord, tool.type)
+                    }
                     className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
                     {tool.icon}
                   </div>

@@ -59,19 +59,43 @@ const injectButton = (tweet: Element) => {
       border-radius: 0.375rem; /* rounded */
       cursor: pointer;
       transition: background-color 0.3s ease;
+      position: relative;
   `
   button.innerHTML = getCollectIcon()
-  button.title = "Collect Post"
+
+  const tooltip = document.createElement("div")
+  tooltip.textContent = "Collect Tweet"
+  tooltip.style.cssText = `
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #151717;
+    border: 1px solid #FFFFFF1A;
+    border-radius: 0.5rem;
+    padding: 12px 10px;
+    font-size: 12px;
+    color: white;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 9999;
+  `
+  button.appendChild(tooltip)
   cont.appendChild(button)
   button.addEventListener("click", (e) => {
     e.stopPropagation()
     collectTweet(tweet as HTMLElement, button)
   })
   cont.addEventListener("mouseenter", () => {
-    button.style.backgroundColor = "#e8ecee"
+    button.style.opacity = "0.8"
+    tooltip.style.opacity = "1"
   })
   cont.addEventListener("mouseleave", () => {
-    button.style.backgroundColor = "transparent"
+    button.style.opacity = "1"
+    tooltip.style.opacity = "0"
   })
 
   const tweetActions = tweet.querySelector("div[role='group']")

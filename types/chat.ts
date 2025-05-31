@@ -1,4 +1,4 @@
-import type { User } from "~node_modules/@blocknote/core/types/src/comments"
+import type { PartialBlock } from "@blocknote/core"
 
 import type { KolStatus } from "./enum"
 
@@ -118,3 +118,47 @@ export interface ChatModelInfo {
   }
   isSelf: boolean
 }
+
+export interface BaseMessageData {
+  type?: string
+  title?: string
+  error?: string
+}
+
+export enum ChatType {
+  MEMO = "memo",
+  SHEET = "sheet",
+  REMINDER = "reminder"
+}
+export interface MemoMessageData extends BaseMessageData {
+  type: ChatType.MEMO
+  title: string
+  content: PartialBlock[]
+}
+
+// Sheet type message data
+export interface SheetMessageData extends BaseMessageData {
+  type: ChatType.SHEET
+  title: string
+  content: string
+}
+
+// Reminder type message data
+export interface ReminderMessageData extends BaseMessageData {
+  type: ChatType.REMINDER
+  title: string
+  description: string
+  start_at: string
+  end_at: string
+}
+
+// Error message data
+export interface ErrorMessageData extends BaseMessageData {
+  error: string
+}
+
+export type ChatMessageData =
+  | MemoMessageData
+  | SheetMessageData
+  | ReminderMessageData
+  | ErrorMessageData
