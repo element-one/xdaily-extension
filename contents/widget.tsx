@@ -1,13 +1,16 @@
 import cssText from "data-text:~/styles/global.css"
-import type { PlasmoCSConfig } from "plasmo"
+import type { PlasmoCSConfig, PlasmoGetShadowHostId } from "plasmo"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { sendToBackground } from "@plasmohq/messaging"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
-  all_frames: true
+  all_frames: false
 }
+
+const SHADOW_HOST_ID = "xdaily-awesome-widget"
+export const getShadowHostId: PlasmoGetShadowHostId = () => SHADOW_HOST_ID
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -16,6 +19,10 @@ export const getStyle = () => {
 }
 
 const WidgetButton = () => {
+  if (typeof window !== "undefined" && window.top !== window.self) {
+    return null
+  }
+
   const toggleSidePanel = () => {
     sendToBackground({
       name: "toggle-panel"
