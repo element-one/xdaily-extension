@@ -63,8 +63,6 @@ const createCollectButton = (tweet: HTMLElement) => {
         border-radius: 0.375rem;
         cursor: pointer;
         position: relative;
-        opacity: 1;
-        transition: background-color 0.3s ease;
       }
       .tooltip {
         position: absolute;
@@ -84,9 +82,6 @@ const createCollectButton = (tweet: HTMLElement) => {
         transition: opacity 0.2s ease;
         z-index: 9999;
       }
-      .button:hover {
-        opacity: 0.8;
-      }
       .button:hover .tooltip {
         opacity: 1;
       }
@@ -97,6 +92,11 @@ const createCollectButton = (tweet: HTMLElement) => {
         justify-content: center;
         width: 100%;
         height: 100%;
+        transition: opacity 0.3s ease;
+        opacity: 1;
+      }
+      .button:hover .icon {
+        opacity: 0.8;
       }
       .spinner-icon {
         animation: spin 1s linear infinite;
@@ -175,7 +175,6 @@ const createQuoteButton = (tweet: HTMLElement) => {
         position: relative;
         opacity: 1;
         color: #FF3B30;
-        transition: background-color 0.3s ease;
       }
       .tooltip {
         position: absolute;
@@ -195,9 +194,7 @@ const createQuoteButton = (tweet: HTMLElement) => {
         transition: opacity 0.2s ease;
         z-index: 9999;
       }
-      .button:hover {
-        opacity: 0.8;
-      }
+
       .button:hover .tooltip {
         opacity: 1;
       }
@@ -207,7 +204,12 @@ const createQuoteButton = (tweet: HTMLElement) => {
         justify-content: center;
         width: 100%;
         height: 100%;
+        transition: opacity 0.3s ease;
       }
+     .button:hover > .icon {
+        opacity: 0.8;
+      }
+      
     </style>
     <div class="button">
       <svg
