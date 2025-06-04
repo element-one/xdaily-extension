@@ -82,6 +82,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   } = useUpdateChatModelInfo()
 
   const [actModelId, setActModelId] = useState("")
+  const isFirstScroll = useRef(true)
 
   const models = useMemo(() => {
     if (!modelsResp) return []
@@ -159,11 +160,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const showGreeting = allMessages.length === 0 && !quoteTweet
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (options: ScrollToOptions = {}) => {
     setTimeout(() => {
-      chatRef.current?.scrollTo({
+      if (!chatRef.current) return
+      chatRef.current.scrollTo({
         top: chatRef.current.scrollHeight,
-        behavior: "smooth"
+        behavior:
+          options.behavior ?? (isFirstScroll.current ? "auto" : "smooth")
       })
     }, 0)
   }
@@ -171,6 +174,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   // scroll to bottom when come new message
   useEffect(() => {
     scrollToBottom()
+    isFirstScroll.current = false
   }, [messages])
 
   useEffect(() => {
@@ -181,7 +185,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   useEffect(() => {
     const initHistory = async () => {
       await fetchNextPage()
-      scrollToBottom()
+      scrollToBottom({ behavior: "auto" })
+      isFirstScroll.current = false
     }
     initHistory()
   }, [])
