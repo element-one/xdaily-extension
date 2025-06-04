@@ -85,3 +85,29 @@ export function extractTweetDataFromTweet(tweetElement: HTMLElement) {
     timestamp
   } as TweetData
 }
+
+/**
+ * get button from tweet section
+ * @param tag to find inside data-testid
+ * @param tweet article
+ * @param returnParent or not
+ * @returns HTMLElement | null
+ */
+export const findTweetButton = (
+  tag: string,
+  tweet: Element,
+  returnParent: boolean = true
+): HTMLElement | null => {
+  const buttons = tweet.querySelectorAll("button[data-testid]")
+
+  for (const btn of buttons) {
+    const testId = btn.getAttribute("data-testid")
+    if (testId && testId.toLowerCase().includes(tag)) {
+      return returnParent
+        ? (btn.parentElement as HTMLElement)
+        : (btn as HTMLElement)
+    }
+  }
+
+  return null
+}

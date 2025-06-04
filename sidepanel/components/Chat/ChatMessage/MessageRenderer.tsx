@@ -1,7 +1,12 @@
 import type { PartialBlock } from "@blocknote/core"
 import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
+import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
 
+import {
+  extractSummaryFromSparseFormat,
+  normalizeMarkdownInput
+} from "~libs/chat"
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
@@ -17,6 +22,7 @@ import type { DialogReminderItem, ReminderItem } from "~types/reminder"
 import type { SparseFormat } from "~types/sheet"
 
 import { ActionButton } from "./ActionButton"
+import { tryParseJsonMessage } from "./utils"
 
 const BasicRenderer: FC<{
   title?: string
@@ -147,33 +153,58 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     isSuccess: isUpdatingSuccess
   } = useUpdateSheet()
 
-  const handleCreateSheet = async (title: string, content: string) => {
+  const isSparseFormat = (obj: any): obj is SparseFormat => {
+    return (
+      obj &&
+      typeof obj === "object" &&
+      Array.isArray(obj.columns) &&
+      Array.isArray(obj.data)
+    )
+  }
+
+  const formatContent = useMemo(() => {
+    const content = data.content
+    const parseObj =
+      typeof content === "string" ? tryParseJsonMessage(content) : content
+    if (parseObj && isSparseFormat(parseObj)) {
+      return extractSummaryFromSparseFormat(parseObj)
+    } else {
+      return normalizeMarkdownInput(content)
+    }
+  }, [data.content])
+
+  const handleCreateSheet = async (
+    title: string,
+    content: string | SparseFormat
+  ) => {
+    const parseObj =
+      typeof content === "string" ? tryParseJsonMessage(content) : content
     try {
-      const newSheet: SparseFormat = {
-        uid: `+new Date()`,
-        columns: [
-          {
-            title: HEADER_NAME,
-            id: "content",
-            index: 0
-          }
-        ],
-        data: [
-          {
-            row_index: 0,
-            column_index: 0,
-            payload: {
-              content: content,
-              labels: []
+      let newSheet: SparseFormat
+      if (parseObj && isSparseFormat(parseObj)) {
+        newSheet = {
+          uid: `sheet-${Date.now()}`,
+          columns: parseObj.columns,
+          data: parseObj.data
+        }
+      } else {
+        let strContent = normalizeMarkdownInput(content)
+        newSheet = {
+          uid: `sheet-${Date.now()}`,
+          columns: [{ title: HEADER_NAME, id: "content", index: 0 }],
+          data: [
+            {
+              row_index: 0,
+              column_index: 0,
+              payload: { content: strContent, labels: [] }
             }
-          }
-        ]
+          ]
+        }
       }
+
       await createSheet({
         title,
-        content: {
-          item: JSON.stringify(newSheet)
-        }
+        content: { item: JSON.stringify(newSheet) }
       })
       refetch()
     } catch (e) {
@@ -185,8 +216,9 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     }
   }
 
-  const handleAppendSheet = async (content: string) => {
+  const handleAppendSheet = async (content: string | SparseFormat) => {
     if (!latestSheet) return
+
     try {
       const raw = latestSheet.content.item
       const parsed = JSON.parse(raw)
@@ -200,34 +232,78 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           }
         : parsed
 
-      // make sure column
-      let columnIndex: number
-      const existing = sheet.columns.find((col) => col.title === HEADER_NAME)
-      if (existing) {
-        columnIndex = existing.index
+      const parseObj =
+        typeof content === "string" ? tryParseJsonMessage(content) : content
+
+      if (parseObj && isSparseFormat(parseObj)) {
+        const colTitleToIndex = new Map<string, number>()
+        sheet.columns.forEach((col) => {
+          colTitleToIndex.set(col.title, col.index)
+        })
+
+        let maxColIndex =
+          sheet.columns.length > 0
+            ? Math.max(...sheet.columns.map((c) => c.index))
+            : -1
+
+        parseObj.columns.forEach((col) => {
+          if (!colTitleToIndex.has(col.title)) {
+            maxColIndex++
+            const newCol = {
+              title: col.title,
+              id: col.id || `col-${Date.now()}-${maxColIndex}`,
+              index: maxColIndex
+            }
+            sheet.columns.push(newCol)
+            colTitleToIndex.set(col.title, maxColIndex)
+          }
+        })
+
+        parseObj.data.forEach((cell) => {
+          const colTitle = parseObj.columns[cell.column_index]?.title
+          if (colTitle === undefined) return
+
+          const targetColIndex = colTitleToIndex.get(colTitle)
+          if (targetColIndex === undefined) return
+
+          const nextRowIndex = getNextRowIndex(sheet, targetColIndex)
+
+          sheet.data.push({
+            row_index: nextRowIndex,
+            column_index: targetColIndex,
+            payload: cell.payload
+          })
+        })
       } else {
-        columnIndex = sheet.columns.length
-        sheet.columns.push({
-          title: HEADER_NAME,
-          id: "content",
-          index: columnIndex
+        const strContent = normalizeMarkdownInput(content)
+
+        let columnIndex: number
+        const existing = sheet.columns.find((col) => col.title === HEADER_NAME)
+        if (existing) {
+          columnIndex = existing.index
+        } else {
+          columnIndex = sheet.columns.length
+          sheet.columns.push({
+            title: HEADER_NAME,
+            id: `content-${Date.now()}`,
+            index: columnIndex
+          })
+        }
+
+        const nextRowIndex = getNextRowIndex(sheet, columnIndex)
+
+        sheet.data.push({
+          row_index: nextRowIndex,
+          column_index: columnIndex,
+          payload: {
+            content: strContent,
+            labels: []
+          }
         })
       }
 
-      // find empty row
-      const nextRowIndex = getNextRowIndex(sheet, columnIndex)
-
-      sheet.data.push({
-        row_index: nextRowIndex,
-        column_index: columnIndex,
-        payload: {
-          content,
-          labels: []
-        }
-      })
-
-      // updated item
       const updatedItem = JSON.stringify(sheet, null, 2)
+
       await updateSheet({
         id: latestSheet.id,
         data: {
@@ -253,6 +329,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
       return rowsInColumn.length > 0 ? Math.max(...rowsInColumn) + 1 : 0
     }
   }
+
+  const content = normalizeMarkdownInput(data.content)
   return (
     <BasicRenderer
       title={data.title}
@@ -280,7 +358,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           )}
         </>
       }>
-      {data.content}
+      <Markdown className="prose prose-sm">{formatContent}</Markdown>
     </BasicRenderer>
   )
 }
@@ -294,10 +372,12 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
   )
   const [isSuccess, setIsSuccess] = useState(false)
 
+  const desc = normalizeMarkdownInput(data.description)
+
   const handleCreateReminder = () => {
     setEditingItem({
       title: data.title,
-      description: data.description,
+      description: desc,
       fromAt: data.start_at,
       toAt: data.end_at
     })
@@ -320,7 +400,7 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
             />
           </>
         }>
-        {data.description}
+        <Markdown>{desc}</Markdown>
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}

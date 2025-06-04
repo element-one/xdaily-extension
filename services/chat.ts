@@ -137,3 +137,35 @@ export const useGetChatModelInfo = (screenName: string) => {
     enabled: !!screenName
   })
 }
+
+export const updateChatModelInfo = async ({
+  userAgentId,
+  modelId
+}: {
+  userAgentId: string
+  modelId: string
+}): Promise<ChatModelInfo> => {
+  const response = await client.put(`/users/chat/agent/${userAgentId}/model`, {
+    modelId
+  })
+  return response.data
+}
+
+export const useUpdateChatModelInfo = (
+  options?: Partial<
+    UseMutationOptions<
+      ChatModelInfo,
+      Error,
+      {
+        userAgentId: string
+        modelId: string
+      }
+    >
+  >
+) => {
+  return useMutation({
+    ...options,
+    mutationKey: ["update-chat-info"],
+    mutationFn: updateChatModelInfo
+  })
+}

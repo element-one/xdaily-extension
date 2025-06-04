@@ -19,7 +19,8 @@ import { formatTweetDate } from "~libs/date"
 import {
   useChatHistory,
   useGetChatModelInfo,
-  useGetUserAgentModels
+  useGetUserAgentModels,
+  useUpdateChatModelInfo
 } from "~services/chat"
 import { useStore } from "~store/store"
 import { ChatType } from "~types/chat"
@@ -38,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "../ui/Select"
+import { useToast } from "../ui/Toast"
 import { Tooltip } from "../ui/Tooltip"
 import { ChatMessage } from "./ChatMessage/ChatMessage"
 
@@ -70,12 +72,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const isSelf = userInfo.username === screenName
 
-  const { data: chatModelInfo } = useGetChatModelInfo(screenName)
+  const { data: chatModelInfo, refetch } = useGetChatModelInfo(screenName)
   const { data: modelsResp } = useGetUserAgentModels(
     chatModelInfo?.agent?.id ?? ""
   )
+  const {
+    mutateAsync: updateChatModelInfo,
+    isPending: isUpdatingChatModelInfo
+  } = useUpdateChatModelInfo()
 
   const [actModelId, setActModelId] = useState("")
+  const isFirstScroll = useRef(true)
 
   const models = useMemo(() => {
     if (!modelsResp) return []
@@ -87,6 +94,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       setActModelId(chatModelInfo.model.id ?? "")
     }
   }, [chatModelInfo])
+
+  const { showToast } = useToast()
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
@@ -100,7 +109,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const msg = data.messages.pop()
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
-        const quoteContent = msg.data?.tweet?.tweetText
         const type = msg.data?.type
 
         const response = await fetch(url, {
@@ -112,7 +120,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           body: JSON.stringify({
             message: userMessage,
             tweetId,
-            quote: quoteContent,
             type
           })
         })
@@ -151,11 +158,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const showGreeting = allMessages.length === 0 && !quoteTweet
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (options: ScrollToOptions = {}) => {
     setTimeout(() => {
-      chatRef.current?.scrollTo({
+      if (!chatRef.current) return
+      chatRef.current.scrollTo({
         top: chatRef.current.scrollHeight,
-        behavior: "smooth"
+        behavior:
+          options.behavior ?? (isFirstScroll.current ? "auto" : "smooth")
       })
     }, 0)
   }
@@ -163,6 +172,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   // scroll to bottom when come new message
   useEffect(() => {
     scrollToBottom()
+    isFirstScroll.current = false
   }, [messages])
 
   useEffect(() => {
@@ -173,7 +183,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   useEffect(() => {
     const initHistory = async () => {
       await fetchNextPage()
-      scrollToBottom()
+      scrollToBottom({ behavior: "auto" })
+      isFirstScroll.current = false
     }
     initHistory()
   }, [])
@@ -248,6 +259,24 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       content: magicWord,
       data
     })
+  }
+
+  // TODO server problem
+  const handleChangeModel = async (modelId: string) => {
+    try {
+      await updateChatModelInfo({
+        userAgentId: chatModelInfo?.id,
+        modelId
+      })
+      setActModelId(modelId)
+      refetch()
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "Something wrong, try later"
+      })
+    }
   }
 
   return (
@@ -325,8 +354,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           {!!models.length ? (
             <Select
               value={actModelId}
-              onValueChange={setActModelId}
-              disabled={!isSelf}>
+              onValueChange={(value) => handleChangeModel(value)}
+              disabled={!isSelf || isUpdatingChatModelInfo}>
               <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
@@ -337,8 +366,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                       <ImageWithFallback
                         src={model.iconUrl}
                         alt={model.id}
-                        className="w-4 h-4 rounded-full bg-fill-bg-grey"
-                        fallbackClassName="w-4 h-4 rounded-full bg-fill-bg-grey"
+                        className="w-4 h-4 rounded-full bg-white"
+                        fallbackClassName="w-4 h-4 rounded-full bg-white"
                       />
                       {model.screenName}
                     </div>

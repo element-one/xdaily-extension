@@ -39,7 +39,7 @@ export const TextTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
       take: 15,
-      equalsType: "text"
+      type: "text"
     })
   const bottomObserver = useRef<HTMLDivElement>(null)
 
@@ -63,6 +63,8 @@ export const TextTabContent = () => {
   const collection = useMemo(() => {
     return data?.pages ?? []
   }, [data])
+
+  console.log("testing", collection)
 
   const handleOpen = (url?: string) => {
     if (url) {

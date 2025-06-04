@@ -34,14 +34,14 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const [toastContent, setToastContent] = useState<ToastProps>({
     title: "",
     description: "",
-    duration: 3000
+    duration: 1000
   })
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
     "info"
   )
 
   const showToast = useCallback((props: ToastProps) => {
-    setToastContent({ duration: 3000, ...props })
+    setToastContent({ duration: 1000, ...props })
     setOpen(false)
     setTimeout(() => setOpen(true), 10)
     setToastType(props.type ?? "info")
@@ -54,8 +54,8 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
         <Toast.Root
           className={clsx(
             "border border-fill-bg-input text-text-default-primary rounded-lg px-4 py-2",
-            toastType === "success" && "bg-green",
-            toastType === "error" && "bg-red",
+            toastType === "success" && "bg-green bg-opacity-90",
+            toastType === "error" && "bg-red bg-opacity-90",
             toastType === "info" && "bg-fill-bg-light"
           )}
           open={open}

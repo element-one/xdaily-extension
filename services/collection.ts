@@ -19,6 +19,7 @@ import type {
   GetUserSearchParams,
   GetUserSearchResp,
   KolCollection,
+  PostCollection,
   TweetCollection,
   UserCollection
 } from "~types/collection"
@@ -146,18 +147,14 @@ export const getKnowledgeBaseCollections = async ({
   page,
   take,
   isSelected,
-  notEqualsType,
-  equalsType
+  type
 }: GetKnowledgeBaseCollectionParams): Promise<GetFileCollectionResp> => {
   let url = `/users/knowledge-bases?page=${page}&take=${take}`
   if (typeof isSelected === "boolean") {
     url += `&isSelected=${isSelected}`
   }
-  if (notEqualsType) {
-    url += `&notEqualsType=${notEqualsType}`
-  }
-  if (equalsType) {
-    url += `&equalsType=${equalsType}`
+  if (type) {
+    url += `&type=${type}`
   }
 
   const response = await client.get(url)
@@ -170,13 +167,12 @@ export const useKnowledgeBaseCollections = (
   return useInfiniteQuery<
     GetFileCollectionResp,
     Error,
-    InfiniteData<FileCollection>
+    InfiniteData<FileCollection | PostCollection>
   >({
     queryKey: [
       "knowledge-collections",
       params.take,
-      params.equalsType,
-      params.notEqualsType,
+      params.type,
       !!params.isSelected
     ],
     queryFn: ({ pageParam = 1 }) =>

@@ -112,8 +112,7 @@ export interface GetKnowledgeBaseCollectionParams {
   page: number
   take: number
   isSelected?: boolean
-  notEqualsType?: string
-  equalsType?: string
+  type?: "text" | "post" | "file"
 }
 
 export interface FileCollection {
@@ -125,8 +124,20 @@ export interface FileCollection {
   createdAt: Date
   isSelected: Boolean
 }
+
+export interface PostCollection {
+  type: string
+  tweet: TweetCollection
+  content: string
+  createdAt: string
+  extId: string
+  fileUrl: null | string
+  id: string
+  isSelected: boolean
+  status: string
+}
 export interface GetFileCollectionResp {
-  data: FileCollection[]
+  data: FileCollection[] | PostCollection[]
   meta: {
     page: number
     take: number

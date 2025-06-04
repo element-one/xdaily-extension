@@ -26,6 +26,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
 
   return (
     <img
+      loading="lazy"
       {...props}
       className={clsx("object-cover", className)}
       onError={() => setHasError(true)}

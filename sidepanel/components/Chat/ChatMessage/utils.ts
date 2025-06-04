@@ -2,13 +2,16 @@ import type { ChatMessageData } from "~types/chat"
 
 export const tryParseJsonMessage = (msg: string): ChatMessageData | null => {
   try {
-    const jsonMatch = msg.match(/```json\s*([\s\S]*?)\s*```/)
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1])
-    }
-    return null
+    const jsonMatch = msg.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
+    const rawContent = jsonMatch?.[1] ?? msg
+
+    // remove useless character
+    const sanitized = rawContent
+      .replace(/\\_/g, "_") // \_ to _
+      .replace(/\\(?!["\\/bfnrtu])/g, "")
+
+    return JSON.parse(sanitized)
   } catch (error) {
-    console.error("Failed to parse JSON message:", error)
     return null
   }
 }

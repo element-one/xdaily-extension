@@ -1,13 +1,19 @@
+import { CheckCheckIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState, type FC } from "react"
 
 import { formatTweetDate } from "~libs/date"
-import { useTweetCollections } from "~services/collection"
+import { useKnowledgeBaseCollections } from "~services/collection"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
-import { type TweetCollection } from "~types/collection"
+import { type PostCollection, type TweetCollection } from "~types/collection"
 import { MessageType, type AddTweetCollectionPayload } from "~types/message"
 
-type TweetListProps = TweetCollection
+interface TweetListProps {
+  screenName: string
+  content: string
+  postedAt: string
+  isSelected: boolean
+}
 export const TweetItem: FC<TweetListProps> = (props) => {
   const handleClickTweetItem = () => {
     chrome.tabs.create({
@@ -22,19 +28,24 @@ export const TweetItem: FC<TweetListProps> = (props) => {
       <div className="flex items-center gap-3 max-w-[80%]">
         <div className="flex flex-col">
           <div className="text-sm flex items-center gap-x-1">
-            <div className="font-semibold text-primary-brand">
+            <div className="font-semibold text-primary-brand line-clamp-1 break-all">
               @{props.screenName}
             </div>
           </div>
-          <div className="text-xs text-text-default-secondary line-clamp-4 px-1">
+          <div className="text-xs text-text-default-secondary line-clamp-4 px-1 break-all">
             {props.content}
           </div>
           {props.postedAt && (
-            <div className="px-1 text-xs mt-1">
+            <div className="px-1 text-xs mt-1 pr-4">
               {formatTweetDate(props.postedAt as any as string)}
             </div>
           )}
         </div>
+      </div>
+      <div>
+        {props.isSelected && (
+          <CheckCheckIcon className="text-primary-brand w-4 h-4 absolute right-4 bottom-4" />
+        )}
       </div>
     </div>
   )
@@ -63,7 +74,10 @@ const PostTabContentSkeleton = () => {
 
 export const PostTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useTweetCollections(15)
+    useKnowledgeBaseCollections({
+      take: 50,
+      type: "post"
+    })
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   const [addedCollection, setAddedCollection] = useState<TweetCollection[]>([])
@@ -96,7 +110,26 @@ export const PostTabContent = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const collection = useMemo(() => {
-    return [...addedCollection, ...(data?.pages ? data.pages : [])]
+    const apiPostData = ((data?.pages ?? []) as PostCollection[]).map(
+      (postCollection) => ({
+        content: postCollection.tweet?.content ?? postCollection.content ?? "",
+        postedAt:
+          postCollection.tweet?.timestamp ?? postCollection.createdAt ?? "",
+        screenName: postCollection.tweet?.screenName ?? postCollection.id ?? "",
+        id: postCollection.id,
+        isSelected: postCollection.isSelected
+      })
+    )
+
+    const addedData = addedCollection.map((collection) => ({
+      content: collection.content,
+      postedAt: collection.postedAt,
+      screenName: collection.screenName,
+      id: collection.tweetId,
+      isSelected: true // default to select
+    }))
+
+    return [...addedData, ...apiPostData]
   }, [addedCollection, data])
 
   if (isLoading) {
@@ -108,7 +141,13 @@ export const PostTabContent = () => {
       {collection?.length > 0 ? (
         <section className="flex flex-col gap-2 py-2 overflow-y-scroll hide-scrollbar">
           {collection.map((item, index) => (
-            <TweetItem key={index} {...item} />
+            <TweetItem
+              key={index}
+              screenName={item.screenName}
+              content={item.content}
+              postedAt={item.postedAt as any as string}
+              isSelected={item.isSelected}
+            />
           ))}
         </section>
       ) : (
