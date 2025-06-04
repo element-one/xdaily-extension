@@ -3,6 +3,7 @@ import Markdown from "markdown-to-jsx"
 import type { FC, ReactNode } from "react"
 import robotImg from "url:/assets/robot.png" // strange
 
+import { normalizeMarkdownInput } from "~libs/chat"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
 import type {
   ChatMessageData,
@@ -57,7 +58,7 @@ export const ChatMessage: FC<ChatMessageProps> = ({
               : "bg-fill-bg-light text-text-default-primary"
           }`}>
           <RobotLogo show={role !== "user" && isSelf} />
-          <Markdown>{content}</Markdown>
+          <Markdown>{normalizeMarkdownInput(content)}</Markdown>
         </div>
       </div>
     )

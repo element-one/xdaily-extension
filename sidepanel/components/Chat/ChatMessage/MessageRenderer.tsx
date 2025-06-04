@@ -1,7 +1,9 @@
 import type { PartialBlock } from "@blocknote/core"
 import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
+import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
 
+import { normalizeMarkdownInput } from "~libs/chat"
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
@@ -253,6 +255,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
       return rowsInColumn.length > 0 ? Math.max(...rowsInColumn) + 1 : 0
     }
   }
+
+  const content = normalizeMarkdownInput(data.content)
   return (
     <BasicRenderer
       title={data.title}
@@ -264,7 +268,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
             isLoading={isCreatingSheet}
             isDisabled={isCreatingSheet}
             isSuccess={isCreatingSuccess}
-            onClick={() => handleCreateSheet(data.title, data.content)}
+            onClick={() => handleCreateSheet(data.title, content)}
             icon={<SaveIcon className="w-4 h-4 text-primary-brand" />}
           />
           {latestSheet && (
@@ -275,12 +279,12 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
               isDisabled={isUpdatingSheet || isFetching}
               isSuccess={isUpdatingSuccess}
               icon={<CopyPlusIcon className="w-4 h-4 text-white" />}
-              onClick={() => handleAppendSheet(data.content)}
+              onClick={() => handleAppendSheet(content)}
             />
           )}
         </>
       }>
-      {data.content}
+      <Markdown className="prose prose-sm">{content}</Markdown>
     </BasicRenderer>
   )
 }
@@ -294,10 +298,12 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
   )
   const [isSuccess, setIsSuccess] = useState(false)
 
+  const desc = normalizeMarkdownInput(data.description)
+
   const handleCreateReminder = () => {
     setEditingItem({
       title: data.title,
-      description: data.description,
+      description: desc,
       fromAt: data.start_at,
       toAt: data.end_at
     })
@@ -320,7 +326,7 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
             />
           </>
         }>
-        {data.description}
+        <Markdown>{desc}</Markdown>
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}
