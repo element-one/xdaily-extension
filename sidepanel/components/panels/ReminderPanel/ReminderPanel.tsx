@@ -100,6 +100,11 @@ export const ReminderPanel = () => {
         })
         if (closestId && closestId !== selectedId) {
           setSelectedId(closestId)
+          tabRefs.current[closestId]?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "nearest"
+          })
         }
         ticking = false
       })
@@ -111,6 +116,11 @@ export const ReminderPanel = () => {
 
   const handleSelectTab = (id: string) => {
     setSelectedId(id)
+    tabRefs.current[id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest"
+    })
     const section = sectionRefs.current[id]
     if (!section) return
 
