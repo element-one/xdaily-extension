@@ -98,10 +98,7 @@ export const findTweetButton = (
   tweet: Element,
   returnParent: boolean = true
 ): HTMLElement | null => {
-  const tweetActions = tweet.querySelector("div[role='group']")
-  if (!tweetActions) return null
-
-  const buttons = tweetActions.querySelectorAll("button[data-testid]")
+  const buttons = tweet.querySelectorAll("button[data-testid]")
 
   for (const btn of buttons) {
     const testId = btn.getAttribute("data-testid")
