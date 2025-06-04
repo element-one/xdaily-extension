@@ -101,6 +101,7 @@ export interface UserAgentModelResp {
 }
 
 export interface ChatModelInfo {
+  id: string // user agent id
   agent: {
     id: string
     name: string

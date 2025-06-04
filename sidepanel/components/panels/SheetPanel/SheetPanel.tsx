@@ -92,7 +92,6 @@ export const SheetPanel = () => {
       await createSheet({
         title: "Untitled",
         content: {
-          // TODO
           item: JSON.stringify({})
         }
       })
