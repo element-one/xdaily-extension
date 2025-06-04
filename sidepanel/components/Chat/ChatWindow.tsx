@@ -109,7 +109,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         const msg = data.messages.pop()
         const userMessage = msg.content
         const tweetId = msg.data?.tweet?.tweetId
-        const quoteContent = msg.data?.tweet?.tweetText
         const type = msg.data?.type
 
         const response = await fetch(url, {
@@ -121,7 +120,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           body: JSON.stringify({
             message: userMessage,
             tweetId,
-            quote: quoteContent,
             type
           })
         })
