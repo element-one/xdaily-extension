@@ -2,7 +2,7 @@ import type { PlasmoCSConfig } from "plasmo"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import { getTweetIdFromTweet } from "~libs/tweet"
+import { findTweetButton, getTweetIdFromTweet } from "~libs/tweet"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -30,16 +30,16 @@ const observeTweets = () => {
   const observer = new MutationObserver(() => {
     document.querySelectorAll("article").forEach((tweet) => {
       const hasCollectButton = tweet.querySelector(`.${COLLECT_BUTTON_CONT}`)
-      const hasBookmark = tweet.querySelector('[data-testid="bookmark"]')
-      if (!hasCollectButton && hasBookmark) {
-        injectButton(tweet)
+      const bookmarkButton = findTweetButton("bookmark", tweet)
+      if (!hasCollectButton && bookmarkButton) {
+        injectButton(tweet, bookmarkButton)
       }
     })
   })
   observer.observe(document.body, { childList: true, subtree: true })
 }
 
-const injectButton = (tweet: Element) => {
+const injectButton = (tweet: Element, bookmarkButton: HTMLElement) => {
   const cont = document.createElement("div")
   cont.className = COLLECT_BUTTON_CONT
   cont.style.cssText = `
@@ -101,9 +101,6 @@ const injectButton = (tweet: Element) => {
   const tweetActions = tweet.querySelector("div[role='group']")
   if (!tweetActions) return
 
-  const bookmarkButton = tweetActions.querySelector(
-    "button[data-testid='bookmark']"
-  )
   if (bookmarkButton && bookmarkButton.parentElement) {
     bookmarkButton.parentElement.insertBefore(cont, bookmarkButton)
   } else {
