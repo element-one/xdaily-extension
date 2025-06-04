@@ -45,7 +45,7 @@ export const FileTabContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
       take: 50,
-      notEqualsType: "text"
+      type: "file"
     })
   const bottomObserver = useRef<HTMLDivElement>(null)
 
