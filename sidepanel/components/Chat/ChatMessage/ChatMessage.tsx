@@ -47,7 +47,7 @@ export const ChatMessage: FC<ChatMessageProps> = ({
     return <ErrorMessageRenderer errorData={jsonData as ErrorMessageData} />
   }
 
-  if (!jsonData) {
+  if (!jsonData || typeof jsonData !== "object" || Array.isArray(jsonData)) {
     return (
       <div
         className={`flex ${role === "user" ? "justify-end" : "justify-start"}`}>
