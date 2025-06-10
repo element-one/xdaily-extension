@@ -35,16 +35,30 @@ export const ChatMessage: FC<ChatMessageProps> = ({
 
   const renderMessageContent = (jsonData: ChatMessageData): ReactNode => {
     // Handle JSON formatted messages
-    if ("error" in jsonData) {
-      return <ErrorMessageRenderer errorData={jsonData as ErrorMessageData} />
-    } else if (jsonData.type === "memo") {
-      return <MemoMessageRenderer data={jsonData as MemoMessageData} />
-    } else if (jsonData.type === "sheet") {
-      return <SheetMessageRenderer data={jsonData as SheetMessageData} />
-    } else if (jsonData.type === "reminder") {
-      return <ReminderMessageRenderer data={jsonData as ReminderMessageData} />
+    try {
+      if ("error" in jsonData) {
+        return <ErrorMessageRenderer errorData={jsonData as ErrorMessageData} />
+      } else if (jsonData.type === "memo") {
+        return <MemoMessageRenderer data={jsonData as MemoMessageData} />
+      } else if (jsonData.type === "sheet") {
+        return <SheetMessageRenderer data={jsonData as SheetMessageData} />
+      } else if (jsonData.type === "reminder") {
+        return (
+          <ReminderMessageRenderer data={jsonData as ReminderMessageData} />
+        )
+      }
+      return (
+        <ErrorMessageRenderer
+          errorData={{ error: "Something wrong" } as ErrorMessageData}
+        />
+      )
+    } catch (e) {
+      return (
+        <ErrorMessageRenderer
+          errorData={{ error: "Something wrong" } as ErrorMessageData}
+        />
+      )
     }
-    return <ErrorMessageRenderer errorData={jsonData as ErrorMessageData} />
   }
 
   if (!jsonData || typeof jsonData !== "object" || Array.isArray(jsonData)) {
