@@ -64,8 +64,6 @@ export const TextTabContent = () => {
     return data?.pages ?? []
   }, [data])
 
-  console.log("testing", collection)
-
   const handleOpen = (url?: string) => {
     if (url) {
       window.open(url, "_blank")
