@@ -330,7 +330,6 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     }
   }
 
-  const content = normalizeMarkdownInput(data.content)
   return (
     <BasicRenderer
       title={data.title}
