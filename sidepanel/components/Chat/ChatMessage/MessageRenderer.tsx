@@ -357,7 +357,9 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           )}
         </>
       }>
-      <Markdown className="prose prose-sm">{formatContent}</Markdown>
+      <Markdown className="prose prose-sm max-w-full overflow-auto">
+        {formatContent}
+      </Markdown>
     </BasicRenderer>
   )
 }
@@ -399,7 +401,9 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
             />
           </>
         }>
-        <Markdown>{desc}</Markdown>
+        <Markdown className="prose prose-sm max-w-full overflow-auto">
+          {desc}
+        </Markdown>
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}
