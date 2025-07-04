@@ -420,7 +420,6 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
 export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
   data
 }) => {
-  console.log("testing", data)
   if (data && data.content && Array.isArray(data.content)) {
     return (
       <div className="flex flex-col gap-2">
