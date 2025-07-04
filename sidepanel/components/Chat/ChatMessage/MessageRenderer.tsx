@@ -18,6 +18,7 @@ import type {
   ErrorMessageData,
   MemoMessageData,
   ReminderMessageData,
+  ReminderMessageItem,
   SheetMessageData
 } from "~types/chat"
 import type { DialogReminderItem, ReminderItem } from "~types/reminder"
@@ -366,9 +367,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
   )
 }
 
-export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
-  data
-}) => {
+const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
   const { t } = useTranslation()
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
@@ -416,6 +415,22 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
       />
     </>
   )
+}
+
+export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
+  data
+}) => {
+  console.log("testing", data)
+  if (data && data.content && Array.isArray(data.content)) {
+    return (
+      <div className="flex flex-col gap-2">
+        {data.content.map((message, index) => (
+          <ReminderMessageItem key={index} data={message} />
+        ))}
+      </div>
+    )
+  }
+  return <ReminderMessageItem data={data as any as ReminderMessageItem} />
 }
 
 export const ErrorMessageRenderer: FC<{ errorData: ErrorMessageData }> = ({
