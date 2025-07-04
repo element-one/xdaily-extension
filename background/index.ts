@@ -6,7 +6,7 @@ console.log(
 
 chrome.cookies.onChanged.addListener((changeInfo) => {
   if (
-    changeInfo.cookie.domain.includes(process.env.PLASMO_PUBLIC_COOKIE_SERVER)
+    changeInfo.cookie.domain.endsWith(process.env.PLASMO_PUBLIC_COOKIE_SERVER)
   ) {
     chrome.runtime.sendMessage({
       type: MessageType.CHECK_AUTH
