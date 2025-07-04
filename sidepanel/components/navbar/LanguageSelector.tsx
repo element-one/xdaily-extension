@@ -13,8 +13,8 @@ export const LanguageSelector: FC = () => {
   }
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="w-9 h-9 flex items-center justify-center outline-none select-none text-text-default-regular">
-        <LanguagesIcon />
+      <DropdownMenu.Trigger className="rounded-full hover:bg-white/10 w-9 h-9 flex items-center justify-center outline-none select-none text-text-default-regular">
+        <LanguagesIcon className="w-5 h-5" />
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         sideOffset={0}

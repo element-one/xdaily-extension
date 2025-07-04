@@ -191,7 +191,7 @@ export const DashboardPage = () => {
           <KolNavbar />
         </div>
         {/* bottom buttons */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {BottomNavbarItems.map((item) => {
             return (
               <MeNavbarItem
@@ -203,8 +203,8 @@ export const DashboardPage = () => {
               />
             )
           })}
-          <UserNavbarItem />
           <LanguageSelector />
+          <UserNavbarItem />
         </div>
       </aside>
     </div>

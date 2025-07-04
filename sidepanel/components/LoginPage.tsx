@@ -5,7 +5,7 @@ import { Button } from "./ui/Button"
 export const LoginPage = () => {
   const handleLogin = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}`
+      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/login`
     })
   }
 
