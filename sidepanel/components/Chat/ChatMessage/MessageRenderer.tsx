@@ -4,8 +4,9 @@ import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
 
 import {
-  extractSummaryFromSparseFormat,
-  normalizeMarkdownInput
+  extractMarkdownTableFromSparseFormat,
+  normalizeMarkdownInput,
+  tryConvertDataToSparseFormat
 } from "~libs/chat"
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
@@ -162,35 +163,35 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     )
   }
 
+  const getParseObj = (content: string) => {
+    if (typeof content === "string") {
+      return tryParseJsonMessage(content)
+    }
+    return tryConvertDataToSparseFormat(content)
+  }
+
   const formatContent = useMemo(() => {
     const content = data.content
-    const parseObj =
-      typeof content === "string" ? tryParseJsonMessage(content) : content
+    const parseObj = getParseObj(content)
     if (parseObj && isSparseFormat(parseObj)) {
-      return extractSummaryFromSparseFormat(parseObj)
+      return extractMarkdownTableFromSparseFormat(parseObj)
     } else {
       return normalizeMarkdownInput(content)
     }
   }, [data.content])
 
-  const handleCreateSheet = async (
-    title: string,
-    content: string | SparseFormat
-  ) => {
-    const parseObj =
-      typeof content === "string" ? tryParseJsonMessage(content) : content
+  const handleCreateSheet = async (title: string, content: string) => {
+    const parseObj = getParseObj(content)
     try {
       let newSheet: SparseFormat
       if (parseObj && isSparseFormat(parseObj)) {
         newSheet = {
-          uid: `sheet-${Date.now()}`,
           columns: parseObj.columns,
           data: parseObj.data
         }
       } else {
         let strContent = normalizeMarkdownInput(content)
         newSheet = {
-          uid: `sheet-${Date.now()}`,
           columns: [{ title: HEADER_NAME, id: "content", index: 0 }],
           data: [
             {
@@ -216,7 +217,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     }
   }
 
-  const handleAppendSheet = async (content: string | SparseFormat) => {
+  const handleAppendSheet = async (content: string) => {
     if (!latestSheet) return
 
     try {
@@ -226,14 +227,12 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
 
       const sheet: SparseFormat = isEmptyObject
         ? {
-            uid: latestSheet.id,
             columns: [],
             data: []
           }
         : parsed
 
-      const parseObj =
-        typeof content === "string" ? tryParseJsonMessage(content) : content
+      const parseObj = getParseObj(content)
 
       if (parseObj && isSparseFormat(parseObj)) {
         const colTitleToIndex = new Map<string, number>()
@@ -357,9 +356,9 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           )}
         </>
       }>
-      <Markdown className="prose prose-sm max-w-full overflow-auto">
-        {formatContent}
-      </Markdown>
+      <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+        <Markdown>{formatContent}</Markdown>
+      </div>
     </BasicRenderer>
   )
 }
@@ -401,9 +400,9 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
             />
           </>
         }>
-        <Markdown className="prose prose-sm max-w-full overflow-auto">
-          {desc}
-        </Markdown>
+        <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+          <Markdown>{desc}</Markdown>
+        </div>
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}

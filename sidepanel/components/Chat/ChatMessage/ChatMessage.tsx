@@ -72,7 +72,9 @@ export const ChatMessage: FC<ChatMessageProps> = ({
               : "bg-fill-bg-light text-text-default-primary"
           }`}>
           <RobotLogo show={role !== "user" && isSelf} />
-          <Markdown>{normalizeMarkdownInput(content)}</Markdown>
+          <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+            <Markdown>{normalizeMarkdownInput(content)}</Markdown>
+          </div>
         </div>
       </div>
     )

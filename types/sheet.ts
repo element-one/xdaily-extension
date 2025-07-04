@@ -5,7 +5,6 @@ export interface GetSheetListParams {
 }
 
 export interface SparseFormat {
-  uid: string
   data: {
     row_index: number
     column_index: number
