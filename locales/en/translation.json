@@ -80,5 +80,24 @@
     "creating": "Creating",
     "create": "Create",
     "cancel": "Cancel"
+  },
+  "chat_panel": {
+    "tool_memo": "Save as Memo",
+    "tool_sheet": "Save as Sheet",
+    "tool_remind": "Remind later",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "loading_history": "Loading history..",
+    "thinking": "Thinking...",
+    "greeting": "Hi, How can I help you?",
+    "select_model": "Select model",
+    "placeholder": "Ask me anything... (Shift + Enter to add a line)",
+    "save_new_memo": "Save as new memo",
+    "append_to_memo": "Append to latest memo",
+    "create_success": "Create success",
+    "append_success": "Append Success",
+    "save_new_sheet": "Save as new sheet",
+    "append_to_sheet": "Append to latest sheet",
+    "create_reminder": "Create a reminder"
   }
 }

@@ -80,5 +80,24 @@
     "creating": "创建中...",
     "create": "创建",
     "cancel": "取消"
+  },
+  "chat_panel": {
+    "tool_memo": "保存为备忘录",
+    "tool_sheet": "保存为表格",
+    "tool_remind": "稍后提醒",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "loading_history": "加载历史记录中...",
+    "thinking": "思考中...",
+    "greeting": "您好，请问有什么可以帮您？",
+    "select_model": "选择 AI 模型",
+    "placeholder": "输入您的问题...（Shift + Enter换行）",
+    "save_new_memo": "另存为新备忘录",
+    "append_to_memo": "追加到最近备忘录",
+    "create_success": "创建成功",
+    "append_success": "追加成功",
+    "save_new_sheet": "另存为新表格",
+    "append_to_sheet": "追加到最近表格",
+    "create_reminder": "创建提醒事项"
   }
 }

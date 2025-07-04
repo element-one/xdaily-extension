@@ -2,6 +2,7 @@ import type { PartialBlock } from "@blocknote/core"
 import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   extractMarkdownTableFromSparseFormat,
@@ -42,6 +43,7 @@ const BasicRenderer: FC<{
 export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   data
 }) => {
+  const { t } = useTranslation()
   const {
     mutateAsync: createMemo,
     isPending: isCreatingMemo,
@@ -73,8 +75,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error.title"),
+        description: t("chat_panel.error.desc")
       })
     }
   }
@@ -95,8 +97,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error.title"),
+        description: t("chat_panel.error.desc")
       })
     }
   }
@@ -106,8 +108,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
       actions={
         <>
           <ActionButton
-            tooltip="Save as new memo"
-            successTooltip="Create success"
+            tooltip={t("chat_panel.save_new_memo")}
+            successTooltip={t("chat_panel.create_success")}
             isLoading={isCreatingMemo}
             isDisabled={isCreatingMemo}
             isSuccess={isCreatingSuccess}
@@ -116,8 +118,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
           />
           {latestMemo && (
             <ActionButton
-              tooltip="Append to latest memo"
-              successTooltip="Append success"
+              tooltip={t("chat_panel.append_to_memo")}
+              successTooltip={t("chat_panel.append_success")}
               isLoading={isUpdatingMemo}
               isDisabled={isUpdatingMemo || isFetching}
               isSuccess={isUpdatingSuccess}
@@ -135,6 +137,7 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
 export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
   data
 }) => {
+  const { t } = useTranslation()
   const HEADER_NAME = "content"
   const { showToast } = useToast()
   const { data: sheetPages, refetch, isFetching } = useSheetList(1)
@@ -211,8 +214,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error_title"),
+        description: t("chat_panel.error_desc")
       })
     }
   }
@@ -315,8 +318,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     } catch (err) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error_title"),
+        description: t("chat_panel.error_desc")
       })
     }
 
@@ -335,8 +338,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
       actions={
         <>
           <ActionButton
-            tooltip="Save as new sheet"
-            successTooltip="Create success"
+            tooltip={t("chat_panel.save_new_sheet")}
+            successTooltip={t("chat_panel.create_success")}
             isLoading={isCreatingSheet}
             isDisabled={isCreatingSheet}
             isSuccess={isCreatingSuccess}
@@ -345,8 +348,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           />
           {latestSheet && (
             <ActionButton
-              tooltip="Append to latest sheet"
-              successTooltip="Append success"
+              tooltip={t("chat_panel.append_to_sheet")}
+              successTooltip={t("chat_panel.append_success")}
               isLoading={isUpdatingSheet}
               isDisabled={isUpdatingSheet || isFetching}
               isSuccess={isUpdatingSuccess}
@@ -366,6 +369,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
 export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
   data
 }) => {
+  const { t } = useTranslation()
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
     null
@@ -390,8 +394,8 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
         actions={
           <>
             <ActionButton
-              tooltip="Create a reminder"
-              successTooltip="Create success"
+              tooltip={t("chat_panel.create_reminder")}
+              successTooltip={t("chat_panel.create_success")}
               isLoading={false}
               isDisabled={false}
               isSuccess={isSuccess}
