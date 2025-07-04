@@ -46,5 +46,20 @@
     "footer_title": "笔记",
     "delete": "删除",
     "empty": "备忘录为空"
+  },
+  "sheet_panel": {
+    "title": "表格",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "delete": "删除",
+    "empty": "暂无数据"
+  },
+  "invite_panel": {
+    "title": "邀请成员加入工作台",
+    "desc": "分享文件给他人，可收集反馈意见、促进创意交流并加强团队协作。",
+    "free_invites": "已用免费邀请次数",
+    "info": "如需更多邀请名额，可升级至高级账户。",
+    "copy": "复制",
+    "copied": "已复制"
   }
 }

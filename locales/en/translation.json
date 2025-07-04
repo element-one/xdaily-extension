@@ -46,5 +46,20 @@
     "footer_title": "Note",
     "delete": "Delete",
     "empty": "Empty Memo"
+  },
+  "sheet_panel": {
+    "title": "Sheet",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "delete": "Delete",
+    "empty": "No Sheet Now"
+  },
+  "invite_panel": {
+    "title": "Invite People to Your Dashboard",
+    "desc": "Share your file with others to collect feedback, facilitate idea exchange, and enhance communication.",
+    "free_invites": "free invites used",
+    "info": "If you need more invites, you can upgrade to a premium account.",
+    "copy": "Copy",
+    "copied": "Copied!"
   }
 }

@@ -1,5 +1,6 @@
 import { EllipsisIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { useDebounce } from "~libs/debounce"
 import { useCreateSheet, useDeleteSheet, useSheetList } from "~services/sheet"
@@ -44,6 +45,8 @@ const SheetPanelSkeleton = () => {
   )
 }
 export const SheetPanel = () => {
+  const { t } = useTranslation()
+
   const [searchValue, setSearchValue] = useState("")
   const {
     data,
@@ -99,8 +102,8 @@ export const SheetPanel = () => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("sheet_panel.error_title"),
+        description: t("sheet_panel.error_desc")
       })
     }
   }
@@ -112,8 +115,8 @@ export const SheetPanel = () => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("sheet_panel.error_title"),
+        description: t("sheet_panel.error_desc")
       })
     }
   }
@@ -125,7 +128,7 @@ export const SheetPanel = () => {
   return (
     <div className="flex flex-col h-full">
       <PanelHeader
-        title="Sheet"
+        title={t("sheet_panel.title")}
         showSearchButton={true}
         onSearchChange={handleSearchChange}
         extraRightContent={
@@ -189,7 +192,7 @@ export const SheetPanel = () => {
                               handleDeleteSheet(item)
                             }}>
                             <Trash2Icon className="text-red w-4 h-4" />
-                            <span>Delete</span>
+                            <span>{t("sheet_panel.delete")}</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -199,7 +202,7 @@ export const SheetPanel = () => {
               ))}
             </section>
           ) : (
-            <EmptyContent content="No Sheet Now" />
+            <EmptyContent content={t("sheet_panel.empty")} />
           )}
           {/* load more */}
           <div ref={bottomObserver} className="h-4 w-full" />

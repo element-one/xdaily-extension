@@ -1,6 +1,7 @@
 import clsx from "clsx"
 import { CopyIcon } from "lucide-react"
 import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { useInviteCode, useInviteHistory } from "~services/invite"
 import { Button } from "~sidepanel/components/ui/Button"
@@ -15,6 +16,7 @@ const ColorMapClass = [
   "text-white bg-white/20"
 ]
 export const InvitePanel = () => {
+  const { t } = useTranslation()
   const { data: inviteCode } = useInviteCode()
   const { data: inviteHistoryData } = useInviteHistory()
 
@@ -50,11 +52,10 @@ export const InvitePanel = () => {
     <div className="flex flex-col h-full py-2 min-h-0 flex-1">
       <div>
         <div className="h-6 text-text-default-primary text-base">
-          Invite People to Your Dashboard
+          {t("invite_panel.title")}
         </div>
         <div className="text-xs leading-[18px] text-text-default-secondary">
-          Share your file with others to collect feedback, facilitate idea
-          exchange, and enhance communication.
+          {t("invite_panel.desc")}
         </div>
       </div>
       <div className="flex gap-4 mt-4">
@@ -66,7 +67,9 @@ export const InvitePanel = () => {
         />
         <Button className="shrink-0 text-sm gap-1" onClick={handleCopy}>
           <CopyIcon className="w-4 h-4 scale-x-[-1]" />{" "}
-          <span>{copied ? "Copied!" : "Copy"}</span>
+          <span>
+            {copied ? t("invite_panel.copied") : t("invite_panel.copy")}
+          </span>
         </Button>
       </div>
       {!!inviteData.length && (
@@ -98,10 +101,10 @@ export const InvitePanel = () => {
           <span className="text-primary-brand mr-1 inline-block">
             {inviteHistoryData?.meta.itemCount}/3
           </span>
-          free invites used
+          {t("invite_panel.free_invites")}
         </div>
         <div className="text-text-default-secondary text-xs leading-[18px]">
-          If you need more invites, you can upgrade to a premium account.
+          {t("invite_panel.info")}
         </div>
         <div className="mt-4 w-full">
           <div className="bg-fill-bg-grey h-1 w-full rounded-full">
