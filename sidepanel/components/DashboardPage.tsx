@@ -16,6 +16,7 @@ import SettingIcon from "./icons/SettingIcon"
 import SheetIcon from "./icons/SheetIcon"
 import { KolChatSection } from "./KolChatSection/KolChatSection"
 import { KolNavbar } from "./navbar/KolNavbar"
+import { LanguageSelector } from "./navbar/LanguageSelector"
 import { MeNavbarItem } from "./navbar/MeNavbarItem"
 import { UserNavbarItem } from "./navbar/UserNavbarItem"
 import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
@@ -203,6 +204,7 @@ export const DashboardPage = () => {
             )
           })}
           <UserNavbarItem />
+          <LanguageSelector />
         </div>
       </aside>
     </div>
