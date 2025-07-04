@@ -61,5 +61,24 @@
     "info": "如需更多邀请名额，可升级至高级账户。",
     "copy": "复制",
     "copied": "已复制"
+  },
+  "reminder_panel": {
+    "title": "提醒",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "empty": "当前无提醒事项",
+    "delete": "删除",
+    "edit": "编辑",
+    "need_fill_all": "请填写所有必填信息",
+    "must_later": "结束时间必须晚于开始时间",
+    "edit_reminder": "编辑提醒",
+    "new_reminder": "新建提醒",
+    "reminder_title": "提醒标题",
+    "reminder_desc": "提醒描述",
+    "updating": "更新中...",
+    "update": "更新",
+    "creating": "创建中...",
+    "create": "创建",
+    "cancel": "取消"
   }
 }

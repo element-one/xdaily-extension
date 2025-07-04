@@ -61,5 +61,24 @@
     "info": "If you need more invites, you can upgrade to a premium account.",
     "copy": "Copy",
     "copied": "Copied!"
+  },
+  "reminder_panel": {
+    "title": "Reminder",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "empty": "No Reminder Now",
+    "delete": "Delete",
+    "edit": "Edit",
+    "need_fill_all": "Please fill in all the information",
+    "must_later": "End time must be later than start time",
+    "edit_reminder": "Edit Reminder",
+    "new_reminder": "New Reminder",
+    "reminder_title": "Reminder Title",
+    "reminder_desc": "Reminder Description",
+    "updating": "Updating",
+    "update": "Update",
+    "creating": "Creating",
+    "create": "Create",
+    "cancel": "Cancel"
   }
 }
