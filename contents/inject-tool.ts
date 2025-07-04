@@ -7,7 +7,9 @@ import {
   findTweetButton,
   getTweetIdFromTweet
 } from "~libs/tweet"
-import { MessageType } from "~types/message"
+import { MessageType, type MessagePayload } from "~types/message"
+
+import i18n from "../locales/i18n"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -33,7 +35,7 @@ const createCollectButton = (tweet: HTMLElement) => {
   const host = document.createElement("xdaily-collect-button")
   host.className = COLLECT_BUTTON_CONT
   const shadow = host.attachShadow({ mode: "open" })
-
+  const collectLabel = i18n.t("content_inject_tool.collect_tooltip")
   const icon = `
   <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" >
       <path fill-rule="evenodd" clip-rule="evenodd" d="M2.6665 4.66732C2.6665 2.82637 4.15889 1.33398 5.99984 1.33398H9.9998C11.8407 1.33398 13.3331 2.82637 13.3331 4.66732V12.6601C13.3331 14.3626 11.3416 15.2866 10.0416 14.1872L8.43033 12.8245C8.18181 12.6143 7.81786 12.6143 7.56934 12.8245L5.958 14.1872C4.65806 15.2866 2.6665 14.3626 2.6665 12.6601V4.66732ZM5.99984 2.66732C4.89527 2.66732 3.99984 3.56275 3.99984 4.66732V12.6601C3.99984 13.2276 4.66369 13.5356 5.097 13.1692L6.70834 11.8064C7.4539 11.1759 8.54578 11.1759 9.29133 11.8064L10.9026 13.1692C11.3359 13.5356 11.9998 13.2276 11.9998 12.6601V4.66732C11.9998 3.56275 11.1044 2.66732 9.9998 2.66732H5.99984Z" fill="#34C759"></path>
@@ -109,7 +111,7 @@ const createCollectButton = (tweet: HTMLElement) => {
     <div class="button">
       <div class="icon">${icon}</div>
       <div class="spinner-icon" style="display: none;">${spinnerIcon}</div>
-      <div class="tooltip">Collect Tweet</div>
+      <div class="tooltip">${collectLabel}</div>
     </div>
   `
 
@@ -152,6 +154,7 @@ const createCollectButton = (tweet: HTMLElement) => {
 }
 
 const createQuoteButton = (tweet: HTMLElement) => {
+  const quoteLabel = i18n.t("content_inject_tool.quote_tooltip")
   const host = document.createElement("xdaily-quote-button")
   host.className = QUOTE_BUTTON_CONT
   const shadow = host.attachShadow({ mode: "open" })
@@ -238,7 +241,7 @@ const createQuoteButton = (tweet: HTMLElement) => {
             fill="currentColor"
           />
         </svg>
-      <div class="tooltip">Quote Tweet</div>
+      <div class="tooltip">${quoteLabel}</div>
     </div>
   `
 
@@ -292,5 +295,36 @@ const injectButton = (tweet: Element) => {
     }
   }
 }
+
+const refreshInjectedButtons = () => {
+  document.querySelectorAll(`.${COLLECT_BUTTON_CONT}`).forEach((host) => {
+    if (host.shadowRoot) {
+      const tooltip = host.shadowRoot.querySelector(".tooltip")
+      if (tooltip) {
+        tooltip.textContent = i18n.t("content_inject_tool.collect_tooltip")
+      }
+    }
+  })
+
+  document.querySelectorAll(`.${QUOTE_BUTTON_CONT}`).forEach((host) => {
+    if (host.shadowRoot) {
+      const tooltip = host.shadowRoot.querySelector(".tooltip")
+      if (tooltip) {
+        tooltip.textContent = i18n.t("content_inject_tool.quote_tooltip")
+      }
+    }
+  })
+}
+
+chrome.runtime.onMessage.addListener((message: MessagePayload) => {
+  if (message.type === MessageType.LANGUAGE_CHANGED) {
+    const newLang = message.language
+    console.log("[content-script] Received language change:", newLang)
+
+    i18n.changeLanguage(newLang).then(() => {
+      refreshInjectedButtons()
+    })
+  }
+})
 
 observeTweets()

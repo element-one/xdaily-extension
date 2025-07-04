@@ -1,5 +1,6 @@
 import { CheckCheckIcon, ClockIcon, FileTextIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
+import { useTranslation } from "react-i18next"
 
 import { formatTweetDate } from "~libs/date"
 import { useKnowledgeBaseCollections } from "~services/collection"
@@ -42,6 +43,8 @@ const FileTabContentSkeleton = () => {
 }
 
 export const FileTabContent = () => {
+  const { t } = useTranslation()
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
       take: 50,
@@ -137,7 +140,7 @@ export const FileTabContent = () => {
           </section>
         </>
       ) : (
-        <EmptyContent content="File is empty" />
+        <EmptyContent content={t("knowledge_panel.empty_file")} />
       )}
       <div ref={bottomObserver} className="h-10" />
       {isFetchingNextPage && <p className="text-center">loading...</p>}

@@ -1,0 +1,107 @@
+{
+  "login_page": {
+    "sign_up": "Sign up with twitter"
+  },
+  "dashboard_page": {
+    "explore": "Explore",
+    "studio": "Studio",
+    "knowledge_base": "Knowledge Base",
+    "memo": "Memo",
+    "sheet": "Sheet",
+    "reminder": "Reminder",
+    "invite": "Invite User",
+    "my_account": "My Account"
+  },
+  "explore_panel": {
+    "title": "Explore",
+    "filter_people": "People",
+    "filter_file": "Files",
+    "filter_text": "Text",
+    "filter_post": "Post",
+    "search_placeholder": "Search for reports",
+    "empty_result": "No result"
+  },
+  "studio_panel": {
+    "title": "Studio AI",
+    "design": "Design",
+    "agent_modal": "Agent Modal",
+    "knowledge_base": "Knowledge Base",
+    "chat_bot": "Twitter Chat Bot",
+    "tools": "Tools",
+    "coming": "Coming soon..."
+  },
+  "knowlege_panel": {
+    "title": "Knowledge Base",
+    "tab_file": "File",
+    "tab_text": "Text",
+    "tab_post": "Post",
+    "empty_file": "File is Empty",
+    "empty_post": "Post is Empty",
+    "empty_text": "No Data"
+  },
+  "memo_panel": {
+    "title": "Memo",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "footer_title": "Note",
+    "delete": "Delete",
+    "empty": "Empty Memo"
+  },
+  "sheet_panel": {
+    "title": "Sheet",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "delete": "Delete",
+    "empty": "No Sheet Now"
+  },
+  "invite_panel": {
+    "title": "Invite People to Your Dashboard",
+    "desc": "Share your file with others to collect feedback, facilitate idea exchange, and enhance communication.",
+    "free_invites": "free invites used",
+    "info": "If you need more invites, you can upgrade to a premium account.",
+    "copy": "Copy",
+    "copied": "Copied!"
+  },
+  "reminder_panel": {
+    "title": "Reminder",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "empty": "No Reminder Now",
+    "delete": "Delete",
+    "edit": "Edit",
+    "need_fill_all": "Please fill in all the information",
+    "must_later": "End time must be later than start time",
+    "edit_reminder": "Edit Reminder",
+    "new_reminder": "New Reminder",
+    "reminder_title": "Reminder Title",
+    "reminder_desc": "Reminder Description",
+    "updating": "Updating",
+    "update": "Update",
+    "creating": "Creating",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "chat_panel": {
+    "tool_memo": "Save as Memo",
+    "tool_sheet": "Save as Sheet",
+    "tool_remind": "Remind later",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "loading_history": "Loading history..",
+    "thinking": "Thinking...",
+    "greeting": "Hi, How can I help you?",
+    "select_model": "Select model",
+    "placeholder": "Ask me anything... (Shift + Enter to add a line)",
+    "save_new_memo": "Save as new memo",
+    "append_to_memo": "Append to latest memo",
+    "create_success": "Create success",
+    "append_success": "Append Success",
+    "save_new_sheet": "Save as new sheet",
+    "append_to_sheet": "Append to latest sheet",
+    "create_reminder": "Create a reminder"
+  },
+  "content_inject_tool": {
+    "collect_tooltip": "Collect Tweet",
+    "quote_tooltip": "Quote Tweet"
+  }
+}

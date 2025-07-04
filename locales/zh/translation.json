@@ -1,0 +1,107 @@
+{
+  "login_page": {
+    "sign_up": "Twitter 注册"
+  },
+  "dashboard_page": {
+    "explore": "探索",
+    "studio": "工作室",
+    "knowledge_base": "知识库",
+    "memo": "备忘录",
+    "sheet": "表格",
+    "reminder": "提醒",
+    "invite": "邀请用户",
+    "my_account": "我的帐户"
+  },
+  "explore_panel": {
+    "title": "探索",
+    "filter_people": "用户",
+    "filter_file": "文件",
+    "filter_text": "文本",
+    "filter_post": "帖子",
+    "search_placeholder": "搜索...",
+    "empty_result": "暂无结果"
+  },
+  "studio_panel": {
+    "title": "AI 工作室",
+    "design": "设计",
+    "agent_modal": "智能代理模块",
+    "knowledge_base": "知识库",
+    "chat_bot": "Twitter 聊天机器人",
+    "tools": "工具集",
+    "coming": "即将上线..."
+  },
+  "knowledge_panel": {
+    "title": "知识库",
+    "tab_file": "文件",
+    "tab_text": "文本",
+    "tab_post": "帖子",
+    "empty_file": "文件为空",
+    "empty_post": "帖子为空",
+    "empty_text": "暂无数据"
+  },
+  "memo_panel": {
+    "title": "备忘录",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "footer_title": "笔记",
+    "delete": "删除",
+    "empty": "备忘录为空"
+  },
+  "sheet_panel": {
+    "title": "表格",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "delete": "删除",
+    "empty": "暂无数据"
+  },
+  "invite_panel": {
+    "title": "邀请成员加入工作台",
+    "desc": "分享文件给他人，可收集反馈意见、促进创意交流并加强团队协作。",
+    "free_invites": "已用免费邀请次数",
+    "info": "如需更多邀请名额，可升级至高级账户。",
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "reminder_panel": {
+    "title": "提醒",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "empty": "当前无提醒事项",
+    "delete": "删除",
+    "edit": "编辑",
+    "need_fill_all": "请填写所有必填信息",
+    "must_later": "结束时间必须晚于开始时间",
+    "edit_reminder": "编辑提醒",
+    "new_reminder": "新建提醒",
+    "reminder_title": "提醒标题",
+    "reminder_desc": "提醒描述",
+    "updating": "更新中...",
+    "update": "更新",
+    "creating": "创建中...",
+    "create": "创建",
+    "cancel": "取消"
+  },
+  "chat_panel": {
+    "tool_memo": "保存为备忘录",
+    "tool_sheet": "保存为表格",
+    "tool_remind": "稍后提醒",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "loading_history": "加载历史记录中...",
+    "thinking": "思考中...",
+    "greeting": "您好，请问有什么可以帮您？",
+    "select_model": "选择 AI 模型",
+    "placeholder": "输入您的问题...（Shift + Enter换行）",
+    "save_new_memo": "另存为新备忘录",
+    "append_to_memo": "追加到最近备忘录",
+    "create_success": "创建成功",
+    "append_success": "追加成功",
+    "save_new_sheet": "另存为新表格",
+    "append_to_sheet": "追加到最近表格",
+    "create_reminder": "创建提醒事项"
+  },
+  "content_inject_tool": {
+    "collect_tooltip": "收藏推文",
+    "quote_tooltip": "引用推文"
+  }
+}

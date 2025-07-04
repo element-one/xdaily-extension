@@ -13,6 +13,7 @@ import {
   type FC,
   type FormEvent
 } from "react"
+import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { formatTweetDate } from "~libs/date"
@@ -60,6 +61,8 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 }
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
+  const { t } = useTranslation()
+
   const { removeQuoteTweet, userInfo } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
@@ -229,19 +232,19 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     {
       type: ChatType.MEMO,
       icon: <MemoIcon className="size-5" />,
-      tooltip: "Save as Memo",
+      tooltipI18nKey: "chat_panel.tool_memo",
       magicWord: "Save as Memo"
     },
     {
       type: ChatType.SHEET,
       icon: <SheetIcon className="size-5" />,
-      tooltip: "Save as Sheet",
+      tooltipI18nKey: "chat_panel.tool_sheet",
       magicWord: "Save as Sheet"
     },
     {
       type: ChatType.REMINDER,
       icon: <ReminderIcon className="size-5" />,
-      tooltip: "Remind later",
+      tooltipI18nKey: "chat_panel.tool_remind",
       magicWord: "Remind me later"
     }
   ]
@@ -261,7 +264,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     })
   }
 
-  // TODO server problem
   const handleChangeModel = async (modelId: string) => {
     try {
       await updateChatModelInfo({
@@ -273,8 +275,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error_title"),
+        description: t("chat_panel.error_desc")
       })
     }
   }
@@ -297,7 +299,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         )}
       </div>
       <div
-        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll"
+        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll pr-2"
         ref={chatRef}
         onScroll={(e) => {
           if ((e.currentTarget.scrollTop ?? 0) === 0) {
@@ -306,7 +308,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         }}>
         {isLoadingHistory && !showGreeting && (
           <div className="w-full text-center text-white">
-            Loading history...
+            {t("chat_panel.loading_history")}
           </div>
         )}
 
@@ -326,7 +328,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
         {(status === "submitted" || status === "streaming") && (
           <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
-            Thinking...
+            {t("chat_panel.thinking")}
           </div>
         )}
         {/* quote post info */}
@@ -341,7 +343,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         )}
         {showGreeting && (
           <EmptyContent
-            content="Hi, How can I help you?"
+            content={t("chat_panel.greeting")}
             hideImage={true}
             textClassName="text-primary-brand"
           />
@@ -357,7 +359,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
               onValueChange={(value) => handleChangeModel(value)}
               disabled={!isSelf || isUpdatingChatModelInfo}>
               <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
-                <SelectValue placeholder="Select model" />
+                <SelectValue placeholder={t("chat_panel.select_model")} />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
@@ -381,7 +383,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           {isSelf && (
             <div className="flex gap-4 items-center shrink-0">
               {Tools.map((tool) => (
-                <Tooltip key={tool.type} content={tool.tooltip}>
+                <Tooltip key={tool.type} content={t(tool.tooltipI18nKey)}>
                   <div
                     onClick={() =>
                       handleClickToolButton(tool.magicWord, tool.type)
@@ -402,7 +404,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             value={input}
             onChange={handleInputChange}
             rows={1}
-            placeholder="Ask me anything... (Shift + Enter to add a line)"
+            placeholder={t("chat_panel.placeholder")}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault()
@@ -422,7 +424,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         </form>
         {status === "error" && (
           <div className="px-2 text-[10px] text-red absolute top-full left-0 right-0 -translate-y-1/2 pt-1">
-            Something wrong, please try again.
+            {t("chat_panel.error_desc")}
           </div>
         )}
       </div>

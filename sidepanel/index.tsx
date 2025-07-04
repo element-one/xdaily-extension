@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "../styles/global.css"
+import "../locales/i18n.ts"
 
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 
 import { useUser } from "~services/user"
 import { useStore } from "~store/store"

@@ -1,7 +1,12 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
+
+import "dayjs/locale/zh"
+import "dayjs/locale/en"
+
 import { PlusIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { useDebounce } from "~libs/debounce"
 import { useDeleteReminder, useReminders } from "~services/reminder"
@@ -42,6 +47,8 @@ const ReminderPanelSkeleton = () => {
   )
 }
 export const ReminderPanel = () => {
+  const { t, i18n } = useTranslation()
+
   const [searchValue, setSearchValue] = useState("")
   const { data, isLoading, refetch } = useReminders({ keywords: searchValue }) // do not use take
   const { mutateAsync: deleteReminder } = useDeleteReminder()
@@ -153,8 +160,8 @@ export const ReminderPanel = () => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("reminder_panel.error_title"),
+        description: t("reminder_panel.error_desc")
       })
     }
   }
@@ -172,7 +179,7 @@ export const ReminderPanel = () => {
     <>
       <div className="flex flex-col h-full">
         <PanelHeader
-          title="Reminder"
+          title={t("reminder_panel.title")}
           showSearchButton={true}
           onSearchChange={handleSearchChange}
           extraRightContent={
@@ -201,7 +208,10 @@ export const ReminderPanel = () => {
                         : "border-fill-bg-input text-text-default-secondary"
                     )}>
                     <div className="h-[18px] flex items-center justify-center text-xs">
-                      {dayjs(item.id).format("ddd").toUpperCase()}
+                      {dayjs(item.id)
+                        .locale(i18n.language)
+                        .format("ddd")
+                        .toUpperCase()}
                     </div>
                     <div
                       className={clsx(
@@ -229,7 +239,7 @@ export const ReminderPanel = () => {
               </div>
             </section>
           ) : (
-            <EmptyContent content="No Reminder Now" />
+            <EmptyContent content={t("reminder_panel.empty")} />
           )}
         </main>
       </div>

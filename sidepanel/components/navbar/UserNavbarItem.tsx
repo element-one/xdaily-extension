@@ -1,11 +1,14 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { UserIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { useStore } from "~store/store"
 
 import { Avatar } from "../ui/Avatar"
 
 export const UserNavbarItem = () => {
+  const { t } = useTranslation()
+
   const userInfo = useStore((state) => state.userInfo)
 
   const jumpToProfilePage = () => {
@@ -43,7 +46,7 @@ export const UserNavbarItem = () => {
           onSelect={jumpToProfilePage}>
           <div className="w-full gap-1 text-sm font-light flex flex-row items-center justify-start">
             <UserIcon className="w-[14px] h-[14px] text-orange" />
-            <div>My Account</div>
+            <div>{t("dashboard_page.my_account")}</div>
           </div>
         </DropdownMenu.Item>
       </DropdownMenu.Content>

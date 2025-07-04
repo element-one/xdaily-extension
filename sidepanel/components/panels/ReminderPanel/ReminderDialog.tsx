@@ -1,6 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog"
 import dayjs from "dayjs"
 import { useEffect, useMemo, useState, type FC } from "react"
+import { useTranslation } from "react-i18next"
 
 import { localInputToUTC, utcToLocalInput } from "~libs/date"
 import { useCreateReminder, useUpdateReminder } from "~services/reminder"
@@ -24,6 +25,8 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
   onComplete,
   reminderItem
 }) => {
+  const { t } = useTranslation()
+
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
 
@@ -38,7 +41,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
   const toast = (msg: string) => {
     showToast({
       type: "error",
-      title: "Error",
+      title: t("reminder_panel.error_title"),
       description: msg
     })
   }
@@ -73,12 +76,12 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
     const to = dayjs(toAt)
 
     if (!title || !fromAt || !toAt) {
-      toast("Please fill in all the information")
+      toast(t("reminder_panel.need_fill_all"))
       return
     }
 
     if (!to.isAfter(from)) {
-      toast("End time must be later than start time")
+      toast(t("reminder_panel.must_later"))
       return
     }
 
@@ -117,7 +120,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
           onComplete?.()
         },
         onError() {
-          toast("Something wrong, please try again")
+          toast(t("reminder_panel.error_desc"))
         }
       }
     )
@@ -137,7 +140,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
           onComplete?.()
         },
         onError() {
-          toast("Something wrong, please try again")
+          toast(t("reminder_panel.error_desc"))
         }
       }
     )
@@ -157,16 +160,18 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
         <Dialog.Overlay className="fixed inset-0 bg-black/40" />
         <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
           <Dialog.Title className="text-base">
-            {isUpdateMode ? "Edit Reminder" : "New Reminder"}
+            {isUpdateMode
+              ? t("reminder_panel.edit_reminder")
+              : t("reminder_panel.new_reminder")}
           </Dialog.Title>
           <div className="space-y-2">
             <InputBox
-              placeholder="Reminder Title"
+              placeholder={t("reminder_panel.reminder_title")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <InputBox
-              placeholder="Reminder Description"
+              placeholder={t("reminder_panel.reminder_desc")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -181,16 +186,16 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
               variant="secondary"
               disabled={isOperating}
               onClick={handleCancel}>
-              Cancel
+              {t("reminder_panel.cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={isOperating}>
               {isUpdateMode
                 ? isOperating
-                  ? "Updating"
-                  : "Update"
+                  ? t("reminder_panel.updating")
+                  : t("reminder_panel.update")
                 : isOperating
-                  ? "Creating"
-                  : "Create"}
+                  ? t("reminder_panel.creating")
+                  : t("reminder_panel.create")}
             </Button>
           </div>
         </Dialog.Content>

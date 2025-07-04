@@ -8,6 +8,7 @@ import {
   type FC,
   type ReactNode
 } from "react"
+import { useTranslation } from "react-i18next"
 
 import { formatRelativeTime } from "~libs/date"
 import { useDebounce } from "~libs/debounce"
@@ -35,21 +36,25 @@ const Filters = [
   {
     type: FilterType.PEOPLE,
     label: "People",
+    labelI18nKey: "explore_panel.filter_people",
     icon: <UsersIcon className="text-orange w-4 h-4" />
   },
   {
     type: FilterType.FILES,
     label: "Files",
+    labelI18nKey: "explore_panel.filter_file",
     icon: <FileTextIcon className="w-4 h-4 text-primary-brand" />
   },
   {
     type: FilterType.TEXT,
     label: "Text",
+    labelI18nKey: "explore_panel.filter_text",
     icon: <TextTabIcon className="w-4 h-4 text-green" />
   },
   {
     type: FilterType.POST,
     label: "Post",
+    labelI18nKey: "explore_panel.filter_post",
     icon: <PostIcon className="w-4 h-4 text-purple" />
   }
 ]
@@ -101,6 +106,7 @@ interface ExploreSearchSubSectionProps {
 export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
   onClose
 }) => {
+  const { t } = useTranslation()
   const {
     mutateAsync: searchExplore,
     isPending: isSearchingExplore,
@@ -222,7 +228,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
             type="text"
             value={searchValue}
             onChange={handleSearchChange}
-            placeholder="Search for reports"
+            placeholder={t("explore_panel.search_placeholder")}
             className="!bg-fill-bg-deep h-6 border-none"
           />
         </div>
@@ -244,21 +250,23 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
               tag === filter.type && "border-primary-brand"
             )}>
             {filter.icon}
-            <span className="text-text-default-primary">{filter.label}</span>
+            <span className="text-text-default-primary">
+              {t(filter.labelI18nKey)}
+            </span>
           </Button>
         ))}
       </div>
       {isSearchingExplore ? (
         <ExploreSearchSkeleton />
       ) : isEmpty ? (
-        <EmptyContent content="No result" />
+        <EmptyContent content={t("explore_panel.empty_result")} />
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar flex flex-col">
           {/* people */}
           {!!searchData?.people?.length && showTag(FilterType.PEOPLE) && (
             <section className="flex flex-col pb-3 border-b border-fill-bg-input">
               <div className="text-xs text-text-default-secondary mb-2 px-4">
-                People
+                {t("explore_panel.filter_people")}
               </div>
               <div className="space-y-1">
                 {searchData.people.map((person) => (
@@ -282,7 +290,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
           {!!fileData?.length && showTag(FilterType.FILES) && (
             <section className="flex flex-col pb-3 border-b border-fill-bg-input mt-3">
               <div className="text-xs text-text-default-secondary mb-2 px-4">
-                Files
+                {t("explore_panel.filter_file")}
               </div>
               <div className="space-y-1">
                 {fileData.map((file) => (
@@ -302,7 +310,7 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
           {!!textData?.length && showTag(FilterType.TEXT) && (
             <section className="flex flex-col pb-3 border-b border-fill-bg-input mt-3">
               <div className="text-xs text-text-default-secondary mb-2 px-4">
-                Text
+                {t("explore_panel.filter_text")}
               </div>
               <div className="space-y-1">
                 {textData.map((text) => (
@@ -315,11 +323,11 @@ export const ExploreSearchSubSection: FC<ExploreSearchSubSectionProps> = ({
               </div>
             </section>
           )}
-          {/* people */}
+          {/* post */}
           {!!searchData?.post?.length && showTag(FilterType.POST) && (
             <section className="flex flex-col pb-3 border-b border-fill-bg-input mt-3">
               <div className="text-xs text-text-default-secondary mb-2 px-4">
-                Post
+                {t("explore_panel.filter_post")}
               </div>
               <div className="space-y-1">
                 {searchData.post.map((post) => (

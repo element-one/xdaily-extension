@@ -1,5 +1,6 @@
 import { CheckCheckIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, useState, type FC } from "react"
+import { useTranslation } from "react-i18next"
 
 import { formatTweetDate } from "~libs/date"
 import { useKnowledgeBaseCollections } from "~services/collection"
@@ -73,6 +74,8 @@ const PostTabContentSkeleton = () => {
 }
 
 export const PostTabContent = () => {
+  const { t } = useTranslation()
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
       take: 50,
@@ -151,7 +154,7 @@ export const PostTabContent = () => {
           ))}
         </section>
       ) : (
-        <EmptyContent content="Post is empty" />
+        <EmptyContent content={t("knowledge_panel.empty_post")} />
       )}
       <div ref={bottomObserver} className="h-10" />
       {isFetchingNextPage && <p className="text-center">loading...</p>}

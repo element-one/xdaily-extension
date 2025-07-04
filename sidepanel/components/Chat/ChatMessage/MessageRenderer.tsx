@@ -2,10 +2,12 @@ import type { PartialBlock } from "@blocknote/core"
 import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
-  extractSummaryFromSparseFormat,
-  normalizeMarkdownInput
+  extractMarkdownTableFromSparseFormat,
+  normalizeMarkdownInput,
+  tryConvertDataToSparseFormat
 } from "~libs/chat"
 import { extractAllTextWithLineBreaks } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
@@ -16,6 +18,7 @@ import type {
   ErrorMessageData,
   MemoMessageData,
   ReminderMessageData,
+  ReminderMessageItem,
   SheetMessageData
 } from "~types/chat"
 import type { DialogReminderItem, ReminderItem } from "~types/reminder"
@@ -41,6 +44,7 @@ const BasicRenderer: FC<{
 export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   data
 }) => {
+  const { t } = useTranslation()
   const {
     mutateAsync: createMemo,
     isPending: isCreatingMemo,
@@ -72,8 +76,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error.title"),
+        description: t("chat_panel.error.desc")
       })
     }
   }
@@ -94,8 +98,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error.title"),
+        description: t("chat_panel.error.desc")
       })
     }
   }
@@ -105,8 +109,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
       actions={
         <>
           <ActionButton
-            tooltip="Save as new memo"
-            successTooltip="Create success"
+            tooltip={t("chat_panel.save_new_memo")}
+            successTooltip={t("chat_panel.create_success")}
             isLoading={isCreatingMemo}
             isDisabled={isCreatingMemo}
             isSuccess={isCreatingSuccess}
@@ -115,8 +119,8 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
           />
           {latestMemo && (
             <ActionButton
-              tooltip="Append to latest memo"
-              successTooltip="Append success"
+              tooltip={t("chat_panel.append_to_memo")}
+              successTooltip={t("chat_panel.append_success")}
               isLoading={isUpdatingMemo}
               isDisabled={isUpdatingMemo || isFetching}
               isSuccess={isUpdatingSuccess}
@@ -134,6 +138,7 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
 export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
   data
 }) => {
+  const { t } = useTranslation()
   const HEADER_NAME = "content"
   const { showToast } = useToast()
   const { data: sheetPages, refetch, isFetching } = useSheetList(1)
@@ -162,35 +167,35 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     )
   }
 
+  const getParseObj = (content: string) => {
+    if (typeof content === "string") {
+      return tryParseJsonMessage(content)
+    }
+    return tryConvertDataToSparseFormat(content)
+  }
+
   const formatContent = useMemo(() => {
     const content = data.content
-    const parseObj =
-      typeof content === "string" ? tryParseJsonMessage(content) : content
+    const parseObj = getParseObj(content)
     if (parseObj && isSparseFormat(parseObj)) {
-      return extractSummaryFromSparseFormat(parseObj)
+      return extractMarkdownTableFromSparseFormat(parseObj)
     } else {
       return normalizeMarkdownInput(content)
     }
   }, [data.content])
 
-  const handleCreateSheet = async (
-    title: string,
-    content: string | SparseFormat
-  ) => {
-    const parseObj =
-      typeof content === "string" ? tryParseJsonMessage(content) : content
+  const handleCreateSheet = async (title: string, content: string) => {
+    const parseObj = getParseObj(content)
     try {
       let newSheet: SparseFormat
       if (parseObj && isSparseFormat(parseObj)) {
         newSheet = {
-          uid: `sheet-${Date.now()}`,
           columns: parseObj.columns,
           data: parseObj.data
         }
       } else {
         let strContent = normalizeMarkdownInput(content)
         newSheet = {
-          uid: `sheet-${Date.now()}`,
           columns: [{ title: HEADER_NAME, id: "content", index: 0 }],
           data: [
             {
@@ -210,13 +215,13 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error_title"),
+        description: t("chat_panel.error_desc")
       })
     }
   }
 
-  const handleAppendSheet = async (content: string | SparseFormat) => {
+  const handleAppendSheet = async (content: string) => {
     if (!latestSheet) return
 
     try {
@@ -226,14 +231,12 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
 
       const sheet: SparseFormat = isEmptyObject
         ? {
-            uid: latestSheet.id,
             columns: [],
             data: []
           }
         : parsed
 
-      const parseObj =
-        typeof content === "string" ? tryParseJsonMessage(content) : content
+      const parseObj = getParseObj(content)
 
       if (parseObj && isSparseFormat(parseObj)) {
         const colTitleToIndex = new Map<string, number>()
@@ -316,8 +319,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
     } catch (err) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("chat_panel.error_title"),
+        description: t("chat_panel.error_desc")
       })
     }
 
@@ -336,8 +339,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
       actions={
         <>
           <ActionButton
-            tooltip="Save as new sheet"
-            successTooltip="Create success"
+            tooltip={t("chat_panel.save_new_sheet")}
+            successTooltip={t("chat_panel.create_success")}
             isLoading={isCreatingSheet}
             isDisabled={isCreatingSheet}
             isSuccess={isCreatingSuccess}
@@ -346,8 +349,8 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           />
           {latestSheet && (
             <ActionButton
-              tooltip="Append to latest sheet"
-              successTooltip="Append success"
+              tooltip={t("chat_panel.append_to_sheet")}
+              successTooltip={t("chat_panel.append_success")}
               isLoading={isUpdatingSheet}
               isDisabled={isUpdatingSheet || isFetching}
               isSuccess={isUpdatingSuccess}
@@ -357,14 +360,15 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
           )}
         </>
       }>
-      <Markdown className="prose prose-sm">{formatContent}</Markdown>
+      <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+        <Markdown>{formatContent}</Markdown>
+      </div>
     </BasicRenderer>
   )
 }
 
-export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
-  data
-}) => {
+const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
+  const { t } = useTranslation()
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
     null
@@ -389,8 +393,8 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
         actions={
           <>
             <ActionButton
-              tooltip="Create a reminder"
-              successTooltip="Create success"
+              tooltip={t("chat_panel.create_reminder")}
+              successTooltip={t("chat_panel.create_success")}
               isLoading={false}
               isDisabled={false}
               isSuccess={isSuccess}
@@ -399,7 +403,9 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
             />
           </>
         }>
-        <Markdown>{desc}</Markdown>
+        <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+          <Markdown>{desc}</Markdown>
+        </div>
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}
@@ -409,6 +415,21 @@ export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
       />
     </>
   )
+}
+
+export const ReminderMessageRenderer: FC<{ data: ReminderMessageData }> = ({
+  data
+}) => {
+  if (data && data.content && Array.isArray(data.content)) {
+    return (
+      <div className="flex flex-col gap-2">
+        {data.content.map((message, index) => (
+          <ReminderMessageItem key={index} data={message} />
+        ))}
+      </div>
+    )
+  }
+  return <ReminderMessageItem data={data as any as ReminderMessageItem} />
 }
 
 export const ErrorMessageRenderer: FC<{ errorData: ErrorMessageData }> = ({

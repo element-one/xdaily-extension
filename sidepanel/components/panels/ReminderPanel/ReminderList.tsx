@@ -1,7 +1,12 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
+
+import "dayjs/locale/zh"
+import "dayjs/locale/en"
+
 import { BookmarkIcon, ClockIcon, EllipsisIcon, Trash2Icon } from "lucide-react"
 import type { FC } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "~sidepanel/components/ui/Button"
 import {
@@ -37,6 +42,7 @@ export const ReminderList: FC<ReminderListProps> = ({
   onDeleteReminder,
   onEditReminder
 }) => {
+  const { t, i18n } = useTranslation()
   const formatTimeSpan = (fromAt: Date | string, toAt: Date | string) => {
     const from = dayjs(fromAt).format("HH:mm")
     const to = dayjs(toAt).format("HH:mm")
@@ -63,7 +69,7 @@ export const ReminderList: FC<ReminderListProps> = ({
           data-id={item.id}
           className="flex flex-col gap-2">
           <div className="text-sm text-text-default-secondary mt-2">
-            {dayjs(item.id).format("MMMM D, YYYY")}
+            {dayjs(item.id).locale(i18n.language).format("MMMM D, YYYY")}
           </div>
           <div className="flex flex-col gap-y-3">
             {item.items.map((detail, index) => (
@@ -107,7 +113,9 @@ export const ReminderList: FC<ReminderListProps> = ({
                           handleEditReminder(detail)
                         }}>
                         <BookmarkIcon className="text-green w-4 h-4" />
-                        <span className="text-xs">Edit</span>
+                        <span className="text-xs">
+                          {t("reminder_panel.edit")}
+                        </span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => {
@@ -115,7 +123,7 @@ export const ReminderList: FC<ReminderListProps> = ({
                           handleDeleteReminder(detail.id)
                         }}>
                         <Trash2Icon className="text-red w-4 h-4" />
-                        <span>Delete</span>
+                        <span>{t("reminder_panel.delete")}</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
