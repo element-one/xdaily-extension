@@ -172,7 +172,7 @@ export const SheetPanel = () => {
                       />
                     </svg>
                   }
-                  footerTitle="excel"
+                  footerTitle="Excel"
                   footerTime={item.postedAt}
                   footerOperation={
                     <div className="flex items-center gap-2">

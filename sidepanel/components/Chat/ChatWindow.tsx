@@ -297,7 +297,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
         )}
       </div>
       <div
-        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll"
+        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll pr-2"
         ref={chatRef}
         onScroll={(e) => {
           if ((e.currentTarget.scrollTop ?? 0) === 0) {
