@@ -1,7 +1,7 @@
 import { FileTextIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import PostIcon from "~sidepanel/components/icons/PostIcon"
-import TextIcon from "~sidepanel/components/icons/TextIcon"
 import TextTabIcon from "~sidepanel/components/icons/TextTabIcon"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import { TabContent, Tabs, TabTrigger } from "~sidepanel/components/ui/Tabs"
@@ -19,28 +19,30 @@ enum KnowledgeType {
 const TabData = [
   {
     key: KnowledgeType.FILE,
-    label: "File",
+    labelI18nKey: "knowledge_panel.tab_file",
     icon: <FileTextIcon className="w-4 h-4 text-primary-brand shrink-0" />,
     content: <FileTabContent />
   },
   {
     key: KnowledgeType.TEXT,
-    label: "Text",
+    labelI18nKey: "knowledge_panel.tab_text",
     icon: <TextTabIcon className="w-5 h-5 text-green shrink-0" />,
     content: <TextTabContent />
   },
   {
     key: KnowledgeType.POST,
-    label: "Post",
+    labelI18nKey: "knowledge_panel.tab_post",
     icon: <PostIcon className="w-4 h-4 text-purple shrink-0" />,
 
     content: <PostTabContent />
   }
 ]
 export const KnowledgeBasePanel = () => {
+  const { t } = useTranslation()
+
   return (
     <div className="flex flex-col h-full">
-      <PanelHeader title="Knowledge Base" />
+      <PanelHeader title={t("knowledge_panel.title")} />
       <Tabs
         distributeEvenly={true}
         defaultValue={KnowledgeType.POST}
@@ -50,7 +52,7 @@ export const KnowledgeBasePanel = () => {
             <TabTrigger key={tab.key} value={tab.key}>
               <div className="gap-1 flex items-center text-xs">
                 {tab.icon}
-                {tab.label}
+                {t(tab.labelI18nKey)}
               </div>
             </TabTrigger>
           ))}

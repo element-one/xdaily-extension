@@ -5,6 +5,7 @@ import {
   Trash2Icon
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { useDebounce } from "~libs/debounce"
 import { extractAllTextWithLineBreaks } from "~libs/memo"
@@ -54,6 +55,7 @@ const MemoPanelSkeleton = () => {
 }
 
 export const MemoPanel = () => {
+  const { t } = useTranslation()
   const [selectedMemo, setSelectedMemo] = useState<MemoItem | null>(null)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
@@ -103,8 +105,8 @@ export const MemoPanel = () => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("memo_panel.error_title"),
+        description: t("memo_panel.error_desc")
       })
     }
   }
@@ -130,8 +132,8 @@ export const MemoPanel = () => {
     } catch (e) {
       showToast({
         type: "error",
-        title: "Error",
-        description: "Something wrong, try later"
+        title: t("memo_panel.error_title"),
+        description: t("memo_panel.error_desc")
       })
     }
   }
@@ -164,13 +166,13 @@ export const MemoPanel = () => {
                 className="w-5 h-5 cursor-pointer"
                 onClick={handleCloseMemo}
               />{" "}
-              Memo
+              {t("memo_panel.title")}
             </>
           }
         />
       ) : (
         <PanelHeader
-          title="Memo"
+          title={t("memo_panel.title")}
           showSearchButton={true}
           onSearchChange={handleSearchChange}
           extraRightContent={
@@ -234,7 +236,7 @@ export const MemoPanel = () => {
                       />
                     </svg>
                   }
-                  footerTitle="Note"
+                  footerTitle={t("memo_panel.footer_title")}
                   footerTime={memo.postedAt}
                   footerOperation={
                     <div className="flex items-center gap-2">
@@ -251,7 +253,7 @@ export const MemoPanel = () => {
                               handleDeleteMemo(memo)
                             }}>
                             <Trash2Icon className="text-red w-4 h-4" />
-                            <span>Delete</span>
+                            <span>{t("memo_panel.delete")}</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -262,7 +264,7 @@ export const MemoPanel = () => {
               ))}
             </section>
           ) : (
-            <EmptyContent content="Empty Memo" />
+            <EmptyContent content={t("memo_panel.empty")} />
           )}
           {/* load more */}
           <div ref={bottomObserver} className="h-4 w-full" />

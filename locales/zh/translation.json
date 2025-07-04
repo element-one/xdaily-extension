@@ -29,5 +29,22 @@
     "chat_bot": "Twitter 聊天机器人",
     "tools": "工具集",
     "coming": "即将上线..."
+  },
+  "knowledge_panel": {
+    "title": "知识库",
+    "tab_file": "文件",
+    "tab_text": "文本",
+    "tab_post": "帖子",
+    "empty_file": "文件为空",
+    "empty_post": "帖子为空",
+    "empty_text": "暂无数据"
+  },
+  "memo_panel": {
+    "title": "备忘录",
+    "error_title": "出错啦",
+    "error_desc": "遇到问题，请稍后再试",
+    "footer_title": "笔记",
+    "delete": "删除",
+    "empty": "备忘录为空"
   }
 }

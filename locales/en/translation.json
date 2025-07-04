@@ -29,5 +29,22 @@
     "chat_bot": "Twitter Chat Bot",
     "tools": "Tools",
     "coming": "Coming soon..."
+  },
+  "knowlege_panel": {
+    "title": "Knowledge Base",
+    "tab_file": "File",
+    "tab_text": "Text",
+    "tab_post": "Post",
+    "empty_file": "File is Empty",
+    "empty_post": "Post is Empty",
+    "empty_text": "No Data"
+  },
+  "memo_panel": {
+    "title": "Memo",
+    "error_title": "Error",
+    "error_desc": "Something wrong, try later",
+    "footer_title": "Note",
+    "delete": "Delete",
+    "empty": "Empty Memo"
   }
 }

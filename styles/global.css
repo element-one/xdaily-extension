@@ -63,3 +63,10 @@ body {
 .markdown-content td {
   @apply border border-border-regular px-2 py-1 text-left;
 }
+
+/* blocknote */
+.blocknote-content a {
+  color: #ffe600 !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+}

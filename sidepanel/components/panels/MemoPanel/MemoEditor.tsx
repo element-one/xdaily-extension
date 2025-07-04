@@ -107,7 +107,7 @@ export const MemoEditor: FC<MemoEditorProps> = ({ memo, onSave }) => {
       )}
       <BlockNoteView
         editor={editor}
-        className="flex-1 min-h-0 my-4"
+        className="flex-1 min-h-0 my-4 blocknote-content"
         theme={customTheme}
         onChange={debouncedHandleUpdateMemo}
       />
