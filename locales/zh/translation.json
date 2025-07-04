@@ -1,5 +1,15 @@
 {
-  "welcome": "欢迎使用我的扩展！",
-  "settings": "设置",
-  "change_language": "切换语言"
+  "login_page": {
+    "sign_up": "Twitter 注册"
+  },
+  "dashboard_page": {
+    "explore": "探索",
+    "studio": "工作室",
+    "knowledge_base": "知识库",
+    "memo": "备忘录",
+    "sheet": "表格",
+    "reminder": "提醒",
+    "invite": "邀请用户",
+    "my_account": "我的帐户"
+  }
 }

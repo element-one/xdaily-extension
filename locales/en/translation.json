@@ -1,5 +1,15 @@
 {
-  "welcome": "Welcome to my extension!",
-  "settings": "Settings",
-  "change_language": "Change language"
+  "login_page": {
+    "sign_up": "Sign up with twitter"
+  },
+  "dashboard_page": {
+    "explore": "Explore",
+    "studio": "Studio",
+    "knowledge_base": "Knowledge Base",
+    "memo": "Memo",
+    "sheet": "Sheet",
+    "reminder": "Reminder",
+    "invite": "Invite User",
+    "my_account": "My Account"
+  }
 }

@@ -1,6 +1,7 @@
 import clsx from "clsx"
 import { AtomIcon } from "lucide-react"
 import { useEffect, useMemo, type FC, type ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
@@ -33,62 +34,56 @@ type NavbarItem = {
   icon: FC<{
     className?: string
   }>
-  tooltip: string
   component: ReactNode
   wrapperClassName?: string
+  tooltipI18nKey?: string
 }
 
 const NavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.EXPLORE,
     icon: ExploreIcon,
-    tooltip: "Explore",
+    tooltipI18nKey: "dashboard_page.explore",
     component: <ExplorePanel />,
     wrapperClassName: "!p-0 !py-4"
   },
   {
     key: NavbarItemKey.SETTING,
     icon: SettingIcon,
-    tooltip: "Studio",
+    tooltipI18nKey: "dashboard_page.studio",
     component: <StudioSettingPanel />
   },
   {
     key: NavbarItemKey.KNOWLEDGE,
     icon: KnowledgeBaseIcon,
-    tooltip: "Knowledge Base",
+    tooltipI18nKey: "dashboard_page.knowledge_base",
     component: <KnowledgeBasePanel />
   },
   {
     key: NavbarItemKey.MEMO,
     icon: MemoIcon,
-    tooltip: "Memo",
+    tooltipI18nKey: "dashboard_page.memo",
     component: <MemoPanel />
   },
   {
     key: NavbarItemKey.SHEET,
     icon: SheetIcon,
-    tooltip: "Sheet",
+    tooltipI18nKey: "dashboard_page.sheet",
     component: <SheetPanel />
   },
   {
     key: NavbarItemKey.REMINDER,
     icon: ReminderIcon,
-    tooltip: "Reminder",
+    tooltipI18nKey: "dashboard_page.reminder",
     component: <ReminderPanel />
   }
-  // {
-  //   key: NavbarItemKey.ADD,
-  //   icon: AddIcon,
-  //   tooltip: "Invite People",
-  //   component: <InvitePanel />
-  // }
 ] as const
 
 const BottomNavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.INVITE,
     icon: MessageIcon,
-    tooltip: "Invite User",
+    tooltipI18nKey: "dashboard_page.invite",
     component: <InvitePanel />
   }
 ] as const
@@ -97,12 +92,12 @@ const ChatNavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.CHAT,
     icon: AtomIcon,
-    tooltip: "",
     component: <ChatPanel />
   }
 ]
 
 export const DashboardPage = () => {
+  const { t } = useTranslation()
   const {
     navbarItemKey,
     setNavbarItemKey,
@@ -184,7 +179,7 @@ export const DashboardPage = () => {
                 handleClick={() => toggleDrawer(item.key)}
                 isTargeted={item.key === currentNavbarItem.key}
                 icon={item.icon}
-                tooltip={item.tooltip}
+                tooltip={item.tooltipI18nKey ? t(item.tooltipI18nKey) : ""}
               />
             )
           })}
@@ -199,7 +194,7 @@ export const DashboardPage = () => {
                 handleClick={() => toggleDrawer(item.key)}
                 isTargeted={item.key === currentNavbarItem.key}
                 icon={item.icon}
-                tooltip={item.tooltip}
+                tooltip={item.tooltipI18nKey ? t(item.tooltipI18nKey) : ""}
               />
             )
           })}

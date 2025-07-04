@@ -1,8 +1,12 @@
+import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
+import { LanguageSelector } from "./navbar/LanguageSelector"
 import { Button } from "./ui/Button"
 
 export const LoginPage = () => {
+  const { t } = useTranslation()
+
   const handleLogin = () => {
     chrome.tabs.create({
       url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/login`
@@ -33,8 +37,9 @@ export const LoginPage = () => {
             fill="black"
           />
         </svg>
-        Sign up with twitter
+        {t("login_page.sign_up")}
       </Button>
+      <LanguageSelector />
     </div>
   )
 }
