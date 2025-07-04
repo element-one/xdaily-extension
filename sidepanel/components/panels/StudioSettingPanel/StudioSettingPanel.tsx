@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 
@@ -51,7 +52,7 @@ const menuList = [
         />
       </svg>
     ),
-    title: "Agent Modal",
+    titleI18nKey: "studio_panel.agent_modal",
     iconBgColor: "bg-[#FF9500]"
   },
   {
@@ -82,7 +83,7 @@ const menuList = [
         />
       </svg>
     ),
-    title: "Knowledge Base",
+    titleI18nKey: "studio_panel.knowledge_base",
     iconBgColor: "bg-[#34C759]"
   },
   {
@@ -99,7 +100,7 @@ const menuList = [
         />
       </svg>
     ),
-    title: "Twitter Chat Bot",
+    titleI18nKey: "studio_panel.chat_bot",
     iconBgColor: "bg-[#AF52DE]"
   }
 ]
@@ -107,15 +108,16 @@ const menuList = [
 const tabs = [
   {
     key: TabKey.DESIGN,
-    label: "Design"
+    labelI18nKey: "studio_panel.design"
   },
   {
     key: TabKey.TOOLS,
-    label: "Tools"
+    labelI18nKey: "studio_panel.tools"
   }
 ]
 
 export const StudioSettingPanel = () => {
+  const { t } = useTranslation()
   const [tabKey, setTabKey] = useState<TabKey>(TabKey.DESIGN)
 
   const handleOpenStudio = () => {
@@ -126,7 +128,7 @@ export const StudioSettingPanel = () => {
 
   return (
     <div className="flex flex-col h-full gap-3">
-      <PanelHeader title="Studio AI" />
+      <PanelHeader title={t("studio_panel.title")} />
       <div className="flex gap-3">
         {tabs.map((tab) => (
           <button
@@ -140,16 +142,16 @@ export const StudioSettingPanel = () => {
             onClick={() => {
               setTabKey(tab.key)
             }}>
-            {tab.label}
+            {t(tab.labelI18nKey)}
           </button>
         ))}
       </div>
       {tabKey === TabKey.DESIGN && (
         <div className="flex flex-col gap-3">
-          {menuList.map((item) => (
+          {menuList.map((item, index) => (
             <button
               onClick={handleOpenStudio}
-              key={item.title}
+              key={index}
               className="bg-fill-bg-light border-fill-bg-input hover:border-primary-brand flex cursor-pointer items-center gap-2 rounded-lg border p-3">
               <div
                 className={clsx(
@@ -159,7 +161,7 @@ export const StudioSettingPanel = () => {
                 {item.icon}
               </div>
               <span className="text-text-default-primary text-xs leading-[18px]">
-                {item.title}
+                {t(item.titleI18nKey)}
               </span>
             </button>
           ))}
@@ -167,7 +169,7 @@ export const StudioSettingPanel = () => {
       )}
       {tabKey === TabKey.TOOLS && (
         <div className="flex-1 min-h-0 flex items-center justify-center text-primary-brand text-xs">
-          <span className="-translate-y-9">Coming soon...</span>
+          <span className="-translate-y-9">{t("studio_panel.coming")}</span>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, type FC } from "react"
+import { useTranslation } from "react-i18next"
 
 import { useKolCollections } from "~services/collection"
 import { Button } from "~sidepanel/components/ui/Button"
@@ -33,6 +34,7 @@ interface KolSubSectionProps {
   onFilter: () => void
 }
 export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
+  const { t } = useTranslation()
   // just all category
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKolCollections(15, allCategory.id)
@@ -62,7 +64,7 @@ export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
   return (
     <div className="flex flex-col h-full pl-4">
       <PanelHeader
-        title="Explore"
+        title={t("explore_panel.title")}
         extraRightContent={
           <Button variant="ghost" className="!p-0 h-fit" onClick={onFilter}>
             <svg
