@@ -10,7 +10,8 @@ export enum MessageType {
   ADD_COLLECTION = "add_tweet_collection",
   ADD_USER_COLLECTION = "add_user_collection",
   QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
-  CHAT_WITH_USER = "chat_with_user"
+  CHAT_WITH_USER = "chat_with_user",
+  LANGUAGE_CHANGED = "language_changed"
 }
 
 export type InpageToastPayload = {
@@ -40,9 +41,15 @@ export type ChatWithUserPayload = {
   }
 }
 
+export type LanguageChangedPayload = {
+  type: MessageType.LANGUAGE_CHANGED
+  language: string
+}
+
 export type MessagePayload =
   | InpageToastPayload
   | AddTweetCollectionPayload
   | AddUserCollectionPayload
   | QuoteTweetPayload
   | ChatWithUserPayload
+  | LanguageChangedPayload

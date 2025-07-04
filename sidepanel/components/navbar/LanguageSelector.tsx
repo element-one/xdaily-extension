@@ -3,13 +3,14 @@ import clsx from "clsx"
 import { LanguagesIcon } from "lucide-react"
 import type { FC } from "react"
 
+import { changeAppLanguage } from "~locales/i18n"
 import { useTranslation } from "~node_modules/react-i18next"
 
 export const LanguageSelector: FC = () => {
   const { i18n } = useTranslation()
 
   const handleChangeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang)
+    changeAppLanguage(lang)
   }
   return (
     <DropdownMenu.Root>

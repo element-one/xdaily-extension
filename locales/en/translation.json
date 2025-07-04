@@ -99,5 +99,9 @@
     "save_new_sheet": "Save as new sheet",
     "append_to_sheet": "Append to latest sheet",
     "create_reminder": "Create a reminder"
+  },
+  "content_inject_tool": {
+    "collect_tooltip": "Collect Tweet",
+    "quote_tooltip": "Quote Tweet"
   }
 }
