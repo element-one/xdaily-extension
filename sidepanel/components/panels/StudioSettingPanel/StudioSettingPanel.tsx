@@ -134,7 +134,7 @@ export const StudioSettingPanel = () => {
           <button
             key={tab.key}
             className={clsx(
-              "text-text-default-primary border flex cursor-pointer items-center rounded-lg px-2 py-1 text-xs",
+              "text-text-default-primary border flex cursor-pointer items-center rounded-lg px-2 py-1 text-sm",
               tabKey === tab.key
                 ? "bg-fill-bg-light  border-fill-bg-input"
                 : "bg-transparent border-transparent"
@@ -160,7 +160,7 @@ export const StudioSettingPanel = () => {
                 )}>
                 {item.icon}
               </div>
-              <span className="text-text-default-primary text-xs leading-[18px]">
+              <span className="text-text-default-primary text-sm leading-[18px]">
                 {t(item.titleI18nKey)}
               </span>
             </button>
@@ -168,7 +168,7 @@ export const StudioSettingPanel = () => {
         </div>
       )}
       {tabKey === TabKey.TOOLS && (
-        <div className="flex-1 min-h-0 flex items-center justify-center text-primary-brand text-xs">
+        <div className="flex-1 min-h-0 flex items-center justify-center text-primary-brand text-sm">
           <span className="-translate-y-9">{t("studio_panel.coming")}</span>
         </div>
       )}
