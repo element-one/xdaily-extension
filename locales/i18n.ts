@@ -65,6 +65,6 @@ export async function changeAppLanguage(newLang: string) {
   console.log(`[i18n] language changed to ${newLang}`)
 }
 
-initI18n()
+// initI18n()
 
 export default i18n
