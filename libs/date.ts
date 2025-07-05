@@ -35,6 +35,7 @@ export const formatRelativeTime = (datetimeStr: string) => {
 export const utcToLocalInput = (utcString: string) => {
   if (!utcString) return ""
   const date = new Date(utcString)
+  if (isNaN(date.getTime())) return ""
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 16)
@@ -43,5 +44,6 @@ export const utcToLocalInput = (utcString: string) => {
 export const localInputToUTC = (localString: string) => {
   if (!localString) return ""
   const date = new Date(localString)
+  if (isNaN(date.getTime())) return ""
   return date.toISOString()
 }
