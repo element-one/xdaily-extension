@@ -9,7 +9,7 @@ import {
 } from "~libs/tweet"
 import { MessageType, type MessagePayload } from "~types/message"
 
-import i18n from "../locales/i18n"
+import i18n, { initI18n } from "../locales/i18n"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -327,4 +327,5 @@ chrome.runtime.onMessage.addListener((message: MessagePayload) => {
   }
 })
 
+initI18n()
 observeTweets()

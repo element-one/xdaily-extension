@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "../styles/global.css"
-import "../locales/i18n.ts"
 
 import { useEffect } from "react"
 
@@ -10,6 +9,7 @@ import { useStore } from "~store/store"
 import { MessageType } from "~types/message"
 
 import { DashboardPage } from "./components/DashboardPage"
+import { I18nProvider } from "./components/I18nProvider"
 import { LoginPage } from "./components/LoginPage"
 import { Loading } from "./components/ui/Loading"
 import { ToastProvider } from "./components/ui/Toast"
@@ -74,7 +74,9 @@ const IndexSidePanel = () => {
 const RootApp = () => (
   <QueryClientProvider client={queryClient}>
     <ToastProvider>
-      <IndexSidePanel />
+      <I18nProvider>
+        <IndexSidePanel />
+      </I18nProvider>
     </ToastProvider>
   </QueryClientProvider>
 )
