@@ -23,9 +23,12 @@ const setStoredLanguage = async (lang: string) => {
 export async function initI18n() {
   const storedLang = await getStoredLanguage()
 
+  const supportedLangs = ["en", "zh"]
   const fallbackLang = "en"
   const browserLang = navigator?.language?.split("-")?.[0] ?? fallbackLang
-  const initialLang = storedLang || browserLang
+  const initialLang =
+    storedLang ||
+    (supportedLangs.includes(browserLang) ? browserLang : fallbackLang)
 
   await i18n.use(initReactI18next).init({
     resources: {
