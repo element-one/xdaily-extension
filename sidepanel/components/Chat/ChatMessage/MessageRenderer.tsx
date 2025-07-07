@@ -1,4 +1,5 @@
 import type { PartialBlock } from "@blocknote/core"
+import dayjs from "dayjs"
 import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
@@ -21,7 +22,7 @@ import type {
   ReminderMessageItem,
   SheetMessageData
 } from "~types/chat"
-import type { DialogReminderItem, ReminderItem } from "~types/reminder"
+import type { DialogReminderItem } from "~types/reminder"
 import type { SparseFormat } from "~types/sheet"
 
 import { ActionButton } from "./ActionButton"
@@ -386,6 +387,12 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
     })
     onDialogChange(true)
   }
+
+  const formatReminderDate = (datetimeStr: string) => {
+    if (!datetimeStr) return "-"
+    const date = isNaN(Number(datetimeStr)) ? datetimeStr : Number(datetimeStr)
+    return dayjs(date).format("YYYY-MM-DD HH:mm")
+  }
   return (
     <>
       <BasicRenderer
@@ -405,6 +412,10 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
         }>
         <div className="prose prose-sm max-w-full overflow-auto markdown-content">
           <Markdown>{desc}</Markdown>
+        </div>
+        <div className="flex items-center gap-1 text-text-default-secondary text-xs">
+          {formatReminderDate(data.start_at)} ~{" "}
+          {formatReminderDate(data.end_at)}
         </div>
       </BasicRenderer>
       <ReminderDialog
