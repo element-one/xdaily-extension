@@ -233,19 +233,19 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       type: ChatType.MEMO,
       icon: <MemoIcon className="size-5" />,
       tooltipI18nKey: "chat_panel.tool_memo",
-      magicWord: "Save as Memo"
+      magicWordI18nKey: "chat_panel.tool_memo"
     },
     {
       type: ChatType.SHEET,
       icon: <SheetIcon className="size-5" />,
       tooltipI18nKey: "chat_panel.tool_sheet",
-      magicWord: "Save as Sheet"
+      magicWordI18nKey: "chat_panel.tool_sheet"
     },
     {
       type: ChatType.REMINDER,
       icon: <ReminderIcon className="size-5" />,
       tooltipI18nKey: "chat_panel.tool_remind",
-      magicWord: "Remind me later"
+      magicWordI18nKey: "chat_panel.tool_remind"
     }
   ]
 
@@ -386,7 +386,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
                 <Tooltip key={tool.type} content={t(tool.tooltipI18nKey)}>
                   <div
                     onClick={() =>
-                      handleClickToolButton(tool.magicWord, tool.type)
+                      handleClickToolButton(t(tool.magicWordI18nKey), tool.type)
                     }
                     className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
                     {tool.icon}
