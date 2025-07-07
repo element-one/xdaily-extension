@@ -84,7 +84,7 @@
   "chat_panel": {
     "tool_memo": "保存为备忘录",
     "tool_sheet": "保存为表格",
-    "tool_remind": "稍后提醒",
+    "tool_remind": "稍后提醒我",
     "error_title": "出错啦",
     "error_desc": "遇到问题，请稍后再试",
     "loading_history": "加载历史记录中...",

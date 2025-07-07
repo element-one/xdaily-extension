@@ -19,3 +19,8 @@ export const useUser = (
     queryFn: getUser
   })
 }
+
+export const updateUserLang = async (langCode: "en" | "zh") => {
+  const response = await client.post("/users/update-lang", { langCode })
+  return response.data
+}

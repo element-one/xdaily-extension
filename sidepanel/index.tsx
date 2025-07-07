@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "../styles/global.css"
 
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 
 import { useUser } from "~services/user"
 import { useStore } from "~store/store"
@@ -64,19 +64,26 @@ const IndexSidePanel = () => {
     return <Loading />
   }
 
+  const defaultLang = useMemo(() => {
+    if (userInfo?.lang) {
+      return userInfo?.lang === "en" ? "en" : "zh"
+    }
+    return ""
+  }, [userInfo])
+
   return (
-    <div className="flex flex-row w-full h-screen overflow-hidden bg-fill-bg-deep font-geist">
-      {isAuthenticated ? <DashboardPage /> : <LoginPage />}
-    </div>
+    <I18nProvider defaultLang={defaultLang}>
+      <div className="flex flex-row w-full h-screen overflow-hidden bg-fill-bg-deep font-geist">
+        {isAuthenticated ? <DashboardPage /> : <LoginPage />}
+      </div>
+    </I18nProvider>
   )
 }
 
 const RootApp = () => (
   <QueryClientProvider client={queryClient}>
     <ToastProvider>
-      <I18nProvider>
-        <IndexSidePanel />
-      </I18nProvider>
+      <IndexSidePanel />
     </ToastProvider>
   </QueryClientProvider>
 )
