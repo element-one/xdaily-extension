@@ -60,16 +60,16 @@ const IndexSidePanel = () => {
     })
   }, [])
 
-  if (isLoading) {
-    return <Loading />
-  }
-
   const defaultLang = useMemo(() => {
     if (userInfo?.lang) {
       return userInfo?.lang === "en" ? "en" : "zh"
     }
     return ""
   }, [userInfo])
+
+  if (isLoading) {
+    return <Loading />
+  }
 
   return (
     <I18nProvider defaultLang={defaultLang}>
