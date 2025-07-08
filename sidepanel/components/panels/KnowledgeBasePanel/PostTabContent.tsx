@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, type FC } from "react"
 import { useTranslation } from "react-i18next"
 
 import { formatTweetDate } from "~libs/date"
+import { getI18nUrl } from "~libs/url"
 import { useKnowledgeBaseCollections } from "~services/collection"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { Skeleton } from "~sidepanel/components/ui/Skeleton"
@@ -16,9 +17,10 @@ interface TweetListProps {
   isSelected: boolean
 }
 export const TweetItem: FC<TweetListProps> = (props) => {
+  const { i18n } = useTranslation()
   const handleClickTweetItem = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
+      url: getI18nUrl("/knowledge-base/posts", i18n.language)
     })
   }
 

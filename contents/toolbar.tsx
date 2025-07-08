@@ -7,7 +7,6 @@ import React, { useEffect, useRef, useState, type FC } from "react"
 import { sendToBackground } from "@plasmohq/messaging"
 
 import { getUserIdFromTweet } from "~libs/tweet"
-import { MessageType } from "~types/message"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -175,14 +174,14 @@ const Toolbar = () => {
         open: true
       }
     })
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: MessageType.CHAT_WITH_USER,
-        data: {
-          kolScreenName: userId
-        }
-      })
-    }, 500)
+    // wait for 500ms
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sendToBackground({
+      name: "relay-chat-with-user",
+      body: {
+        userId
+      }
+    })
   }
 
   useEffect(() => {

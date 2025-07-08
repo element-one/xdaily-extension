@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useDebounce } from "~libs/debounce"
+import { getI18nUrl } from "~libs/url"
 import { useCreateSheet, useDeleteSheet, useSheetList } from "~services/sheet"
 import { Button } from "~sidepanel/components/ui/Button"
 import { Card } from "~sidepanel/components/ui/Card"
@@ -45,7 +46,7 @@ const SheetPanelSkeleton = () => {
   )
 }
 export const SheetPanel = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [searchValue, setSearchValue] = useState("")
   const {
@@ -65,7 +66,7 @@ export const SheetPanel = () => {
 
   const handleGoSheetPage = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/sheet`
+      url: getI18nUrl("/sheet", i18n.language)
     })
   }
 
