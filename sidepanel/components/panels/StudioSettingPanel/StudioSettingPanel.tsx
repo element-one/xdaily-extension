@@ -2,6 +2,7 @@ import clsx from "clsx"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { getI18nUrl } from "~libs/url"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 
 enum TabKey {
@@ -117,12 +118,12 @@ const tabs = [
 ]
 
 export const StudioSettingPanel = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [tabKey, setTabKey] = useState<TabKey>(TabKey.DESIGN)
 
   const handleOpenStudio = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/studio`
+      url: getI18nUrl("/studio", i18n.language)
     })
   }
 

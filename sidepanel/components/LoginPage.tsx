@@ -1,15 +1,17 @@
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
+import { getI18nUrl } from "~libs/url"
+
 import { LanguageSelector } from "./navbar/LanguageSelector"
 import { Button } from "./ui/Button"
 
 export const LoginPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const handleLogin = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/login`
+      url: getI18nUrl("/login", i18n.language)
     })
   }
 
