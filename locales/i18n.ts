@@ -72,10 +72,12 @@ export async function changeAppLanguage(newLang: string) {
   notifyLanguageChangeToTabs(newLang)
   updateUserLang(newLang as "en" | "zh")
   const { updateUserInfo, userInfo } = useStore.getState()
-  updateUserInfo({
-    ...userInfo,
-    lang: newLang
-  })
+  if (userInfo) {
+    updateUserInfo({
+      ...userInfo,
+      lang: newLang
+    })
+  }
   console.log(`[i18n] language changed to ${newLang}`)
 }
 
