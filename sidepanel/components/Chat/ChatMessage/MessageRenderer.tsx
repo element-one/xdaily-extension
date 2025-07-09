@@ -1,6 +1,10 @@
 import type { PartialBlock } from "@blocknote/core"
 import dayjs from "dayjs"
-import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
+
+import "dayjs/locale/zh"
+import "dayjs/locale/en"
+
+import { ClockIcon, CopyPlusIcon, MoveRightIcon, SaveIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
@@ -369,7 +373,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
 }
 
 const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
     null
@@ -388,11 +392,16 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
     onDialogChange(true)
   }
 
-  const formatReminderDate = (datetimeStr: string) => {
-    if (!datetimeStr) return "-"
-    const date = isNaN(Number(datetimeStr)) ? datetimeStr : Number(datetimeStr)
-    return dayjs(date).format("YYYY-MM-DD HH:mm")
+  const formatTime = (time: Date | string) => {
+    if (!time) return "-"
+    return dayjs(time).format("hh:mm A")
   }
+
+  const formatDate = (time: Date | string) => {
+    if (!time) return "-"
+    return dayjs(time).locale(i18n.language).format("dddd, MMMM D, YYYY")
+  }
+
   return (
     <>
       <BasicRenderer
@@ -413,10 +422,19 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
         <div className="prose prose-sm max-w-full overflow-auto markdown-content">
           <Markdown>{desc}</Markdown>
         </div>
-        <div className="flex items-center gap-1 text-text-default-secondary text-xs">
-          {formatReminderDate(data.start_at)} ~{" "}
-          {formatReminderDate(data.end_at)}
-        </div>
+        {(!!data.start_at || !!data.end_at) && (
+          <div className="border-t pt-2 border-text-default-secondary">
+            <div className="items-center gap-1 text-text-default-primary text-lg flex flex-row justify-between">
+              <div>{formatTime(data.start_at)}</div>
+              <MoveRightIcon className="w-4" />
+              <div>{formatTime(data.end_at)}</div>
+            </div>
+            <div className="items-center gap-1 text-text-default-secondary text-[10px] flex flex-row justify-between">
+              <div className="break-all">{formatDate(data.start_at)}</div>
+              <div className="break-all">{formatDate(data.end_at)}</div>
+            </div>
+          </div>
+        )}
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}
