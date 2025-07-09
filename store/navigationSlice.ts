@@ -19,6 +19,7 @@ const initialState: NavigationState = {
 
 export const createNavigationSlice: StateCreator<NavigationSlice> = (set) => ({
   ...initialState,
-  setNavbarItemKey: (key: NavbarItemKey) => set({ navbarItemKey: key }),
+  setNavbarItemKey: (key: NavbarItemKey) =>
+    set((state) => (state.navbarItemKey === key ? {} : { navbarItemKey: key })),
   clearNavbar: () => set(initialState)
 })
