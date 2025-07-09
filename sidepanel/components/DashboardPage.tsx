@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { AtomIcon } from "lucide-react"
-import { useEffect, useMemo, type FC, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
@@ -105,6 +105,7 @@ export const DashboardPage = () => {
     setQuoteTweet,
     setKolScreenName
   } = useStore()
+  const didInitRef = useRef(false)
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -117,16 +118,12 @@ export const DashboardPage = () => {
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
     setKolScreenName("")
-    if (itemKey !== navbarItemKey) {
-      setNavbarItemKey(itemKey)
-    }
+    setNavbarItemKey(itemKey)
   }
 
   useEffect(() => {
-    clearNavbar()
-    setKolScreenName("")
-
     const messageListener = (message: MessagePayload) => {
+      didInitRef.current = true
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)
@@ -140,6 +137,13 @@ export const DashboardPage = () => {
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
+
+    requestAnimationFrame(() => {
+      if (!didInitRef.current) {
+        clearNavbar()
+        setKolScreenName("")
+      }
+    })
 
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener)
