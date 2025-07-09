@@ -399,7 +399,7 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
 
   const formatDate = (time: Date | string) => {
     if (!time) return "-"
-    return dayjs(time).locale(i18n.language).format("dddd, MMMM D, YYYY")
+    return dayjs(time).locale(i18n.language).format("ddd, MMMM D, YYYY")
   }
 
   return (
