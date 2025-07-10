@@ -10,11 +10,10 @@ import client from "~libs/client"
 import type {
   ChatMessage,
   ChatModelInfo,
-  DetailedUserAgentModel,
   GetChatHistoryParams,
   GetChatHistoryResp,
   KolStatusResp,
-  UserAgent,
+  TopChatUser,
   UserAgentModelResp,
   UserAgentResp
 } from "~types/chat"
@@ -167,5 +166,21 @@ export const useUpdateChatModelInfo = (
     ...options,
     mutationKey: ["update-chat-info"],
     mutationFn: updateChatModelInfo
+  })
+}
+
+export const getTopChatUsers = async (
+  order = "desc"
+): Promise<TopChatUser[]> => {
+  const response = await client.get(`/users/chat/top-users?order=${order}`)
+  return response.data?.data
+}
+
+export const useGetTopChatUsers = () => {
+  return useQuery({
+    retry: 0,
+    refetchOnWindowFocus: false,
+    queryKey: ["get-top-chat-users"],
+    queryFn: () => getTopChatUsers()
   })
 }

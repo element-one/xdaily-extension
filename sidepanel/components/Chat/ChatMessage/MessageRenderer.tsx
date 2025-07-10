@@ -1,4 +1,4 @@
-import type { PartialBlock } from "@blocknote/core"
+import { type PartialBlock } from "@blocknote/core"
 import dayjs from "dayjs"
 
 import "dayjs/locale/zh"
@@ -14,7 +14,7 @@ import {
   normalizeMarkdownInput,
   tryConvertDataToSparseFormat
 } from "~libs/chat"
-import { extractAllTextWithLineBreaks } from "~libs/memo"
+import { blocksToMarkdown } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
 import { ReminderDialog } from "~sidepanel/components/panels/ReminderPanel/ReminderDialog"
@@ -46,6 +46,25 @@ const BasicRenderer: FC<{
   )
 }
 
+const ExtensionLink: FC<{ href: string; children: ReactNode }> = ({
+  href,
+  children
+}) => {
+  const onClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (typeof chrome !== "undefined" && chrome.tabs) {
+      chrome.tabs.create({ url: href! })
+    } else {
+      window.open(href, "_blank", "noopener")
+    }
+  }
+
+  return (
+    <a href={href} onClick={onClick}>
+      {children}
+    </a>
+  )
+}
 export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   data
 }) => {
@@ -67,6 +86,13 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   const latestMemo = useMemo(() => {
     return (memoPages?.pages ?? [])[0]
   }, [memoPages])
+
+  const markdownMemo = useMemo(() => {
+    if (data?.content && !!data?.content.length) {
+      return blocksToMarkdown(data.content)
+    }
+    return ""
+  }, [data])
 
   const handleCreateMemo = async (title: string, document: PartialBlock[]) => {
     if (isCreatingMemo) return
@@ -108,6 +134,7 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
       })
     }
   }
+
   return (
     <BasicRenderer
       title={data.title}
@@ -135,7 +162,18 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
           )}
         </>
       }>
-      {extractAllTextWithLineBreaks(data.content)}
+      <div className="max-w-full overflow-auto markdown-content">
+        <Markdown
+          options={{
+            overrides: {
+              a: {
+                component: ExtensionLink
+              }
+            }
+          }}>
+          {markdownMemo}
+        </Markdown>
+      </div>
     </BasicRenderer>
   )
 }
@@ -419,7 +457,7 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
             />
           </>
         }>
-        <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+        <div className="max-w-full overflow-auto markdown-content">
           <Markdown>{desc}</Markdown>
         </div>
         {(!!data.start_at || !!data.end_at) && (
