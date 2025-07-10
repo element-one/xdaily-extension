@@ -55,13 +55,63 @@ body {
 }
 
 /* markdown */
+.prose {
+  color: inherit;
+}
+.prose li {
+  color: inherit;
+}
+.markdown-content {
+  @apply prose prose-sm max-w-full;
+}
 .markdown-content table {
   @apply border-collapse w-full;
+  color: inherit !important;
 }
 
 .markdown-content th,
 .markdown-content td {
   @apply border border-border-regular px-2 py-1 text-left;
+  color: inherit !important;
+}
+
+.markdown-content h1 {
+  @apply text-sm font-semibold my-1;
+  color: inherit !important;
+}
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply text-xs font-semibold my-0 text-primary-brand;
+}
+
+.markdown-content p {
+  @apply my-0.5 leading-relaxed text-xs;
+  color: inherit !important;
+}
+
+.markdown-content a {
+  @apply text-primary-brand underline cursor-pointer;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply my-1;
+}
+
+.markdown-content blockquote {
+  @apply border-l  pl-1 italic  my-1;
+}
+.markdown-content pre {
+  @apply rounded px-1 py-0.5 overflow-x-auto mb-2 font-mono text-xs;
+}
+
+.markdown-content code {
+  @apply rounded px-1 py-0.5 font-mono text-xs;
+}
+
+.markdown-content li {
+  @apply mb-1;
 }
 
 /* blocknote */

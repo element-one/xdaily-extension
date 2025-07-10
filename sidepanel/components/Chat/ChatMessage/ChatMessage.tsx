@@ -66,13 +66,13 @@ export const ChatMessage: FC<ChatMessageProps> = ({
       <div
         className={`flex ${role === "user" ? "justify-end" : "justify-start"}`}>
         <div
-          className={`prose prose-sm break-words wrap w-fit max-w-[92%] p-3 rounded-lg message-item font-light text-sm border border-fill-bg-input ${
+          className={`break-words wrap w-fit max-w-[92%] p-3 rounded-lg message-item font-light text-sm border border-fill-bg-input ${
             role === "user"
               ? "bg-primary-brand text-text-inverse-primary"
               : "bg-fill-bg-light text-text-default-primary"
           }`}>
           <RobotLogo show={role !== "user" && isSelf} />
-          <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+          <div className="max-w-full overflow-auto markdown-content">
             <Markdown>{normalizeMarkdownInput(content)}</Markdown>
           </div>
         </div>
