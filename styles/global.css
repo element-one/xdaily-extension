@@ -107,7 +107,7 @@ body {
 }
 
 .markdown-content code {
-  @apply rounded px-1 py-0.5 font-mono text-xs;
+  @apply rounded px-1 py-0.5 font-mono text-xs bg-fill-layer-layer text-white;
 }
 
 .markdown-content li {
