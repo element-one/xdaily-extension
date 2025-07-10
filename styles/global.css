@@ -103,7 +103,7 @@ body {
   @apply border-l  pl-1 italic  my-1;
 }
 .markdown-content pre {
-  @apply rounded px-1 py-0.5 overflow-x-auto mb-2 font-mono text-xs;
+  @apply rounded px-1 py-0.5 overflow-x-auto mb-2 font-mono text-xs bg-fill-layer-layer text-white;
 }
 
 .markdown-content code {
