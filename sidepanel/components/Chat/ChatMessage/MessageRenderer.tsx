@@ -174,7 +174,6 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
           {markdownMemo}
         </Markdown>
       </div>
-      {/* {extractAllTextWithLineBreaks(data.content)} */}
     </BasicRenderer>
   )
 }
