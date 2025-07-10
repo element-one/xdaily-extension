@@ -96,7 +96,7 @@ body {
 
 .markdown-content ul,
 .markdown-content ol {
-  @apply my-1;
+  @apply my-1 leading-relaxed text-xs;
 }
 
 .markdown-content blockquote {

@@ -92,6 +92,7 @@ function inlineContentsToMarkdown(
 
 export function blocksToMarkdown(blocks?: PartialBlock[]): string {
   if (!blocks || blocks.length === 0) return ""
+  let numberIndex = 0
   return blocks
     .map((block) => {
       const contentMd = inlineContentsToMarkdown(block.content as any)
@@ -105,7 +106,8 @@ export function blocksToMarkdown(blocks?: PartialBlock[]): string {
         case "bulletListItem":
           return `- ${contentMd}`
         case "numberedListItem":
-          return `1. ${contentMd}`
+          numberIndex++
+          return `${numberIndex}. ${contentMd}`
         case "checkListItem":
           const checked = (block as any)?.props?.checked ? "x" : " "
           return `- [${checked}] ${contentMd}`
@@ -114,7 +116,6 @@ export function blocksToMarkdown(blocks?: PartialBlock[]): string {
         case "codeBlock":
           return `\`\`\`\n${contentMd}\n\`\`\``
         case "table":
-          // TODO
           return "[Table content not supported]"
         case "file":
           const fileName = (block as any).fileName || "file"
