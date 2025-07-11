@@ -9,16 +9,17 @@ interface KolItemProps {
 }
 
 export const KolItem: FC<KolItemProps> = ({ item: user }) => {
-  const { setKolScreenName } = useStore()
+  const { setKolScreenName, setKolAvatarUrl } = useStore()
 
-  const handleClickTweetItem = (screenName: string) => {
+  const handleClickTweetItem = (screenName: string, url?: string) => {
     setKolScreenName(screenName)
+    setKolAvatarUrl(url ?? "")
   }
 
   return (
     <div
       className="w-full p-4 rounded-lg border border-fill-bg-input bg-fill-bg-deep hover:border-primary-brand cursor-pointer"
-      onClick={() => handleClickTweetItem(user.screenName)}>
+      onClick={() => handleClickTweetItem(user.screenName, user.avatar)}>
       <div>
         <Avatar alt={user.screenName} url={user.avatar} className="w-12 h-12" />
       </div>

@@ -10,10 +10,11 @@ interface KolNavbarProps {}
 export const KolNavbar: FC<KolNavbarProps> = ({}) => {
   const { data } = useGetTopChatUsers()
 
-  const { kolScreenName, setKolScreenName } = useStore()
+  const { kolScreenName, setKolScreenName, setKolAvatarUrl } = useStore()
 
-  const handleClickKol = (screenName: string) => {
+  const handleClickKol = (screenName: string, url?: string) => {
     setKolScreenName(screenName)
+    setKolAvatarUrl(url ?? "")
   }
 
   const collection = useMemo(() => {
@@ -27,7 +28,7 @@ export const KolNavbar: FC<KolNavbarProps> = ({}) => {
           {collection.map((kol) => (
             <div
               key={kol.id}
-              onClick={() => handleClickKol(kol.screenName)}
+              onClick={() => handleClickKol(kol.screenName, kol.avatar)}
               className={clsx(
                 "cursor-pointer w-9 h-9 flex items-center justify-center border rounded-full",
                 kolScreenName === kol.screenName

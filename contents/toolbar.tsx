@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState, type FC } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import { getUserIdFromTweet } from "~libs/tweet"
+import { extractTweetDataFromTweet, getUserIdFromTweet } from "~libs/tweet"
 
 export const config: PlasmoCSConfig = {
   // only show in these two sites
@@ -166,7 +166,10 @@ const Toolbar = () => {
 
   const handleChatWithUser = async () => {
     if (!tweet) return
-    const userId = getUserIdFromTweet(tweet)
+    const info = extractTweetDataFromTweet(tweet)
+    if (!info) return
+    const userId = info.username
+    const avatarUrl = info.avatarUrl
     // open panel
     sendToBackground({
       name: "toggle-panel",
@@ -179,7 +182,8 @@ const Toolbar = () => {
     await sendToBackground({
       name: "relay-chat-with-user",
       body: {
-        userId
+        userId,
+        avatarUrl
       }
     })
   }
