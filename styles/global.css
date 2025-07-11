@@ -55,10 +55,8 @@ body {
 }
 
 /* markdown */
-.prose {
-  color: inherit;
-}
-.prose li {
+.prose,
+.prose * {
   color: inherit;
 }
 .markdown-content {
@@ -66,18 +64,15 @@ body {
 }
 .markdown-content table {
   @apply border-collapse w-full;
-  color: inherit !important;
 }
 
 .markdown-content th,
 .markdown-content td {
   @apply border border-border-regular px-2 py-1 text-left;
-  color: inherit !important;
 }
 
 .markdown-content h1 {
   @apply text-sm font-semibold my-1;
-  color: inherit !important;
 }
 .markdown-content h2,
 .markdown-content h3,
@@ -87,7 +82,6 @@ body {
 
 .markdown-content p {
   @apply my-0.5 leading-relaxed text-xs;
-  color: inherit !important;
 }
 
 .markdown-content a {
