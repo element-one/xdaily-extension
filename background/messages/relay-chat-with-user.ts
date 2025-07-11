@@ -4,6 +4,7 @@ import { MessageType } from "~types/message"
 
 type ChatWithUserMessage = {
   userId: string
+  avatarUrl?: string
 }
 
 const handler: PlasmoMessaging.MessageHandler<ChatWithUserMessage> = async (
@@ -13,7 +14,8 @@ const handler: PlasmoMessaging.MessageHandler<ChatWithUserMessage> = async (
   await chrome.runtime.sendMessage({
     type: MessageType.CHAT_WITH_USER,
     data: {
-      kolScreenName: req.body.userId
+      kolScreenName: req.body.userId,
+      kolAvatarUrl: req.body.avatarUrl
     }
   })
 

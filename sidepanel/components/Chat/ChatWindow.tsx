@@ -63,7 +63,7 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { t } = useTranslation()
 
-  const { removeQuoteTweet, userInfo } = useStore()
+  const { removeQuoteTweet, userInfo, kolAvatarUrl } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -320,8 +320,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
             <ChatMessage
               content={m.content}
               role={m.role}
-              isSelf={isSelf}
               key={m.id}
+              robotAvatar={kolAvatarUrl}
+              displayScreenName={isSelf ? "" : screenName}
             />
           </div>
         ))}

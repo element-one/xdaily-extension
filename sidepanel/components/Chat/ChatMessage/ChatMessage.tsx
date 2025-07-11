@@ -24,12 +24,14 @@ import { tryParseJsonMessage } from "./utils"
 interface ChatMessageProps {
   content: string
   role: VercelMessage["role"]
-  isSelf: boolean
+  robotAvatar?: string
+  displayScreenName?: string
 }
 export const ChatMessage: FC<ChatMessageProps> = ({
   content,
   role,
-  isSelf
+  robotAvatar,
+  displayScreenName
 }) => {
   const jsonData = tryParseJsonMessage(content)
 
@@ -71,7 +73,11 @@ export const ChatMessage: FC<ChatMessageProps> = ({
               ? "bg-primary-brand text-text-inverse-primary"
               : "bg-fill-bg-light text-text-default-primary"
           }`}>
-          <RobotLogo show={role !== "user" && isSelf} />
+          <RobotLogo
+            avatar={robotAvatar}
+            show={role !== "user"}
+            name={displayScreenName}
+          />
           <div className="max-w-full overflow-auto markdown-content">
             <Markdown>{normalizeMarkdownInput(content)}</Markdown>
           </div>
@@ -86,24 +92,36 @@ export const ChatMessage: FC<ChatMessageProps> = ({
       className={`flex ${role === "user" ? "justify-end" : "justify-start"}`}>
       <div
         className={`break-words wrap w-full message-item font-light text-sm`}>
-        <RobotLogo show={role !== "user" && isSelf} />
+        <RobotLogo
+          avatar={robotAvatar}
+          show={role !== "user"}
+          name={displayScreenName}
+        />
         {renderMessageContent(jsonData)}
       </div>
     </div>
   )
 }
 
-const RobotLogo: FC<{ show: boolean }> = ({ show }) => {
-  if (!show) return <></>
+const RobotLogo: FC<{ avatar?: string; show: boolean; name?: string }> = ({
+  avatar,
+  name,
+  show
+}) => {
+  if (!show) {
+    return <></>
+  }
+  const robotAvatar = avatar ? avatar : robotImg
+  const screenName = name ? `@${name}` : "xDaily"
   return (
     <div className="mb-2 flex items-center text-xs font-semibold gap-x-1">
       <ImageWithFallback
-        src={robotImg}
+        src={robotAvatar}
         alt={"Robot"}
         className="w-5 h-5 rounded-full object-contain"
         fallbackClassName="w-5 h-5 rounded-full"
       />
-      xDaily
+      {screenName}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useMemo, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { useGetTopChatUsers } from "~services/chat"
 import { useStore } from "~store/store"
@@ -8,12 +8,22 @@ import { Avatar } from "../ui/Avatar"
 
 interface KolNavbarProps {}
 export const KolNavbar: FC<KolNavbarProps> = ({}) => {
-  const { data } = useGetTopChatUsers()
+  const { data, refetch } = useGetTopChatUsers()
 
-  const { kolScreenName, setKolScreenName } = useStore()
+  const { kolScreenName, setKolScreenName, setKolAvatarUrl } = useStore()
+  const prevKolScreenNameRef = useRef(kolScreenName)
 
-  const handleClickKol = (screenName: string) => {
+  useEffect(() => {
+    if (prevKolScreenNameRef.current && !kolScreenName) {
+      // kolScreenName cleared, refetching top user data
+      refetch()
+    }
+    prevKolScreenNameRef.current = kolScreenName
+  }, [kolScreenName])
+
+  const handleClickKol = (screenName: string, url?: string) => {
     setKolScreenName(screenName)
+    setKolAvatarUrl(url ?? "")
   }
 
   const collection = useMemo(() => {
@@ -27,7 +37,7 @@ export const KolNavbar: FC<KolNavbarProps> = ({}) => {
           {collection.map((kol) => (
             <div
               key={kol.id}
-              onClick={() => handleClickKol(kol.screenName)}
+              onClick={() => handleClickKol(kol.screenName, kol.avatar)}
               className={clsx(
                 "cursor-pointer w-9 h-9 flex items-center justify-center border rounded-full",
                 kolScreenName === kol.screenName
