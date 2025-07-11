@@ -2,7 +2,7 @@ import type {
   DefaultInlineContentSchema,
   DefaultStyleSchema,
   PartialBlock,
-  PartialInlineContent
+  PartialTableContent
 } from "@blocknote/core"
 
 export const extractAllTextWithLineBreaks = (
@@ -43,51 +43,81 @@ export const extractAllTextWithLineBreaks = (
   return lines.slice(0, maxLine).join("\n")
 }
 
-function inlineContentsToMarkdown(
-  inlines?: PartialInlineContent<DefaultInlineContentSchema, DefaultStyleSchema>
+function renderTableContent(
+  table: PartialTableContent<DefaultInlineContentSchema, DefaultStyleSchema>
 ): string {
+  const rows = table.rows || []
+  if (rows.length === 0) return ""
+
+  const headerCells = rows[0].cells.map((cell) =>
+    inlineContentsToMarkdown(cell)
+  )
+  const headerLine = `| ${headerCells.join(" | ")} |`
+  const separatorLine = `| ${headerCells.map(() => "---").join(" | ")} |`
+
+  const bodyLines = rows.slice(1).map((row) => {
+    const cells = row.cells.map((cell) => inlineContentsToMarkdown(cell))
+    return `| ${cells.join(" | ")} |`
+  })
+
+  return [headerLine, separatorLine, ...bodyLines].join("\n")
+}
+
+function inlineContentsToMarkdown(inlines?: PartialBlock["content"]): string {
   if (!inlines) return ""
 
   if (typeof inlines === "string") return inlines
 
-  return inlines
-    .map((item) => {
-      if (typeof item === "string") {
-        return item
-      }
-      if ("type" in item) {
-        switch (item.type) {
-          case "text": {
-            let t = item.text || ""
-            if ("marks" in item && Array.isArray(item.marks)) {
-              for (const mark of item.marks) {
-                switch (mark.type) {
-                  case "bold":
-                    t = `**${t}**`
-                    break
-                  case "italic":
-                    t = `_${t}_`
-                    break
-                  case "code":
-                    t = `\`${t}\``
-                    break
+  if (Array.isArray(inlines)) {
+    return inlines
+      .map((item) => {
+        if (typeof item === "string") {
+          return item
+        }
+        if ("type" in item) {
+          switch (item.type) {
+            case "text": {
+              let t = item.text || ""
+              if ("marks" in item && Array.isArray(item.marks)) {
+                for (const mark of item.marks) {
+                  switch (mark.type) {
+                    case "bold":
+                      t = `**${t}**`
+                      break
+                    case "italic":
+                      t = `_${t}_`
+                      break
+                    case "code":
+                      t = `\`${t}\``
+                      break
+                  }
                 }
               }
+              return t
             }
-            return t
+            case "link": {
+              const inner = inlineContentsToMarkdown(item.content)
+              return `[${inner}](${item.href})`
+            }
+            default:
+              return ""
           }
-          case "link": {
-            const inner = inlineContentsToMarkdown(item.content)
-            return `[${inner}](${item.href})`
-          }
-          default:
-            return ""
         }
-      }
 
-      return ""
-    })
-    .join("")
+        return ""
+      })
+      .join("")
+  }
+
+  if (
+    inlines &&
+    typeof inlines === "object" &&
+    "rows" in inlines &&
+    Array.isArray(inlines.rows)
+  ) {
+    return renderTableContent(inlines)
+  }
+  return ""
 }
 
 export function blocksToMarkdown(blocks?: PartialBlock[]): string {
@@ -95,7 +125,7 @@ export function blocksToMarkdown(blocks?: PartialBlock[]): string {
   let numberIndex = 0
   return blocks
     .map((block) => {
-      const contentMd = inlineContentsToMarkdown(block.content as any)
+      const contentMd = inlineContentsToMarkdown(block.content)
 
       switch (block.type) {
         case "paragraph":
@@ -116,7 +146,7 @@ export function blocksToMarkdown(blocks?: PartialBlock[]): string {
         case "codeBlock":
           return `\`\`\`\n${contentMd}\n\`\`\``
         case "table":
-          return "[Table content not supported]"
+          return contentMd
         case "file":
           const fileName = (block as any).fileName || "file"
           const fileUrl = (block as any).url || ""
