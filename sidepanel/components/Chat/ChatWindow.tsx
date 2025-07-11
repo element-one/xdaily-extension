@@ -322,7 +322,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
               role={m.role}
               key={m.id}
               robotAvatar={kolAvatarUrl}
-              screenName={screenName}
+              displayScreenName={isSelf ? "" : screenName}
             />
           </div>
         ))}

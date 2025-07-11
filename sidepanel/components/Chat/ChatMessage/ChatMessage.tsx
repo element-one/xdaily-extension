@@ -25,13 +25,13 @@ interface ChatMessageProps {
   content: string
   role: VercelMessage["role"]
   robotAvatar?: string
-  screenName?: string
+  displayScreenName?: string
 }
 export const ChatMessage: FC<ChatMessageProps> = ({
   content,
   role,
   robotAvatar,
-  screenName
+  displayScreenName
 }) => {
   const jsonData = tryParseJsonMessage(content)
 
@@ -76,7 +76,7 @@ export const ChatMessage: FC<ChatMessageProps> = ({
           <RobotLogo
             avatar={robotAvatar}
             show={role !== "user"}
-            name={screenName}
+            name={displayScreenName}
           />
           <div className="max-w-full overflow-auto markdown-content">
             <Markdown>{normalizeMarkdownInput(content)}</Markdown>
@@ -95,7 +95,7 @@ export const ChatMessage: FC<ChatMessageProps> = ({
         <RobotLogo
           avatar={robotAvatar}
           show={role !== "user"}
-          name={screenName}
+          name={displayScreenName}
         />
         {renderMessageContent(jsonData)}
       </div>
