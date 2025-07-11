@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useMemo, type FC } from "react"
+import { useEffect, useMemo, useRef, type FC } from "react"
 
 import { useGetTopChatUsers } from "~services/chat"
 import { useStore } from "~store/store"
@@ -8,9 +8,18 @@ import { Avatar } from "../ui/Avatar"
 
 interface KolNavbarProps {}
 export const KolNavbar: FC<KolNavbarProps> = ({}) => {
-  const { data } = useGetTopChatUsers()
+  const { data, refetch } = useGetTopChatUsers()
 
   const { kolScreenName, setKolScreenName, setKolAvatarUrl } = useStore()
+  const prevKolScreenNameRef = useRef(kolScreenName)
+
+  useEffect(() => {
+    if (prevKolScreenNameRef.current && !kolScreenName) {
+      // kolScreenName cleared, refetching top user data
+      refetch()
+    }
+    prevKolScreenNameRef.current = kolScreenName
+  }, [kolScreenName])
 
   const handleClickKol = (screenName: string, url?: string) => {
     setKolScreenName(screenName)
