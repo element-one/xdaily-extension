@@ -5,6 +5,7 @@ import { MessageType } from "~types/message"
 type ChatWithUserMessage = {
   userId: string
   avatarUrl?: string
+  userName?: string
 }
 
 const handler: PlasmoMessaging.MessageHandler<ChatWithUserMessage> = async (
@@ -15,7 +16,8 @@ const handler: PlasmoMessaging.MessageHandler<ChatWithUserMessage> = async (
     type: MessageType.CHAT_WITH_USER,
     data: {
       kolScreenName: req.body.userId,
-      kolAvatarUrl: req.body.avatarUrl
+      kolAvatarUrl: req.body.avatarUrl,
+      kolUserName: req.body.userName
     }
   })
 

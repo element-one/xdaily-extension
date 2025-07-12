@@ -104,7 +104,7 @@ export const DashboardPage = () => {
     clearNavbar,
     setQuoteTweet,
     setKolScreenName,
-    setKolAvatarUrl
+    setKolInfo
   } = useStore()
   const didInitRef = useRef(false)
 
@@ -119,7 +119,7 @@ export const DashboardPage = () => {
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
     setKolScreenName("")
-    setKolAvatarUrl("")
+    setKolInfo({ avatarUrl: "", userName: "" })
     setNavbarItemKey(itemKey)
   }
 
@@ -134,8 +134,12 @@ export const DashboardPage = () => {
         toggleDrawer(NavbarItemKey.KNOWLEDGE)
       }
       if (message.type === MessageType.CHAT_WITH_USER) {
-        setKolScreenName(message.data?.kolScreenName ?? "")
-        setKolAvatarUrl(message.data?.kolAvatarUrl ?? "")
+        const screenName = message.data?.kolScreenName ?? ""
+        setKolScreenName(screenName)
+        setKolInfo({
+          avatarUrl: message.data.kolAvatarUrl ?? "",
+          userName: message.data.kolUserName ?? screenName
+        })
       }
     }
 
@@ -145,7 +149,10 @@ export const DashboardPage = () => {
       if (!didInitRef.current) {
         clearNavbar()
         setKolScreenName("")
-        setKolAvatarUrl("")
+        setKolInfo({
+          avatarUrl: "",
+          userName: ""
+        })
       }
     })
 
