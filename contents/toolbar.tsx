@@ -170,6 +170,7 @@ const Toolbar = () => {
     if (!info) return
     const userId = info.username
     const avatarUrl = info.avatarUrl
+    const name = info.displayName
     // open panel
     sendToBackground({
       name: "toggle-panel",
@@ -183,7 +184,8 @@ const Toolbar = () => {
       name: "relay-chat-with-user",
       body: {
         userId,
-        avatarUrl
+        avatarUrl,
+        userName: name
       }
     })
   }

@@ -5,14 +5,14 @@ import type { TweetData } from "~types/tweet"
 type ChatState = {
   quoteTweet: TweetData | null
   kolScreenName: string // to deside whether show KolChatSection or not
-  kolAvatarUrl: string
+  kolInfo: { avatarUrl: string; userName: string }
 }
 
 type ChatActions = {
   setQuoteTweet: (tweetData: TweetData) => void
   removeQuoteTweet: () => void
   setKolScreenName: (screenName: string) => void
-  setKolAvatarUrl: (url: string) => void
+  setKolInfo: (info: { avatarUrl: string; userName: string }) => void
 }
 
 export type ChatSlice = ChatState & ChatActions
@@ -20,7 +20,10 @@ export type ChatSlice = ChatState & ChatActions
 const initialState: ChatState = {
   quoteTweet: null,
   kolScreenName: "",
-  kolAvatarUrl: ""
+  kolInfo: {
+    avatarUrl: "",
+    userName: ""
+  }
 }
 
 export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
@@ -31,5 +34,11 @@ export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
       quoteTweet: null
     }),
   setKolScreenName: (screenName: string) => set({ kolScreenName: screenName }),
-  setKolAvatarUrl: (url: string) => set({ kolAvatarUrl: url })
+  setKolInfo: (info: { avatarUrl: string; userName: string }) =>
+    set({
+      kolInfo: {
+        avatarUrl: info.avatarUrl,
+        userName: info.userName
+      }
+    })
 })

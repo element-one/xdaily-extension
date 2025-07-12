@@ -63,7 +63,7 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const { t } = useTranslation()
 
-  const { removeQuoteTweet, userInfo, kolAvatarUrl } = useStore()
+  const { removeQuoteTweet, userInfo, kolInfo } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
   const {
     data: history,
@@ -282,12 +282,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   }
 
   return (
-    <div className="flex gap-y-6 rounded-md flex-col h-full flex-1 min-h-0">
-      <div className="text-xs font-semibold min-h-[18px] flex items-center text-primary-brand">
+    <div className="flex gap-y-4 rounded-md flex-col h-full flex-1 min-h-0">
+      <div className="text-xs font-semibold min-h-[18px] flex items-center text-text-default-primary">
+        {/* here show avatar */}
         {!isSelf && screenName ? (
-          `@${screenName}`
+          <div className="flex items-center gap-x-2 pt-2">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-fill-bg-input">
+              <ImageWithFallback
+                src={kolInfo.avatarUrl ?? ""}
+                className="w-9 h-9 rounded-full object-contain"
+                fallbackClassName="w-9 h-9 rounded-full"
+              />
+            </div>
+            <div>
+              <div className="text-sm text-primary-brand line-clamp-1">
+                {kolInfo.userName ?? screenName}
+              </div>
+              <div className="text-[10px] text-text-default-secondary">
+                @{screenName}
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="mb-2 flex items-center text-xs font-semibold gap-x-1 text-text-default-primary">
+          <div className=" flex items-center gap-x-1 mb-1">
             <ImageWithFallback
               src={robotImg}
               alt="robot"
@@ -321,7 +338,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
               content={m.content}
               role={m.role}
               key={m.id}
-              robotAvatar={kolAvatarUrl}
+              robotAvatar={kolInfo.avatarUrl ?? ""}
               displayScreenName={isSelf ? "" : screenName}
             />
           </div>

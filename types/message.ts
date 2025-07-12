@@ -39,6 +39,7 @@ export type ChatWithUserPayload = {
   data: {
     kolScreenName: string
     kolAvatarUrl?: string
+    kolUserName?: string
   }
 }
 

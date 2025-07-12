@@ -10,7 +10,7 @@ interface KolNavbarProps {}
 export const KolNavbar: FC<KolNavbarProps> = ({}) => {
   const { data, refetch } = useGetTopChatUsers()
 
-  const { kolScreenName, setKolScreenName, setKolAvatarUrl } = useStore()
+  const { kolScreenName, setKolScreenName, setKolInfo } = useStore()
   const prevKolScreenNameRef = useRef(kolScreenName)
 
   useEffect(() => {
@@ -21,9 +21,12 @@ export const KolNavbar: FC<KolNavbarProps> = ({}) => {
     prevKolScreenNameRef.current = kolScreenName
   }, [kolScreenName])
 
-  const handleClickKol = (screenName: string, url?: string) => {
+  const handleClickKol = (screenName: string, url?: string, name?: string) => {
     setKolScreenName(screenName)
-    setKolAvatarUrl(url ?? "")
+    setKolInfo({
+      avatarUrl: url ?? "",
+      userName: name ?? screenName
+    })
   }
 
   const collection = useMemo(() => {
@@ -37,7 +40,9 @@ export const KolNavbar: FC<KolNavbarProps> = ({}) => {
           {collection.map((kol) => (
             <div
               key={kol.id}
-              onClick={() => handleClickKol(kol.screenName, kol.avatar)}
+              onClick={() =>
+                handleClickKol(kol.screenName, kol.avatar, kol.name)
+              }
               className={clsx(
                 "cursor-pointer w-9 h-9 flex items-center justify-center border rounded-full",
                 kolScreenName === kol.screenName
