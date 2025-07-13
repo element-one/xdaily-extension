@@ -166,3 +166,36 @@ export type ChatMessageData =
   | SheetMessageData
   | ReminderMessageData
   | ErrorMessageData
+
+export interface TopChatUser {
+  chatAt: string
+  threadId: string
+  message: string
+  user: {
+    id: string
+    email: string
+    username: string
+    firstName: string
+    lastName: string | null
+    profileImageUrl: string
+    referralCode: string
+  }
+  twitterUser: {
+    avatar: string
+    bio: string
+    followers: number
+    following: number
+    id: string
+    isClaimed: boolean
+    isVerified: boolean
+    joinedAt: Date
+    kolStatus: KolStatus
+    location: string
+    name: string
+    screenName: string
+    userId: string
+    tweets: number
+    updatedAt: Date
+    website: string | null
+  }
+}

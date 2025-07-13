@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { AtomIcon } from "lucide-react"
-import { useEffect, useMemo, type FC, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
@@ -103,8 +103,10 @@ export const DashboardPage = () => {
     setNavbarItemKey,
     clearNavbar,
     setQuoteTweet,
-    setKolScreenName
+    setKolScreenName,
+    setKolInfo
   } = useStore()
+  const didInitRef = useRef(false)
 
   const currentNavbarItem = useMemo(() => {
     if (navbarItemKey) {
@@ -117,16 +119,13 @@ export const DashboardPage = () => {
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
     setKolScreenName("")
-    if (itemKey !== navbarItemKey) {
-      setNavbarItemKey(itemKey)
-    }
+    setKolInfo({ avatarUrl: "", userName: "" })
+    setNavbarItemKey(itemKey)
   }
 
   useEffect(() => {
-    clearNavbar()
-    setKolScreenName("")
-
     const messageListener = (message: MessagePayload) => {
+      didInitRef.current = true
       if (message.type === MessageType.QUOTE_TWEET) {
         setQuoteTweet(message.data)
         toggleDrawer(NavbarItemKey.CHAT)
@@ -135,11 +134,27 @@ export const DashboardPage = () => {
         toggleDrawer(NavbarItemKey.KNOWLEDGE)
       }
       if (message.type === MessageType.CHAT_WITH_USER) {
-        setKolScreenName(message.data?.kolScreenName ?? "")
+        const screenName = message.data?.kolScreenName ?? ""
+        setKolScreenName(screenName)
+        setKolInfo({
+          avatarUrl: message.data.kolAvatarUrl ?? "",
+          userName: message.data.kolUserName ?? screenName
+        })
       }
     }
 
     chrome.runtime.onMessage.addListener(messageListener)
+
+    requestAnimationFrame(() => {
+      if (!didInitRef.current) {
+        clearNavbar()
+        setKolScreenName("")
+        setKolInfo({
+          avatarUrl: "",
+          userName: ""
+        })
+      }
+    })
 
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener)

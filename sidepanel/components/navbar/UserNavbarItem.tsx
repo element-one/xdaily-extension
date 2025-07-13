@@ -2,18 +2,19 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { UserIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { getI18nUrl } from "~libs/url"
 import { useStore } from "~store/store"
 
 import { Avatar } from "../ui/Avatar"
 
 export const UserNavbarItem = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const userInfo = useStore((state) => state.userInfo)
 
   const jumpToProfilePage = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}`
+      url: getI18nUrl("", i18n.language)
     })
   }
   if (!userInfo) {

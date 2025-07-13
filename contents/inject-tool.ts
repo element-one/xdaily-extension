@@ -259,12 +259,12 @@ const createQuoteButton = (tweet: HTMLElement) => {
         open: true
       }
     })
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: MessageType.QUOTE_TWEET,
-        data: tweetInfo
-      })
-    }, 500)
+    // wait for 500ms
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sendToBackground({
+      name: "relay-quote-tweet",
+      body: { tweetInfo }
+    })
   })
 
   return host

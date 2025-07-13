@@ -8,6 +8,7 @@ import { BookmarkIcon, ClockIcon, EllipsisIcon, Trash2Icon } from "lucide-react"
 import type { FC } from "react"
 import { useTranslation } from "react-i18next"
 
+import { getI18nUrl } from "~libs/url"
 import { Button } from "~sidepanel/components/ui/Button"
 import {
   DropdownMenu,
@@ -57,7 +58,7 @@ export const ReminderList: FC<ReminderListProps> = ({
   }
   const handleClickReminder = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/reminder`
+      url: getI18nUrl("/reminder", i18n.language)
     })
   }
   return (

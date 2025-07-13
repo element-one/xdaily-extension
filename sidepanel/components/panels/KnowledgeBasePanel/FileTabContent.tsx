@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
 
 import { formatTweetDate } from "~libs/date"
+import { getI18nUrl } from "~libs/url"
 import { useKnowledgeBaseCollections } from "~services/collection"
 import DocIcon from "~sidepanel/components/icons/DocIcon"
 import ExcelIcon from "~sidepanel/components/icons/ExcelIcon"
@@ -43,7 +44,7 @@ const FileTabContentSkeleton = () => {
 }
 
 export const FileTabContent = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useKnowledgeBaseCollections({
@@ -105,7 +106,7 @@ export const FileTabContent = () => {
 
   const handleOpen = () => {
     chrome.tabs.create({
-      url: `${process.env.PLASMO_PUBLIC_MAIN_SITE}/knowledge-base/posts`
+      url: getI18nUrl("/knowledge-base/posts", i18n.language)
     })
   }
 

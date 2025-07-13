@@ -1,6 +1,10 @@
-import type { PartialBlock } from "@blocknote/core"
+import { type PartialBlock } from "@blocknote/core"
 import dayjs from "dayjs"
-import { ClockIcon, CopyPlusIcon, SaveIcon } from "lucide-react"
+
+import "dayjs/locale/zh"
+import "dayjs/locale/en"
+
+import { ClockIcon, CopyPlusIcon, MoveRightIcon, SaveIcon } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import { useMemo, useState, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
@@ -10,7 +14,7 @@ import {
   normalizeMarkdownInput,
   tryConvertDataToSparseFormat
 } from "~libs/chat"
-import { extractAllTextWithLineBreaks } from "~libs/memo"
+import { blocksToMarkdown } from "~libs/memo"
 import { useCreateMemo, useMemoList, useUpdateMemo } from "~services/memo"
 import { useCreateSheet, useSheetList, useUpdateSheet } from "~services/sheet"
 import { ReminderDialog } from "~sidepanel/components/panels/ReminderPanel/ReminderDialog"
@@ -42,6 +46,25 @@ const BasicRenderer: FC<{
   )
 }
 
+const ExtensionLink: FC<{ href: string; children: ReactNode }> = ({
+  href,
+  children
+}) => {
+  const onClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (typeof chrome !== "undefined" && chrome.tabs) {
+      chrome.tabs.create({ url: href! })
+    } else {
+      window.open(href, "_blank", "noopener")
+    }
+  }
+
+  return (
+    <a href={href} onClick={onClick}>
+      {children}
+    </a>
+  )
+}
 export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   data
 }) => {
@@ -63,6 +86,13 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
   const latestMemo = useMemo(() => {
     return (memoPages?.pages ?? [])[0]
   }, [memoPages])
+
+  const markdownMemo = useMemo(() => {
+    if (data?.content && !!data?.content.length) {
+      return blocksToMarkdown(data.content)
+    }
+    return ""
+  }, [data])
 
   const handleCreateMemo = async (title: string, document: PartialBlock[]) => {
     if (isCreatingMemo) return
@@ -104,6 +134,7 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
       })
     }
   }
+
   return (
     <BasicRenderer
       title={data.title}
@@ -131,7 +162,18 @@ export const MemoMessageRenderer: FC<{ data: MemoMessageData }> = ({
           )}
         </>
       }>
-      {extractAllTextWithLineBreaks(data.content)}
+      <div className="max-w-full overflow-auto markdown-content">
+        <Markdown
+          options={{
+            overrides: {
+              a: {
+                component: ExtensionLink
+              }
+            }
+          }}>
+          {markdownMemo}
+        </Markdown>
+      </div>
     </BasicRenderer>
   )
 }
@@ -369,7 +411,7 @@ export const SheetMessageRenderer: FC<{ data: SheetMessageData }> = ({
 }
 
 const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isDialogOpen, onDialogChange] = useState(false)
   const [editingItem, setEditingItem] = useState<DialogReminderItem | null>(
     null
@@ -388,11 +430,16 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
     onDialogChange(true)
   }
 
-  const formatReminderDate = (datetimeStr: string) => {
-    if (!datetimeStr) return "-"
-    const date = isNaN(Number(datetimeStr)) ? datetimeStr : Number(datetimeStr)
-    return dayjs(date).format("YYYY-MM-DD HH:mm")
+  const formatTime = (time: Date | string) => {
+    if (!time) return "-"
+    return dayjs(time).format("hh:mm A")
   }
+
+  const formatDate = (time: Date | string) => {
+    if (!time) return "-"
+    return dayjs(time).locale(i18n.language).format("ddd, MMMM D, YYYY")
+  }
+
   return (
     <>
       <BasicRenderer
@@ -410,13 +457,22 @@ const ReminderMessageItem: FC<{ data: ReminderMessageItem }> = ({ data }) => {
             />
           </>
         }>
-        <div className="prose prose-sm max-w-full overflow-auto markdown-content">
+        <div className="max-w-full overflow-auto markdown-content">
           <Markdown>{desc}</Markdown>
         </div>
-        <div className="flex items-center gap-1 text-text-default-secondary text-xs">
-          {formatReminderDate(data.start_at)} ~{" "}
-          {formatReminderDate(data.end_at)}
-        </div>
+        {(!!data.start_at || !!data.end_at) && (
+          <div className="border-t pt-2 border-text-default-secondary">
+            <div className="items-center gap-1 text-text-default-primary text-lg flex flex-row justify-between">
+              <div>{formatTime(data.start_at)}</div>
+              <MoveRightIcon className="w-4" />
+              <div>{formatTime(data.end_at)}</div>
+            </div>
+            <div className="items-center gap-1 text-text-default-secondary text-[10px] flex flex-row justify-between">
+              <div className="break-all">{formatDate(data.start_at)}</div>
+              <div className="break-all">{formatDate(data.end_at)}</div>
+            </div>
+          </div>
+        )}
       </BasicRenderer>
       <ReminderDialog
         open={isDialogOpen}

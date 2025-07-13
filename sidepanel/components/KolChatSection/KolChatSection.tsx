@@ -14,10 +14,14 @@ const ChatSection: FC<ChatSectionProps> = ({ screenName }) => {
 }
 
 export const KolChatSection: FC = () => {
-  const { kolScreenName, setKolScreenName } = useStore()
+  const { kolScreenName, setKolScreenName, setKolInfo } = useStore()
 
   const handleBack = () => {
     setKolScreenName("")
+    setKolInfo({
+      avatarUrl: "",
+      userName: ""
+    })
   }
   if (!kolScreenName) {
     return <></>
