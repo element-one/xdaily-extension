@@ -318,7 +318,7 @@ const createQuoteButton = (tweet: HTMLElement) => {
 }
 
 const createProfileHeaderButton = (header: HTMLElement) => {
-  const chatLabel = "chat" // TODO
+  const chatLabel = i18n.t("content_inject_tool.robot_chat_tooltip")
   const host = document.createElement("xdaily-profile-header-button")
   host.className = ROBOT_BUTTON_CONT
   const shadow = host.attachShadow({ mode: "open" })
@@ -485,6 +485,15 @@ const refreshInjectedButtons = () => {
       const tooltip = host.shadowRoot.querySelector(".tooltip")
       if (tooltip) {
         tooltip.textContent = i18n.t("content_inject_tool.quote_tooltip")
+      }
+    }
+  })
+
+  document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((host) => {
+    if (host.shadowRoot) {
+      const tooltip = host.shadowRoot.querySelector(".tooltip")
+      if (tooltip) {
+        tooltip.textContent = i18n.t("content_inject_tool.robot_chat_tooltip")
       }
     }
   })

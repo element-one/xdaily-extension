@@ -102,6 +102,7 @@
   },
   "content_inject_tool": {
     "collect_tooltip": "Collect Tweet",
-    "quote_tooltip": "Quote Tweet"
+    "quote_tooltip": "Quote Tweet",
+    "robot_chat_tooltip": "Chat"
   }
 }
