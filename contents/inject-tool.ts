@@ -5,28 +5,75 @@ import { sendToBackground } from "@plasmohq/messaging"
 import {
   extractTweetDataFromTweet,
   findTweetButton,
-  getTweetIdFromTweet
+  getTweetIdFromTweet,
+  getUserInfoFromHeader
 } from "~libs/tweet"
 import { MessageType, type MessagePayload } from "~types/message"
 
 import i18n, { initI18n } from "../locales/i18n"
 
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
+  // only show in these two sites
+  matches: ["https://twitter.com/*", "https://x.com/*"],
   all_frames: true
 }
 
 const COLLECT_BUTTON_CONT = "xdaily-collect-button-cont"
 const QUOTE_BUTTON_CONT = "xdaily-quote-button-cont"
+const ROBOT_BUTTON_CONT = "xdaily-robot-chat-button-cont"
 
 const loadingTweets = new Set<string>()
 
+let lastHandledScreenName = ""
+const onRouteChange = (callback) => {
+  let lastHref = location.href
+
+  const check = () => {
+    if (location.href !== lastHref) {
+      lastHref = location.href
+      callback()
+    }
+  }
+
+  // hook pushState / replaceState
+  const originalPush = history.pushState
+  history.pushState = function () {
+    originalPush.apply(this, arguments)
+    check()
+  }
+
+  const originalReplace = history.replaceState
+  history.replaceState = function () {
+    originalReplace.apply(this, arguments)
+    check()
+  }
+
+  window.addEventListener("popstate", check)
+
+  // also poll as fallback
+  setInterval(check, 1000)
+}
+
 // twitter is SPA
 const observeTweets = () => {
+  onRouteChange(() => {
+    lastHandledScreenName = ""
+    document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((el) => {
+      el.remove()
+    })
+    // observe profile header
+    const usernameHeader = document.querySelector('[data-testid="UserName"]')
+    injectPageHeaderButton(usernameHeader)
+  })
   const observer = new MutationObserver(() => {
+    // observe article
     document.querySelectorAll("article").forEach((tweet) => {
       injectButton(tweet)
     })
+
+    // observe profile header
+    const usernameHeader = document.querySelector('[data-testid="UserName"]')
+    injectPageHeaderButton(usernameHeader)
   })
   observer.observe(document.body, { childList: true, subtree: true })
 }
@@ -270,6 +317,98 @@ const createQuoteButton = (tweet: HTMLElement) => {
   return host
 }
 
+const createProfileHeaderButton = (header: HTMLElement) => {
+  const chatLabel = "chat" // TODO
+  const host = document.createElement("xdaily-profile-header-button")
+  host.className = ROBOT_BUTTON_CONT
+  const shadow = host.attachShadow({ mode: "open" })
+  shadow.innerHTML = `
+    <style>
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        margin: 0px 8px;
+        position: absolute;
+        right:0;
+      }
+      .button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 2em;
+        height: 2em;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        position: relative;
+        opacity: 1;
+        color: #ff9500;
+      }
+      .tooltip {
+        position: absolute;
+        top: 100%;
+        margin-top: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #151717;
+        border: 1px solid #FFFFFF1A;
+        border-radius: 0.5rem;
+        padding: 10px 8px;
+        font-size: 12px;
+        color: white;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 9999;
+      }
+
+      .button:hover .tooltip {
+        opacity: 1;
+      }
+      .button > .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.3s ease;
+      }
+     .button:hover > .icon {
+        opacity: 0.8;
+      }
+    </style>
+     <div class="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      <div class="tooltip">${chatLabel}</div>
+    </div>
+  `
+
+  const button = shadow.querySelector(".button")! as HTMLDivElement
+  button.addEventListener("click", async () => {
+    // get user info
+    const { avatar, screenName, displayName } = getUserInfoFromHeader(header)
+    sendToBackground({
+      name: "toggle-panel",
+      body: {
+        open: true
+      }
+    })
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sendToBackground({
+      name: "relay-chat-with-user",
+      body: {
+        userId: screenName,
+        avatarUrl: avatar,
+        userName: displayName
+      }
+    })
+  })
+
+  return host
+}
+
 const injectButton = (tweet: Element) => {
   // inject collect tweet button
   const hasCollectButton = tweet.querySelector(`.${COLLECT_BUTTON_CONT}`)
@@ -293,6 +432,41 @@ const injectButton = (tweet: Element) => {
     if (moreButton?.parentElement) {
       moreButton.parentElement.insertBefore(buttonEl, moreButton)
     }
+  }
+}
+
+const injectPageHeaderButton = async (header: Element) => {
+  if (!header) return
+  const hasRobotChatButton = header.querySelector(`.${ROBOT_BUTTON_CONT}`)
+  if (hasRobotChatButton) return
+
+  const { screenName } = getUserInfoFromHeader(header)
+  if (!screenName) return
+
+  if (screenName === lastHandledScreenName) {
+    return
+  }
+  lastHandledScreenName = screenName
+
+  let isUserKOL = false
+  try {
+    isUserKOL = await sendToBackground({
+      name: "is-user-kol",
+      body: {
+        userId: screenName
+      }
+    })
+  } catch (e) {
+    isUserKOL = false
+  }
+  if (isUserKOL) {
+    const buttonEl = createProfileHeaderButton(header as HTMLElement)
+    header.appendChild(buttonEl)
+  } else {
+    // create an empty button
+    const host = document.createElement("xdaily-profile-header-button")
+    host.className = ROBOT_BUTTON_CONT
+    header.appendChild(host)
   }
 }
 

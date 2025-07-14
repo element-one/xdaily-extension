@@ -111,3 +111,46 @@ export const findTweetButton = (
 
   return null
 }
+
+export const getUserInfoFromHeader = (header: Element) => {
+  const headerCont = header.parentElement
+  let avatar = ""
+  const imgEl = headerCont.querySelector(
+    '[data-testid^="UserAvatar-Container"] img'
+  ) as HTMLImageElement
+  if (imgEl?.src) {
+    avatar = imgEl.src
+  }
+
+  const bgDiv = headerCont.querySelector(
+    '[data-testid^="UserAvatar-Container"] [style*="background-image"]'
+  ) as HTMLElement
+  if (bgDiv) {
+    const bgImage = bgDiv.style.backgroundImage
+    const match = bgImage.match(/url\(["']?(.*?)["']?\)/)
+    if (match?.[1]) {
+      avatar = match[1]
+    }
+  }
+
+  const spans = Array.from(header.querySelectorAll("span")).filter((span) => {
+    return !span.querySelector("span")
+  })
+
+  let displayName = ""
+  let screenName = ""
+
+  for (const span of spans) {
+    const text = span.textContent?.trim() ?? ""
+    if (text.startsWith("@")) {
+      screenName = text.slice(1)
+    } else if (!displayName) {
+      displayName = text
+    }
+  }
+  return {
+    displayName,
+    screenName,
+    avatar
+  }
+}
