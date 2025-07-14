@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
+import { sendToBackground } from "@plasmohq/messaging"
+
 import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
 import { MessageType, type MessagePayload } from "~types/message"
@@ -161,6 +163,12 @@ export const DashboardPage = () => {
     }
   }, [])
 
+  const startScreenshot = () => {
+    sendToBackground({
+      name: "relay-start-screenshot"
+    })
+  }
+
   return (
     <div className="flex flex-row w-full h-screen overflow-hidden">
       {/* main */}
@@ -215,7 +223,7 @@ export const DashboardPage = () => {
           })}
           <MeNavbarItem
             key="cut"
-            handleClick={() => {}}
+            handleClick={() => startScreenshot()}
             icon={ScissorsIcon}
             tooltip="Test Screenshot"
             isTargeted={false}

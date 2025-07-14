@@ -1,13 +1,14 @@
 import cssText from "data-text:~/styles/global.css"
 import type { PlasmoCSConfig, PlasmoGetShadowHostId } from "plasmo"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Layer, Rect, Stage } from "react-konva"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
+import { MessageType } from "~types/message"
+
 export const config: PlasmoCSConfig = {
-  // only show in these two sites
-  matches: ["https://twitter.com/*", "https://x.com/*"],
+  matches: ["<all_urls>"],
   all_frames: true
 }
 
@@ -35,6 +36,20 @@ const ScreenCropOverlay = () => {
   const dpr = window.devicePixelRatio || 1
   const scrollX = window.scrollX
   const scrollY = window.scrollY
+
+  useEffect(() => {
+    const messageListener = (message) => {
+      if (message.type === MessageType.START_SCREENSHOT) {
+        setShowOverlay(true)
+      }
+    }
+
+    chrome.runtime.onMessage.addListener(messageListener)
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener)
+    }
+  }, [])
 
   const onMouseDown = (e: any) => {
     const pos = e.target.getStage().getPointerPosition()
@@ -104,7 +119,6 @@ const ScreenCropOverlay = () => {
           rect.height
         )
         const croppedUrl = canvas.toDataURL()
-        console.log("testing", croppedUrl)
         setScreenshotUrl(croppedUrl)
       }
       img.src = res.dataUrl

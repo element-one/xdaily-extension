@@ -11,7 +11,8 @@ export enum MessageType {
   ADD_USER_COLLECTION = "add_user_collection",
   QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
   CHAT_WITH_USER = "chat_with_user",
-  LANGUAGE_CHANGED = "language_changed"
+  LANGUAGE_CHANGED = "language_changed",
+  START_SCREENSHOT = "start_screenshot"
 }
 
 export type InpageToastPayload = {
