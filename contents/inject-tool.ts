@@ -51,10 +51,17 @@ const onRouteChange = (callback) => {
   window.addEventListener("popstate", check)
 
   // also poll as fallback
-  setInterval(check, 1000)
+  const intervalId = setInterval(check, 1000)
+  return () => {
+    history.pushState = originalPush
+    history.replaceState = originalReplace
+    window.removeEventListener("popstate", check)
+    clearInterval(intervalId)
+  }
 }
 
 // twitter is SPA
+let tweetObserver = null
 const observeTweets = () => {
   onRouteChange(() => {
     lastHandledScreenName = ""
@@ -65,7 +72,10 @@ const observeTweets = () => {
     const usernameHeader = document.querySelector('[data-testid="UserName"]')
     injectPageHeaderButton(usernameHeader)
   })
-  const observer = new MutationObserver(() => {
+  if (tweetObserver) {
+    tweetObserver.disconnect()
+  }
+  tweetObserver = new MutationObserver(() => {
     // observe article
     document.querySelectorAll("article").forEach((tweet) => {
       injectButton(tweet)
@@ -75,7 +85,7 @@ const observeTweets = () => {
     const usernameHeader = document.querySelector('[data-testid="UserName"]')
     injectPageHeaderButton(usernameHeader)
   })
-  observer.observe(document.body, { childList: true, subtree: true })
+  tweetObserver.observe(document.body, { childList: true, subtree: true })
 }
 
 const createCollectButton = (tweet: HTMLElement) => {
@@ -504,9 +514,12 @@ chrome.runtime.onMessage.addListener((message: MessagePayload) => {
     const newLang = message.language
     console.log("[content-script] Received language change:", newLang)
 
-    i18n.changeLanguage(newLang).then(() => {
-      refreshInjectedButtons()
-    })
+    i18n
+      .changeLanguage(newLang)
+      .then(() => {
+        refreshInjectedButtons()
+      })
+      .catch((err) => console.error("i18n error:", err))
   }
 })
 
