@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { AtomIcon } from "lucide-react"
+import { AtomIcon, ScissorsIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
@@ -213,6 +213,13 @@ export const DashboardPage = () => {
               />
             )
           })}
+          <MeNavbarItem
+            key="cut"
+            handleClick={() => {}}
+            icon={ScissorsIcon}
+            tooltip="Test Screenshot"
+            isTargeted={false}
+          />
           <LanguageSelector />
           <UserNavbarItem />
         </div>

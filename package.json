@@ -31,6 +31,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "i18next": "^25.3.0",
+    "konva": "^9.3.22",
     "lucide-react": "^0.475.0",
     "markdown-to-jsx": "^7.7.4",
     "plasmo": "0.90.5",
@@ -38,6 +39,7 @@
     "react-datepicker": "^8.3.0",
     "react-dom": "18.2.0",
     "react-i18next": "^15.6.0",
+    "react-konva": "18",
     "react-markdown": "^10.1.0",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
@@ -61,12 +63,15 @@
   "manifest": {
     "permissions": [
       "storage",
-      "cookies"
+      "cookies",
+      "tabs",
+      "activeTab"
     ],
     "host_permissions": [
       "$PLASMO_PUBLIC_SERVER_URL/*",
       "https://twitter.com/*",
-      "https://x.com/*"
+      "https://x.com/*",
+      "<all_urls>"
     ]
   }
 }
