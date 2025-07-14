@@ -70,7 +70,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "need_fill_all": "Please fill in all the information",
-    "must_later": "End time must be later than start time",
+    "must_later": "End time must be later or equal to start time",
     "edit_reminder": "Edit Reminder",
     "new_reminder": "New Reminder",
     "reminder_title": "Reminder Title",

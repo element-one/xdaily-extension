@@ -70,7 +70,7 @@
     "delete": "删除",
     "edit": "编辑",
     "need_fill_all": "请填写所有必填信息",
-    "must_later": "结束时间必须晚于开始时间",
+    "must_later": "结束时间必须晚于或者等于开始时间",
     "edit_reminder": "编辑提醒",
     "new_reminder": "新建提醒",
     "reminder_title": "提醒标题",
