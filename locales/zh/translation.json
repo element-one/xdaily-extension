@@ -102,6 +102,7 @@
   },
   "content_inject_tool": {
     "collect_tooltip": "收藏推文",
-    "quote_tooltip": "引用推文"
+    "quote_tooltip": "引用推文",
+    "robot_chat_tooltip": "对话"
   }
 }
