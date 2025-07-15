@@ -13,10 +13,11 @@ import {
   type FC,
   type FormEvent
 } from "react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { formatTweetDate } from "~libs/date"
+import { getI18nUrl } from "~libs/url"
 import {
   useChatHistory,
   useGetChatModelInfo,
@@ -25,6 +26,7 @@ import {
 } from "~services/chat"
 import { useStore } from "~store/store"
 import { ChatType } from "~types/chat"
+import { CHAT_ERROR } from "~types/enum"
 import type { TweetData } from "~types/tweet"
 
 import MemoIcon from "../icons/MemoIcon"
@@ -61,7 +63,7 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 }
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const { removeQuoteTweet, userInfo, kolInfo } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
@@ -102,33 +104,40 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
-  const { messages, input, handleInputChange, status, append, setInput } =
-    useChat({
-      id: screenName, // as different session
-      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
-      streamProtocol: "text",
-      fetch: async (url, options) => {
-        const data = JSON.parse(options.body as string)
-        const msg = data.messages.pop()
-        const userMessage = msg.content
-        const tweetId = msg.data?.tweet?.tweetId
-        const type = msg.data?.type
+  const {
+    messages,
+    input,
+    handleInputChange,
+    status,
+    append,
+    setInput,
+    error
+  } = useChat({
+    id: screenName, // as different session
+    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+    streamProtocol: "text",
+    fetch: async (url, options) => {
+      const data = JSON.parse(options.body as string)
+      const msg = data.messages.pop()
+      const userMessage = msg.content
+      const tweetId = msg.data?.tweet?.tweetId
+      const type = msg.data?.type
 
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          credentials: "include", // cookie
-          body: JSON.stringify({
-            message: userMessage,
-            tweetId,
-            type
-          })
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", // cookie
+        body: JSON.stringify({
+          message: userMessage,
+          tweetId,
+          type
         })
-        return response
-      }
-    }) as CustomUseChat
+      })
+      return response
+    }
+  }) as CustomUseChat
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
@@ -281,6 +290,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     }
   }
 
+  const goUpgradePage = () => {
+    chrome.tabs.create({
+      url: getI18nUrl("#pricing", i18n.language)
+    })
+  }
+
   return (
     <div className="flex gap-y-4 rounded-md flex-col h-full flex-1 min-h-0">
       <div className="text-xs font-semibold min-h-[18px] flex items-center text-text-default-primary">
@@ -369,7 +384,11 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
       </div>
 
       {/* input and send message button */}
-      <div className="py-2 flex flex-col gap-1 relative shrink-0">
+      <div
+        className={clsx(
+          "flex flex-col gap-1 shrink-0",
+          status === "error" ? "pb-0" : "pb-2"
+        )}>
         <div className="flex mb-2 items-center justify-between gap-2">
           {!!models.length ? (
             <Select
@@ -441,8 +460,22 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
           </button>
         </form>
         {status === "error" && (
-          <div className="px-2 text-[10px] text-red absolute top-full left-0 right-0 -translate-y-1/2 pt-1">
-            {t("chat_panel.error_desc")}
+          <div className="px-2 text-[10px] text-red">
+            {(error?.message ?? "").includes(CHAT_ERROR.TRIAL_END) ? (
+              <Trans
+                i18nKey={"chat_panel.trial_end"}
+                components={{
+                  upgradeLink: (
+                    <span
+                      onClick={goUpgradePage}
+                      className="underline font-bold text-primary-brand cursor-pointer"
+                    />
+                  )
+                }}
+              />
+            ) : (
+              t("chat_panel.error_desc")
+            )}
           </div>
         )}
       </div>

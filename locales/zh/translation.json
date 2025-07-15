@@ -98,7 +98,8 @@
     "append_success": "追加成功",
     "save_new_sheet": "另存为新表格",
     "append_to_sheet": "追加到最近表格",
-    "create_reminder": "创建提醒事项"
+    "create_reminder": "创建提醒事项",
+    "trial_end": "今日额度已用完，<upgradeLink>去升级</upgradeLink>"
   },
   "content_inject_tool": {
     "collect_tooltip": "收藏推文",
