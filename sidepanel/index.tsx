@@ -58,6 +58,10 @@ const IndexSidePanel = () => {
         refetch()
       }
     })
+    const port = chrome.runtime.connect({ name: "sidepanel" })
+    return () => {
+      port.disconnect()
+    }
   }, [])
 
   const defaultLang = useMemo(() => {

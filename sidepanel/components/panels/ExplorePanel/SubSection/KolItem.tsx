@@ -38,7 +38,7 @@ export const KolItem: FC<KolItemProps> = ({ item: user }) => {
           @{user.screenName}
         </div>
       </div>
-      <div className="text-sm font-light mt-2">{user.bio}</div>
+      <div className="text-sm font-light mt-2 break-words">{user.bio}</div>
     </div>
   )
 }

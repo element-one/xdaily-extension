@@ -55,3 +55,5 @@ export type MessagePayload =
   | QuoteTweetPayload
   | ChatWithUserPayload
   | LanguageChangedPayload
+
+export const DASHBOARD_READY_KEY = "xdaily_dashboard_ready"

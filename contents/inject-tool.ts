@@ -316,8 +316,6 @@ const createQuoteButton = (tweet: HTMLElement) => {
         open: true
       }
     })
-    // wait for 500ms
-    await new Promise((resolve) => setTimeout(resolve, 500))
     await sendToBackground({
       name: "relay-quote-tweet",
       body: { tweetInfo }
@@ -342,25 +340,28 @@ const createProfileHeaderButton = (header: HTMLElement) => {
         margin: 0px 8px;
         position: absolute;
         right:0;
+        z-index: 9999;
       }
       .button {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 2em;
-        height: 2em;
-        border-radius: 0.375rem;
         cursor: pointer;
         position: relative;
         opacity: 1;
         color: #ff9500;
+        border: 1px solid #ff9500;
+        width: 2.5em;
+        height: 2.5em;
+        border-radius: 50%;
+        transition: all 0.3s ease;
       }
       .tooltip {
         position: absolute;
-        top: 100%;
-        margin-top: 4px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 50%;
+        right: 100%;
+        margin-right: 4px;
+        transform: translateY(-50%);
         background-color: #151717;
         border: 1px solid #FFFFFF1A;
         border-radius: 0.5rem;
@@ -374,6 +375,9 @@ const createProfileHeaderButton = (header: HTMLElement) => {
         z-index: 9999;
       }
 
+      .button:hover {
+        background: rgba(0,0,0,0.05);
+      }
       .button:hover .tooltip {
         opacity: 1;
       }
@@ -405,7 +409,6 @@ const createProfileHeaderButton = (header: HTMLElement) => {
         open: true
       }
     })
-    await new Promise((resolve) => setTimeout(resolve, 500))
     await sendToBackground({
       name: "relay-chat-with-user",
       body: {

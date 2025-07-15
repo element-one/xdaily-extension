@@ -98,7 +98,8 @@
     "append_success": "Append Success",
     "save_new_sheet": "Save as new sheet",
     "append_to_sheet": "Append to latest sheet",
-    "create_reminder": "Create a reminder"
+    "create_reminder": "Create a reminder",
+    "trial_end": "Credits exhausted. <upgradeLink>Upgrade</upgradeLink>"
   },
   "content_inject_tool": {
     "collect_tooltip": "Collect Tweet",
