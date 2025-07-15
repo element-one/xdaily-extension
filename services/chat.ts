@@ -103,20 +103,17 @@ export const useGetUserAgents = () => {
   })
 }
 
-export const getUserAgentModels = async (
-  id: string
-): Promise<UserAgentModelResp> => {
-  const response = await client.get(`/users/agents/${id}/models`)
+export const getUserAgentModels = async (): Promise<UserAgentModelResp> => {
+  const response = await client.get(`/users/models`)
   return response.data
 }
 
-export const useGetUserAgentModels = (id: string) => {
+export const useGetUserAgentModels = () => {
   return useQuery({
     retry: 0,
     refetchOnWindowFocus: false,
-    queryKey: ["user-agent-models", id],
-    queryFn: () => getUserAgentModels(id),
-    enabled: !!id
+    queryKey: ["user-agent-models"],
+    queryFn: () => getUserAgentModels()
   })
 }
 

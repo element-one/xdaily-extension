@@ -76,9 +76,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const isSelf = userInfo.username === screenName
 
   const { data: chatModelInfo, refetch } = useGetChatModelInfo(screenName)
-  const { data: modelsResp } = useGetUserAgentModels(
-    chatModelInfo?.agent?.id ?? ""
-  )
+  const { data: modelsResp } = useGetUserAgentModels()
+
   const {
     mutateAsync: updateChatModelInfo,
     isPending: isUpdatingChatModelInfo
@@ -92,6 +91,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     return modelsResp.data ?? []
   }, [modelsResp])
 
+  // TODO the default or selected model need to change
   useEffect(() => {
     if (chatModelInfo) {
       setActModelId(chatModelInfo.model.id ?? "")
