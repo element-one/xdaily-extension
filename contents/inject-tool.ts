@@ -316,8 +316,6 @@ const createQuoteButton = (tweet: HTMLElement) => {
         open: true
       }
     })
-    // wait for 500ms
-    await new Promise((resolve) => setTimeout(resolve, 500))
     await sendToBackground({
       name: "relay-quote-tweet",
       body: { tweetInfo }
@@ -411,7 +409,6 @@ const createProfileHeaderButton = (header: HTMLElement) => {
         open: true
       }
     })
-    await new Promise((resolve) => setTimeout(resolve, 500))
     await sendToBackground({
       name: "relay-chat-with-user",
       body: {

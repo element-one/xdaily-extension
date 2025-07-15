@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-import { showToastInWebPage } from "~background/utils"
+import { showToastInWebPage, waitUntilDashboardReady } from "~background/utils"
 import { subscribeTweetUser } from "~services/tweet"
 import { MessageType } from "~types/message"
 
@@ -14,9 +14,12 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
         showToastInWebPage({
           message: `Subscribe to @${userId} success`
         })
-        chrome.runtime.sendMessage({
-          type: MessageType.ADD_USER_COLLECTION,
-          data: res
+
+        await waitUntilDashboardReady(async () => {
+          await chrome.runtime.sendMessage({
+            type: MessageType.ADD_USER_COLLECTION,
+            data: res
+          })
         })
       }
     }
