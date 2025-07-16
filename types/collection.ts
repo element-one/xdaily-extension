@@ -64,6 +64,7 @@ export interface GetUserCollectionResp {
 export interface GetKolCollectionParams {
   page: number
   take: number
+  lang: "zh" | "en"
   categoryId?: string
 }
 export interface KolCollection {

@@ -87,9 +87,10 @@ export const useUserCollections = (take: number) => {
 export const getKolCollection = async ({
   page,
   take,
-  categoryId
+  categoryId,
+  lang
 }: GetKolCollectionParams): Promise<GetKolCollectionResp> => {
-  let reqUrl = `/users/categories/kol?page=${page}&take=${take}`
+  let reqUrl = `/users/categories/kol?page=${page}&take=${take}&lang=${lang}`
   if (categoryId) {
     reqUrl = `reqUrl&categoryId=${categoryId}`
   }
@@ -97,15 +98,19 @@ export const getKolCollection = async ({
   return response.data
 }
 
-export const useKolCollections = (take: number, categoryId?: string) => {
+export const useKolCollections = (
+  take: number,
+  lang: "en" | "zh",
+  categoryId?: string
+) => {
   return useInfiniteQuery<
     GetKolCollectionResp,
     Error,
     InfiniteData<KolCollection>
   >({
-    queryKey: ["kol-collections", take],
+    queryKey: ["kol-collections", take, lang],
     queryFn: ({ pageParam = 1 }) =>
-      getKolCollection({ page: pageParam as number, take, categoryId }),
+      getKolCollection({ page: pageParam as number, take, categoryId, lang }),
     initialPageParam: 1,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

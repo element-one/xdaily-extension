@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-import { showToastInWebPage } from "~background/utils"
+import { showToastInWebPage, waitUntilDashboardReady } from "~background/utils"
 import { collectTweet } from "~services/tweet"
 import { MessageType } from "~types/message"
 
@@ -13,12 +13,12 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       showToastInWebPage({
         message: `Save tweet ${tweetId} success`
       })
-      setTimeout(() => {
-        chrome.runtime.sendMessage({
+      await waitUntilDashboardReady(async () => {
+        await chrome.runtime.sendMessage({
           type: MessageType.ADD_COLLECTION,
           data: res
         })
-      }, 500)
+      })
     }
   } catch (e) {
     console.log(e)

@@ -70,7 +70,7 @@
     "delete": "删除",
     "edit": "编辑",
     "need_fill_all": "请填写所有必填信息",
-    "must_later": "结束时间必须晚于开始时间",
+    "must_later": "结束时间必须晚于或者等于开始时间",
     "edit_reminder": "编辑提醒",
     "new_reminder": "新建提醒",
     "reminder_title": "提醒标题",
@@ -98,10 +98,12 @@
     "append_success": "追加成功",
     "save_new_sheet": "另存为新表格",
     "append_to_sheet": "追加到最近表格",
-    "create_reminder": "创建提醒事项"
+    "create_reminder": "创建提醒事项",
+    "trial_end": "今日额度已用完，<upgradeLink>去升级</upgradeLink>"
   },
   "content_inject_tool": {
     "collect_tooltip": "收藏推文",
-    "quote_tooltip": "引用推文"
+    "quote_tooltip": "引用推文",
+    "robot_chat_tooltip": "对话"
   }
 }

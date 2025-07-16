@@ -70,7 +70,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "need_fill_all": "Please fill in all the information",
-    "must_later": "End time must be later than start time",
+    "must_later": "End time must be later or equal to start time",
     "edit_reminder": "Edit Reminder",
     "new_reminder": "New Reminder",
     "reminder_title": "Reminder Title",
@@ -98,10 +98,12 @@
     "append_success": "Append Success",
     "save_new_sheet": "Save as new sheet",
     "append_to_sheet": "Append to latest sheet",
-    "create_reminder": "Create a reminder"
+    "create_reminder": "Create a reminder",
+    "trial_end": "Credits exhausted. <upgradeLink>Upgrade</upgradeLink>"
   },
   "content_inject_tool": {
     "collect_tooltip": "Collect Tweet",
-    "quote_tooltip": "Quote Tweet"
+    "quote_tooltip": "Quote Tweet",
+    "robot_chat_tooltip": "Chat"
   }
 }

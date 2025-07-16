@@ -3,6 +3,7 @@ import {
   type UseChatHelpers,
   type Message as VercelMessage
 } from "@ai-sdk/react"
+import * as Dialog from "@radix-ui/react-dialog"
 import clsx from "clsx"
 import { ArrowUpIcon, ClockIcon, XIcon } from "lucide-react"
 import {
@@ -13,10 +14,11 @@ import {
   type FC,
   type FormEvent
 } from "react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
 
 import { formatTweetDate } from "~libs/date"
+import { getI18nUrl } from "~libs/url"
 import {
   useChatHistory,
   useGetChatModelInfo,
@@ -25,6 +27,7 @@ import {
 } from "~services/chat"
 import { useStore } from "~store/store"
 import { ChatType } from "~types/chat"
+import { CHAT_ERROR } from "~types/enum"
 import type { TweetData } from "~types/tweet"
 
 import MemoIcon from "../icons/MemoIcon"
@@ -61,7 +64,7 @@ type CustomUseChat = Omit<UseChatHelpers, "messages"> & {
 }
 
 export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const { removeQuoteTweet, userInfo, kolInfo } = useStore()
   const chatRef = useRef<HTMLDivElement>(null)
@@ -76,9 +79,8 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const isSelf = userInfo.username === screenName
 
   const { data: chatModelInfo, refetch } = useGetChatModelInfo(screenName)
-  const { data: modelsResp } = useGetUserAgentModels(
-    chatModelInfo?.agent?.id ?? ""
-  )
+  const { data: modelsResp } = useGetUserAgentModels()
+
   const {
     mutateAsync: updateChatModelInfo,
     isPending: isUpdatingChatModelInfo
@@ -87,11 +89,14 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
   const [actModelId, setActModelId] = useState("")
   const isFirstScroll = useRef(true)
 
+  const [showErrorDialog, setShowErrorDialog] = useState(false)
+
   const models = useMemo(() => {
     if (!modelsResp) return []
     return modelsResp.data ?? []
   }, [modelsResp])
 
+  // TODO the default or selected model need to change
   useEffect(() => {
     if (chatModelInfo) {
       setActModelId(chatModelInfo.model.id ?? "")
@@ -102,33 +107,40 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
 
   const isLoadingHistory = isFetching || isFetchingNextPage
 
-  const { messages, input, handleInputChange, status, append, setInput } =
-    useChat({
-      id: screenName, // as different session
-      api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
-      streamProtocol: "text",
-      fetch: async (url, options) => {
-        const data = JSON.parse(options.body as string)
-        const msg = data.messages.pop()
-        const userMessage = msg.content
-        const tweetId = msg.data?.tweet?.tweetId
-        const type = msg.data?.type
+  const {
+    messages,
+    input,
+    handleInputChange,
+    status,
+    append,
+    setInput,
+    error
+  } = useChat({
+    id: screenName, // as different session
+    api: `${process.env.PLASMO_PUBLIC_SERVER_URL}/users/chat/${screenName}`,
+    streamProtocol: "text",
+    fetch: async (url, options) => {
+      const data = JSON.parse(options.body as string)
+      const msg = data.messages.pop()
+      const userMessage = msg.content
+      const tweetId = msg.data?.tweet?.tweetId
+      const type = msg.data?.type
 
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          credentials: "include", // cookie
-          body: JSON.stringify({
-            message: userMessage,
-            tweetId,
-            type
-          })
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", // cookie
+        body: JSON.stringify({
+          message: userMessage,
+          tweetId,
+          type
         })
-        return response
-      }
-    }) as CustomUseChat
+      })
+      return response
+    }
+  }) as CustomUseChat
 
   const allMessages = useMemo(() => {
     const historyMessages = (history?.pages ? history.pages : []).map(
@@ -281,172 +293,230 @@ export const ChatWindow: FC<ChatWindowProps> = ({ screenName, quoteTweet }) => {
     }
   }
 
+  const goUpgradePage = () => {
+    chrome.tabs.create({
+      url: getI18nUrl("#pricing", i18n.language)
+    })
+    setShowErrorDialog(false)
+  }
+
+  useEffect(() => {
+    if (status === "error") {
+      setShowErrorDialog((error?.message ?? "").includes(CHAT_ERROR.TRIAL_END))
+    }
+  }, [error, status])
+
   return (
-    <div className="flex gap-y-4 rounded-md flex-col h-full flex-1 min-h-0">
-      <div className="text-xs font-semibold min-h-[18px] flex items-center text-text-default-primary">
-        {/* here show avatar */}
-        {!isSelf && screenName ? (
-          <div className="flex items-center gap-x-2 pt-2">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-fill-bg-input">
-              <ImageWithFallback
-                src={kolInfo.avatarUrl ?? ""}
-                className="w-9 h-9 rounded-full object-contain"
-                fallbackClassName="w-9 h-9 rounded-full"
-              />
-            </div>
-            <div>
-              <div className="text-sm text-primary-brand line-clamp-1">
-                {kolInfo.userName ?? screenName}
+    <>
+      <div className="flex gap-y-4 rounded-md flex-col h-full flex-1 min-h-0">
+        <div className="text-xs font-semibold min-h-[18px] flex items-center text-text-default-primary">
+          {/* here show avatar */}
+          {!isSelf && screenName ? (
+            <div className="flex items-center gap-x-2 pt-2">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-fill-bg-input">
+                <ImageWithFallback
+                  src={kolInfo.avatarUrl ?? ""}
+                  className="w-9 h-9 rounded-full object-contain"
+                  fallbackClassName="w-9 h-9 rounded-full"
+                />
               </div>
-              <div className="text-[10px] text-text-default-secondary">
-                @{screenName}
+              <div>
+                <div className="text-sm text-primary-brand line-clamp-1">
+                  {kolInfo.userName ?? screenName}
+                </div>
+                <div className="text-[10px] text-text-default-secondary">
+                  @{screenName}
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className=" flex items-center gap-x-1 mb-1">
-            <ImageWithFallback
-              src={robotImg}
-              alt="robot"
-              className="w-5 h-5 rounded-full object-contain"
-              fallbackClassName="w-5 h-5 rounded-full"
-            />
-            xDaily
-          </div>
-        )}
-      </div>
-      <div
-        className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll pr-2"
-        ref={chatRef}
-        onScroll={(e) => {
-          if ((e.currentTarget.scrollTop ?? 0) === 0) {
-            loadMoreHistory()
-          }
-        }}>
-        {isLoadingHistory && !showGreeting && (
-          <div className="w-full text-center text-white">
-            {t("chat_panel.loading_history")}
-          </div>
-        )}
-
-        {allMessages.map((m, i) => (
-          <div key={i} className={`flex flex-col gap-3`}>
-            {m.data?.tweet && (
-              <ChatTweetSection tweet={m.data.tweet} showClearButton={false} />
-            )}
-            <ChatMessage
-              content={m.content}
-              role={m.role}
-              key={m.id}
-              robotAvatar={kolInfo.avatarUrl ?? ""}
-              displayScreenName={isSelf ? "" : screenName}
-            />
-          </div>
-        ))}
-
-        {(status === "submitted" || status === "streaming") && (
-          <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
-            {t("chat_panel.thinking")}
-          </div>
-        )}
-        {/* quote post info */}
-        {quoteTweet && (
-          <div className="w-full mb-2">
-            <ChatTweetSection
-              tweet={quoteTweet}
-              showClearButton={true}
-              handleClear={handleCancelQuoteTweet}
-            />
-          </div>
-        )}
-        {showGreeting && (
-          <EmptyContent
-            content={t("chat_panel.greeting")}
-            hideImage={true}
-            textClassName="text-primary-brand"
-          />
-        )}
-      </div>
-
-      {/* input and send message button */}
-      <div className="py-2 flex flex-col gap-1 relative shrink-0">
-        <div className="flex mb-2 items-center justify-between gap-2">
-          {!!models.length ? (
-            <Select
-              value={actModelId}
-              onValueChange={(value) => handleChangeModel(value)}
-              disabled={!isSelf || isUpdatingChatModelInfo}>
-              <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
-                <SelectValue placeholder={t("chat_panel.select_model")} />
-              </SelectTrigger>
-              <SelectContent>
-                {models.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    <div className="flex gap-1 items-center">
-                      <ImageWithFallback
-                        src={model.iconUrl}
-                        alt={model.id}
-                        className="w-4 h-4 rounded-full bg-white"
-                        fallbackClassName="w-4 h-4 rounded-full bg-white"
-                      />
-                      {model.screenName}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           ) : (
-            <div />
-          )}
-          {isSelf && (
-            <div className="flex gap-4 items-center shrink-0">
-              {Tools.map((tool) => (
-                <Tooltip key={tool.type} content={t(tool.tooltipI18nKey)}>
-                  <div
-                    onClick={() =>
-                      handleClickToolButton(t(tool.magicWordI18nKey), tool.type)
-                    }
-                    className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
-                    {tool.icon}
-                  </div>
-                </Tooltip>
-              ))}
+            <div className=" flex items-center gap-x-1 mb-1">
+              <ImageWithFallback
+                src={robotImg}
+                alt="robot"
+                className="w-5 h-5 rounded-full object-contain"
+                fallbackClassName="w-5 h-5 rounded-full"
+              />
+              xDaily
             </div>
           )}
         </div>
-        <form
-          className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
-          onSubmit={(event) => handleFormSubmit(event)}>
-          <textarea
-            disabled={isDisableStatus}
-            value={input}
-            onChange={handleInputChange}
-            rows={1}
-            placeholder={t("chat_panel.placeholder")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                handleFormSubmit(e)
-              }
-            }}
-            className="caret-primary-brand mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
-          />
-          <button
-            type="submit"
-            className={clsx(
-              "border border-[#404040] w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:brightness-75 focus:outline-none focus:ring-0",
-              isDisable && "opacity-70 cursor-not-allowed"
-            )}>
-            <ArrowUpIcon className="w-6 h-6 text-primary-brand" />
-          </button>
-        </form>
-        {status === "error" && (
-          <div className="px-2 text-[10px] text-red absolute top-full left-0 right-0 -translate-y-1/2 pt-1">
-            {t("chat_panel.error_desc")}
+        <div
+          className="flex-1 min-h-0 overflow-y-auto space-y-6 stylized-scroll pr-2"
+          ref={chatRef}
+          onScroll={(e) => {
+            if ((e.currentTarget.scrollTop ?? 0) === 0) {
+              loadMoreHistory()
+            }
+          }}>
+          {isLoadingHistory && !showGreeting && (
+            <div className="w-full text-center text-white">
+              {t("chat_panel.loading_history")}
+            </div>
+          )}
+
+          {allMessages.map((m, i) => (
+            <div key={i} className={`flex flex-col gap-3`}>
+              {m.data?.tweet && (
+                <ChatTweetSection
+                  tweet={m.data.tweet}
+                  showClearButton={false}
+                />
+              )}
+              <ChatMessage
+                content={m.content}
+                role={m.role}
+                key={m.id}
+                robotAvatar={kolInfo.avatarUrl ?? ""}
+                displayScreenName={isSelf ? "" : screenName}
+              />
+            </div>
+          ))}
+
+          {(status === "submitted" || status === "streaming") && (
+            <div className="self-start bg-fill-bg-light text-text-default-primary0 p-3 rounded-lg border border-fill-bg-input w-fit animate-pulse">
+              {t("chat_panel.thinking")}
+            </div>
+          )}
+          {/* quote post info */}
+          {quoteTweet && (
+            <div className="w-full mb-2">
+              <ChatTweetSection
+                tweet={quoteTweet}
+                showClearButton={true}
+                handleClear={handleCancelQuoteTweet}
+              />
+            </div>
+          )}
+          {showGreeting && (
+            <EmptyContent
+              content={t("chat_panel.greeting")}
+              hideImage={true}
+              textClassName="text-primary-brand"
+            />
+          )}
+        </div>
+
+        {/* input and send message button */}
+        <div
+          className={clsx(
+            "flex flex-col gap-1 shrink-0",
+            status === "error" ? "pb-0" : "pb-2"
+          )}>
+          <div className="flex mb-2 items-center justify-between gap-2">
+            {!!models.length ? (
+              <Select
+                value={actModelId}
+                onValueChange={(value) => handleChangeModel(value)}
+                disabled={!isSelf || isUpdatingChatModelInfo}>
+                <SelectTrigger className="w-[176px] overflow-hidden" size="sm">
+                  <SelectValue placeholder={t("chat_panel.select_model")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex gap-1 items-center">
+                        <ImageWithFallback
+                          src={model.iconUrl}
+                          alt={model.id}
+                          className="w-4 h-4 rounded-full bg-white"
+                          fallbackClassName="w-4 h-4 rounded-full bg-white"
+                        />
+                        {model.screenName}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div />
+            )}
+            {isSelf && (
+              <div className="flex gap-4 items-center shrink-0">
+                {Tools.map((tool) => (
+                  <Tooltip key={tool.type} content={t(tool.tooltipI18nKey)}>
+                    <div
+                      onClick={() =>
+                        handleClickToolButton(
+                          t(tool.magicWordI18nKey),
+                          tool.type
+                        )
+                      }
+                      className="text-fill-layer-layer hover:text-primary-brand cursor-pointer">
+                      {tool.icon}
+                    </div>
+                  </Tooltip>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+          <form
+            className="p-3 flex flex-col items-end rounded-xl overflow-hidden border border-primary-brand bg-fill-bg-light"
+            onSubmit={(event) => handleFormSubmit(event)}>
+            <textarea
+              disabled={isDisableStatus}
+              value={input}
+              onChange={handleInputChange}
+              rows={1}
+              placeholder={t("chat_panel.placeholder")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  handleFormSubmit(e)
+                }
+              }}
+              className="caret-primary-brand mb-1 w-full pb-0 focus:outline-none focus:ring-0 bg-transparent min-h-[70px] h-[70px] overflow-y-auto resize-none"
+            />
+            <button
+              type="submit"
+              className={clsx(
+                "border border-[#404040] w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:brightness-75 focus:outline-none focus:ring-0",
+                isDisable && "opacity-70 cursor-not-allowed"
+              )}>
+              <ArrowUpIcon className="w-6 h-6 text-primary-brand" />
+            </button>
+          </form>
+          {status === "error" && (
+            <div className="px-2 text-[10px] text-red">
+              {(error?.message ?? "").includes(CHAT_ERROR.TRIAL_END) ? (
+                <Trans
+                  i18nKey={"chat_panel.trial_end"}
+                  components={{
+                    upgradeLink: (
+                      <span
+                        onClick={goUpgradePage}
+                        className="underline font-bold text-primary-brand cursor-pointer"
+                      />
+                    )
+                  }}
+                />
+              ) : (
+                t("chat_panel.error_desc")
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <Dialog.Root open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+          <Dialog.Content className="focus:outline-none fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary text-sm">
+            <Dialog.Title className="hidden">warning</Dialog.Title>
+            <Trans
+              i18nKey={"chat_panel.trial_end"}
+              components={{
+                upgradeLink: (
+                  <span
+                    onClick={goUpgradePage}
+                    className="underline font-bold text-primary-brand cursor-pointer"
+                  />
+                )
+              }}
+            />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   )
 }
 

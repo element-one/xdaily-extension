@@ -1,5 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
+import { waitUntilDashboardReady } from "~background/utils"
 import { MessageType } from "~types/message"
 import type { TweetData } from "~types/tweet"
 
@@ -11,9 +12,11 @@ const handler: PlasmoMessaging.MessageHandler<QuoteTweetMessage> = async (
   req,
   res
 ) => {
-  await chrome.runtime.sendMessage({
-    type: MessageType.QUOTE_TWEET,
-    data: req.body.tweetInfo
+  await waitUntilDashboardReady(async () => {
+    await chrome.runtime.sendMessage({
+      type: MessageType.QUOTE_TWEET,
+      data: req.body.tweetInfo
+    })
   })
 
   res.send({ relayed: true })

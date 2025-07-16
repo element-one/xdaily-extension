@@ -30,3 +30,7 @@ export enum KolStatus {
   APPLYING = "applying",
   APPROVED = "approved"
 }
+
+export enum CHAT_ERROR {
+  TRIAL_END = "free-trial-end"
+}

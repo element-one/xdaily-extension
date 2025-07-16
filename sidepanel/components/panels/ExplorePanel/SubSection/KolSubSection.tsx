@@ -34,10 +34,10 @@ interface KolSubSectionProps {
   onFilter: () => void
 }
 export const KolSubSection: FC<KolSubSectionProps> = ({ onFilter }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   // just all category
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useKolCollections(15, allCategory.id)
+    useKolCollections(15, i18n.language as "en" | "zh", allCategory.id)
   const bottomObserver = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

@@ -6,7 +6,11 @@ import robotImg from "url:/assets/robot.png" // strange
 
 import { useStore } from "~store/store"
 import { NavbarItemKey } from "~types/enum"
-import { MessageType, type MessagePayload } from "~types/message"
+import {
+  DASHBOARD_READY_KEY,
+  MessageType,
+  type MessagePayload
+} from "~types/message"
 
 import ExploreIcon from "./icons/ExploreIcon"
 import KnowledgeBaseIcon from "./icons/KnowlegeBaseIcon"
@@ -124,6 +128,7 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => {
+    chrome.storage.local.set({ [DASHBOARD_READY_KEY]: true })
     const messageListener = (message: MessagePayload) => {
       didInitRef.current = true
       if (message.type === MessageType.QUOTE_TWEET) {

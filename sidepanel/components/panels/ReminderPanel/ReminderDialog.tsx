@@ -80,7 +80,7 @@ export const ReminderDialog: FC<ReminderDialogProps> = ({
       return
     }
 
-    if (!to.isAfter(from)) {
+    if (to.isBefore(from)) {
       toast(t("reminder_panel.must_later"))
       return
     }
