@@ -48,7 +48,7 @@ export const extractMarkdownTableFromSparseFormat = (
           const content =
             cellsInRow.find((c) => c.column_index === colIndex)?.payload
               .content ?? ""
-          return String(content).trim()
+          return String(content).trim().replace(/\n/g, "<br>")
         })
         .join(" | ") +
       " |"
