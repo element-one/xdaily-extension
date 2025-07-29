@@ -26,6 +26,7 @@ const SCAN_POST_CONT = "xdaily-scan-button-cont"
 
 const loadingTweets = new Set<string>()
 
+let isScanning = false // isScanning post replies
 let lastHandledScreenName = ""
 const onRouteChange = (callback) => {
   let lastHref = location.href
@@ -67,6 +68,7 @@ let tweetObserver = null
 const observeTweets = () => {
   onRouteChange(() => {
     lastHandledScreenName = ""
+    isScanning = false
     document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((el) => {
       el.remove()
     })
@@ -79,6 +81,7 @@ const observeTweets = () => {
   }
   tweetObserver = new MutationObserver(() => {
     if (isTweetDetailPage(location.pathname)) {
+      isScanning = false
       injectScanButtonToMainTweet()
     }
     // observe article
@@ -386,13 +389,18 @@ const createPostScanningButton = (tweet: HTMLElement) => {
         height: 100%;
         transition: opacity 0.3s ease;
       }
-     .button:hover > .icon {
-        opacity: 0.8;
+      .button.scanning svg {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
       
     </style>
     <div class="button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radar-icon lucide-radar"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radar-icon lucide-radar"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/></svg>
       <div class="tooltip">${label}</div>
     </div>
   `
@@ -400,7 +408,9 @@ const createPostScanningButton = (tweet: HTMLElement) => {
   const button = shadow.querySelector(".button")! as HTMLDivElement
   button.addEventListener("click", async (e) => {
     e.stopPropagation()
-    // TODO scan applies
+    // toggle scanning status
+    isScanning = !isScanning
+    button.classList.toggle("scanning", isScanning)
   })
 
   return host
@@ -462,15 +472,7 @@ const createProfileHeaderButton = (header: HTMLElement) => {
       .button:hover .tooltip {
         opacity: 1;
       }
-      .button > .icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        transition: opacity 0.3s ease;
-      }
-     .button:hover > .icon {
+     .button:hover svg {
         opacity: 0.8;
       }
     </style>
@@ -604,6 +606,15 @@ const refreshInjectedButtons = () => {
       const tooltip = host.shadowRoot.querySelector(".tooltip")
       if (tooltip) {
         tooltip.textContent = i18n.t("content_inject_tool.robot_chat_tooltip")
+      }
+    }
+  })
+
+  document.querySelectorAll(`.${SCAN_POST_CONT}`).forEach((host) => {
+    if (host.shadowRoot) {
+      const tooltip = host.shadowRoot.querySelector(".tooltip")
+      if (tooltip) {
+        tooltip.textContent = i18n.t("content_inject_tool.scan_tooltip")
       }
     }
   })

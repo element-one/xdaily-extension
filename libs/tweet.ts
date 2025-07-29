@@ -155,12 +155,6 @@ export const getUserInfoFromHeader = (header: Element) => {
   }
 }
 
-// TODO 细化
-export const isTweetDetailPage2 = (pathname: string) => {
-  if (!pathname) return false
-  return /^\/[^/]+\/status\/\d+/.test(pathname)
-}
-
 /**
  * check if is post detail page
  * e.g. /jack/status/1234567890123456789
