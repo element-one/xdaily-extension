@@ -1,7 +1,7 @@
 {
   "name": "xdaily-extension",
   "displayName": "xDaily: AI Assistant for daily X tasks",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "AI Assistant for daily X tasks",
   "author": "xDaily",
   "scripts": {
