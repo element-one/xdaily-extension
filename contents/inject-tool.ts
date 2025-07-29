@@ -28,6 +28,7 @@ const loadingTweets = new Set<string>()
 
 let isScanning = false // isScanning post replies
 let lastHandledScreenName = ""
+let detailMainTweetId = ""
 const onRouteChange = (callback) => {
   let lastHref = location.href
 
@@ -67,6 +68,7 @@ const onRouteChange = (callback) => {
 let tweetObserver = null
 const observeTweets = () => {
   onRouteChange(() => {
+    detailMainTweetId = ""
     lastHandledScreenName = ""
     isScanning = false
     document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((el) => {
@@ -81,7 +83,6 @@ const observeTweets = () => {
   }
   tweetObserver = new MutationObserver(() => {
     if (isTweetDetailPage(location.pathname)) {
-      isScanning = false
       injectScanButtonToMainTweet()
     }
     // observe article
@@ -406,11 +407,19 @@ const createPostScanningButton = (tweet: HTMLElement) => {
   `
 
   const button = shadow.querySelector(".button")! as HTMLDivElement
+  if (isScanning) {
+    button.classList.add("scanning")
+  }
   button.addEventListener("click", async (e) => {
     e.stopPropagation()
     // toggle scanning status
     isScanning = !isScanning
     button.classList.toggle("scanning", isScanning)
+    if (isScanning) {
+      startCollectingReplies()
+    } else {
+      stopCollectingReplies()
+    }
   })
 
   return host
@@ -568,17 +577,25 @@ const injectPageHeaderButton = async (header: Element) => {
 }
 
 const injectScanButtonToMainTweet = () => {
-  const mainTweet = document.querySelector("article")
-  if (!mainTweet) return
+  const el = document.querySelector("article")
+  const tweetId = getTweetIdFromTweet(el)
+  if (!detailMainTweetId) {
+    detailMainTweetId = tweetId
+  }
+
+  if (!tweetId || tweetId !== detailMainTweetId) return
   // // inject scan post button
-  const hasScanningButton = mainTweet.querySelector(`.${SCAN_POST_CONT}`)
-  const moreButton = findTweetButton("caret", mainTweet, false)
+  const hasScanningButton = el.querySelector(`.${SCAN_POST_CONT}`)
+  const moreButton = findTweetButton("caret", el, false)
 
   if (!hasScanningButton && moreButton) {
-    const buttonEl = createPostScanningButton(mainTweet as HTMLElement)
+    const buttonEl = createPostScanningButton(el as HTMLElement)
     if (moreButton?.parentElement) {
       moreButton.parentElement.insertBefore(buttonEl, moreButton)
     }
+  } else if (hasScanningButton && isScanning) {
+    const btn = hasScanningButton.shadowRoot?.querySelector("button")
+    btn?.classList.add("scanning")
   }
 }
 
@@ -618,6 +635,65 @@ const refreshInjectedButtons = () => {
       }
     }
   })
+}
+
+let replyObserver: MutationObserver | null = null
+let collectedReplySet = new Set<string>()
+
+const startCollectingReplies = () => {
+  collectedReplySet.clear()
+
+  const processReplyElement = (el: HTMLElement) => {
+    const tweetId = getTweetIdFromTweet(el)
+    if (
+      tweetId &&
+      tweetId !== detailMainTweetId &&
+      !collectedReplySet.has(tweetId)
+    ) {
+      collectedReplySet.add(tweetId)
+      console.log("📥 New reply (incremental):", el.innerText?.trim())
+      // TODO: handleReply(el, tweetId)
+    }
+  }
+
+  const collectInitialReplies = () => {
+    const allTweets = Array.from(document.querySelectorAll("article"))
+    for (const el of allTweets) {
+      processReplyElement(el as HTMLElement)
+    }
+  }
+
+  collectInitialReplies()
+
+  replyObserver = new MutationObserver((mutations) => {
+    if (!isScanning) return
+
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue
+
+        const articles =
+          node.tagName === "ARTICLE"
+            ? [node]
+            : Array.from(node.querySelectorAll?.("article") || [])
+
+        for (const el of articles) {
+          processReplyElement(el as HTMLElement)
+        }
+      }
+    }
+  })
+
+  replyObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+}
+
+const stopCollectingReplies = () => {
+  replyObserver?.disconnect()
+  replyObserver = null
+  collectedReplySet.clear()
 }
 
 chrome.runtime.onMessage.addListener((message: MessagePayload) => {
