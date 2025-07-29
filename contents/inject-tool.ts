@@ -2,6 +2,7 @@ import type { PlasmoCSConfig } from "plasmo"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
+import { onRouteChange } from "~libs/inject-tools/route"
 import {
   extractTweetDataFromTweet,
   findTweetButton,
@@ -29,74 +30,12 @@ const loadingTweets = new Set<string>()
 let isScanning = false // isScanning post replies
 let lastHandledScreenName = ""
 let detailMainTweetId = ""
-const onRouteChange = (callback) => {
-  let lastHref = location.href
-
-  const check = () => {
-    if (location.href !== lastHref) {
-      lastHref = location.href
-      callback()
-    }
-  }
-
-  // hook pushState / replaceState
-  const originalPush = history.pushState
-  history.pushState = function () {
-    originalPush.apply(this, arguments)
-    check()
-  }
-
-  const originalReplace = history.replaceState
-  history.replaceState = function () {
-    originalReplace.apply(this, arguments)
-    check()
-  }
-
-  window.addEventListener("popstate", check)
-
-  // also poll as fallback
-  const intervalId = setInterval(check, 1000)
-  return () => {
-    history.pushState = originalPush
-    history.replaceState = originalReplace
-    window.removeEventListener("popstate", check)
-    clearInterval(intervalId)
-  }
-}
-
 // twitter is SPA
 let tweetObserver = null
-const observeTweets = () => {
-  onRouteChange(() => {
-    detailMainTweetId = ""
-    lastHandledScreenName = ""
-    isScanning = false
-    document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((el) => {
-      el.remove()
-    })
-    // observe profile header
-    const usernameHeader = document.querySelector('[data-testid="UserName"]')
-    injectPageHeaderButton(usernameHeader)
-  })
-  if (tweetObserver) {
-    tweetObserver.disconnect()
-  }
-  tweetObserver = new MutationObserver(() => {
-    if (isTweetDetailPage(location.pathname)) {
-      injectScanButtonToMainTweet()
-    }
-    // observe article
-    document.querySelectorAll("article").forEach((tweet) => {
-      injectButton(tweet)
-    })
+let replyObserver: MutationObserver | null = null
+const collectedReplySet = new Set<string>()
 
-    // observe profile header
-    const usernameHeader = document.querySelector('[data-testid="UserName"]')
-    injectPageHeaderButton(usernameHeader)
-  })
-  tweetObserver.observe(document.body, { childList: true, subtree: true })
-}
-
+// start - create buttons
 const createCollectButton = (tweet: HTMLElement) => {
   const host = document.createElement("xdaily-collect-button")
   host.className = COLLECT_BUTTON_CONT
@@ -334,6 +273,95 @@ const createQuoteButton = (tweet: HTMLElement) => {
   return host
 }
 
+const createProfileHeaderButton = (header: HTMLElement) => {
+  const chatLabel = i18n.t("content_inject_tool.robot_chat_tooltip")
+  const host = document.createElement("xdaily-profile-header-button")
+  host.className = ROBOT_BUTTON_CONT
+  const shadow = host.attachShadow({ mode: "open" })
+  shadow.innerHTML = `
+    <style>
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        margin: 0px 8px;
+        position: absolute;
+        right:0;
+        z-index: 9999;
+      }
+      .button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        opacity: 1;
+        color: #ff9500;
+        border: 1px solid #ff9500;
+        width: 2.5em;
+        height: 2.5em;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+      .tooltip {
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        margin-right: 4px;
+        transform: translateY(-50%);
+        background-color: #151717;
+        border: 1px solid #FFFFFF1A;
+        border-radius: 0.5rem;
+        padding: 10px 8px;
+        font-size: 12px;
+        color: white;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 9999;
+      }
+
+      .button:hover {
+        background: rgba(0,0,0,0.05);
+      }
+      .button:hover .tooltip {
+        opacity: 1;
+      }
+     .button:hover svg {
+        opacity: 0.8;
+      }
+    </style>
+     <div class="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      <div class="tooltip">${chatLabel}</div>
+    </div>
+  `
+
+  const button = shadow.querySelector(".button")! as HTMLDivElement
+  button.addEventListener("click", async () => {
+    // get user info
+    const { avatar, screenName, displayName } = getUserInfoFromHeader(header)
+    sendToBackground({
+      name: "toggle-panel",
+      body: {
+        open: true
+      }
+    })
+    await sendToBackground({
+      name: "relay-chat-with-user",
+      body: {
+        userId: screenName,
+        avatarUrl: avatar,
+        userName: displayName
+      }
+    })
+  })
+
+  return host
+}
+
 const createPostScanningButton = (tweet: HTMLElement) => {
   const label = i18n.t("content_inject_tool.scan_tooltip")
   const host = document.createElement("xdaily-scan-button")
@@ -425,95 +453,65 @@ const createPostScanningButton = (tweet: HTMLElement) => {
   return host
 }
 
-const createProfileHeaderButton = (header: HTMLElement) => {
-  const chatLabel = i18n.t("content_inject_tool.robot_chat_tooltip")
-  const host = document.createElement("xdaily-profile-header-button")
-  host.className = ROBOT_BUTTON_CONT
-  const shadow = host.attachShadow({ mode: "open" })
-  shadow.innerHTML = `
-    <style>
-      :host {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        margin: 0px 8px;
-        position: absolute;
-        right:0;
-        z-index: 9999;
-      }
-      .button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        position: relative;
-        opacity: 1;
-        color: #ff9500;
-        border: 1px solid #ff9500;
-        width: 2.5em;
-        height: 2.5em;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-      }
-      .tooltip {
-        position: absolute;
-        top: 50%;
-        right: 100%;
-        margin-right: 4px;
-        transform: translateY(-50%);
-        background-color: #151717;
-        border: 1px solid #FFFFFF1A;
-        border-radius: 0.5rem;
-        padding: 10px 8px;
-        font-size: 12px;
-        color: white;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 9999;
-      }
+const startCollectingReplies = () => {
+  collectedReplySet.clear()
 
-      .button:hover {
-        background: rgba(0,0,0,0.05);
-      }
-      .button:hover .tooltip {
-        opacity: 1;
-      }
-     .button:hover svg {
-        opacity: 0.8;
-      }
-    </style>
-     <div class="button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-      <div class="tooltip">${chatLabel}</div>
-    </div>
-  `
+  const processReplyElement = (el: HTMLElement) => {
+    const tweetId = getTweetIdFromTweet(el)
+    if (
+      tweetId &&
+      tweetId !== detailMainTweetId &&
+      !collectedReplySet.has(tweetId)
+    ) {
+      collectedReplySet.add(tweetId)
+      console.log("📥 New reply (incremental):", el.innerText?.trim())
+      // TODO: handleReply(el, tweetId)
+    }
+  }
 
-  const button = shadow.querySelector(".button")! as HTMLDivElement
-  button.addEventListener("click", async () => {
-    // get user info
-    const { avatar, screenName, displayName } = getUserInfoFromHeader(header)
-    sendToBackground({
-      name: "toggle-panel",
-      body: {
-        open: true
+  const collectInitialReplies = () => {
+    const allTweets = Array.from(document.querySelectorAll("article"))
+    for (const el of allTweets) {
+      processReplyElement(el as HTMLElement)
+    }
+  }
+
+  collectInitialReplies()
+
+  replyObserver = new MutationObserver((mutations) => {
+    if (!isScanning) return
+
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue
+
+        const articles =
+          node.tagName === "ARTICLE"
+            ? [node]
+            : Array.from(node.querySelectorAll?.("article") || [])
+
+        for (const el of articles) {
+          processReplyElement(el as HTMLElement)
+        }
       }
-    })
-    await sendToBackground({
-      name: "relay-chat-with-user",
-      body: {
-        userId: screenName,
-        avatarUrl: avatar,
-        userName: displayName
-      }
-    })
+    }
   })
 
-  return host
+  replyObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
 }
 
+const stopCollectingReplies = () => {
+  replyObserver?.disconnect()
+  replyObserver = null
+  collectedReplySet.clear()
+}
+
+// end - create buttons
+
+// start - inject button
 const injectButton = (tweet: Element) => {
   // inject collect tweet button
   const hasCollectButton = tweet.querySelector(`.${COLLECT_BUTTON_CONT}`)
@@ -598,117 +596,73 @@ const injectScanButtonToMainTweet = () => {
     btn?.classList.add("scanning")
   }
 }
+// end - inject button
 
 const refreshInjectedButtons = () => {
-  document.querySelectorAll(`.${COLLECT_BUTTON_CONT}`).forEach((host) => {
-    if (host.shadowRoot) {
-      const tooltip = host.shadowRoot.querySelector(".tooltip")
+  const updateTooltip = (className: string, key: string) => {
+    document.querySelectorAll(`.${className}`).forEach((host) => {
+      const tooltip = host.shadowRoot?.querySelector(".tooltip")
       if (tooltip) {
-        tooltip.textContent = i18n.t("content_inject_tool.collect_tooltip")
+        tooltip.textContent = i18n.t(key)
       }
-    }
-  })
+    })
+  }
 
-  document.querySelectorAll(`.${QUOTE_BUTTON_CONT}`).forEach((host) => {
-    if (host.shadowRoot) {
-      const tooltip = host.shadowRoot.querySelector(".tooltip")
-      if (tooltip) {
-        tooltip.textContent = i18n.t("content_inject_tool.quote_tooltip")
-      }
-    }
-  })
+  updateTooltip(COLLECT_BUTTON_CONT, "content_inject_tool.collect_tooltip")
+  updateTooltip(QUOTE_BUTTON_CONT, "content_inject_tool.quote_tooltip")
+  updateTooltip(ROBOT_BUTTON_CONT, "content_inject_tool.robot_chat_tooltip")
+  updateTooltip(SCAN_POST_CONT, "content_inject_tool.scan_tooltip")
+}
 
-  document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((host) => {
-    if (host.shadowRoot) {
-      const tooltip = host.shadowRoot.querySelector(".tooltip")
-      if (tooltip) {
-        tooltip.textContent = i18n.t("content_inject_tool.robot_chat_tooltip")
-      }
-    }
+const observeTweets = () => {
+  onRouteChange(() => {
+    detailMainTweetId = ""
+    lastHandledScreenName = ""
+    isScanning = false
+    document.querySelectorAll(`.${ROBOT_BUTTON_CONT}`).forEach((el) => {
+      el.remove()
+    })
+    // observe profile header
+    const usernameHeader = document.querySelector('[data-testid="UserName"]')
+    injectPageHeaderButton(usernameHeader)
+    stopCollectingReplies()
   })
+  if (tweetObserver) {
+    tweetObserver.disconnect()
+  }
+  tweetObserver = new MutationObserver(() => {
+    if (isTweetDetailPage(location.pathname)) {
+      injectScanButtonToMainTweet()
+    }
+    // observe article
+    document.querySelectorAll("article").forEach((tweet) => {
+      injectButton(tweet)
+    })
 
-  document.querySelectorAll(`.${SCAN_POST_CONT}`).forEach((host) => {
-    if (host.shadowRoot) {
-      const tooltip = host.shadowRoot.querySelector(".tooltip")
-      if (tooltip) {
-        tooltip.textContent = i18n.t("content_inject_tool.scan_tooltip")
-      }
+    // observe profile header
+    const usernameHeader = document.querySelector('[data-testid="UserName"]')
+    injectPageHeaderButton(usernameHeader)
+  })
+  tweetObserver.observe(document.body, { childList: true, subtree: true })
+}
+
+const initialize = () => {
+  initI18n()
+  observeTweets()
+
+  chrome.runtime.onMessage.addListener((message: MessagePayload) => {
+    if (message.type === MessageType.LANGUAGE_CHANGED) {
+      const newLang = message.language
+      console.log("[content-script] Received language change:", newLang)
+
+      i18n
+        .changeLanguage(newLang)
+        .then(() => {
+          refreshInjectedButtons()
+        })
+        .catch((err) => console.error("i18n error:", err))
     }
   })
 }
 
-let replyObserver: MutationObserver | null = null
-let collectedReplySet = new Set<string>()
-
-const startCollectingReplies = () => {
-  collectedReplySet.clear()
-
-  const processReplyElement = (el: HTMLElement) => {
-    const tweetId = getTweetIdFromTweet(el)
-    if (
-      tweetId &&
-      tweetId !== detailMainTweetId &&
-      !collectedReplySet.has(tweetId)
-    ) {
-      collectedReplySet.add(tweetId)
-      console.log("📥 New reply (incremental):", el.innerText?.trim())
-      // TODO: handleReply(el, tweetId)
-    }
-  }
-
-  const collectInitialReplies = () => {
-    const allTweets = Array.from(document.querySelectorAll("article"))
-    for (const el of allTweets) {
-      processReplyElement(el as HTMLElement)
-    }
-  }
-
-  collectInitialReplies()
-
-  replyObserver = new MutationObserver((mutations) => {
-    if (!isScanning) return
-
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (!(node instanceof HTMLElement)) continue
-
-        const articles =
-          node.tagName === "ARTICLE"
-            ? [node]
-            : Array.from(node.querySelectorAll?.("article") || [])
-
-        for (const el of articles) {
-          processReplyElement(el as HTMLElement)
-        }
-      }
-    }
-  })
-
-  replyObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-  })
-}
-
-const stopCollectingReplies = () => {
-  replyObserver?.disconnect()
-  replyObserver = null
-  collectedReplySet.clear()
-}
-
-chrome.runtime.onMessage.addListener((message: MessagePayload) => {
-  if (message.type === MessageType.LANGUAGE_CHANGED) {
-    const newLang = message.language
-    console.log("[content-script] Received language change:", newLang)
-
-    i18n
-      .changeLanguage(newLang)
-      .then(() => {
-        refreshInjectedButtons()
-      })
-      .catch((err) => console.error("i18n error:", err))
-  }
-})
-
-initI18n()
-observeTweets()
+initialize()
