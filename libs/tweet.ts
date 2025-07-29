@@ -154,3 +154,27 @@ export const getUserInfoFromHeader = (header: Element) => {
     avatar
   }
 }
+
+// TODO 细化
+export const isTweetDetailPage2 = (pathname: string) => {
+  if (!pathname) return false
+  return /^\/[^/]+\/status\/\d+/.test(pathname)
+}
+
+/**
+ * check if is post detail page
+ * e.g. /jack/status/1234567890123456789
+ *      /jack/status/1234567890123456789/photo/1
+ *      /jack/status/1234567890123456789/retweets
+ */
+export const isTweetDetailPage = (pathname: string): boolean => {
+  if (!pathname) return false
+
+  const segments = pathname.split("/").filter(Boolean)
+
+  if (segments.length < 3) return false
+  if (segments[1] !== "status") return false
+
+  const tweetId = segments[2]
+  return /^\d{5,25}$/.test(tweetId)
+}

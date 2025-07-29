@@ -6,7 +6,8 @@ import {
   extractTweetDataFromTweet,
   findTweetButton,
   getTweetIdFromTweet,
-  getUserInfoFromHeader
+  getUserInfoFromHeader,
+  isTweetDetailPage
 } from "~libs/tweet"
 import { MessageType, type MessagePayload } from "~types/message"
 
@@ -21,6 +22,7 @@ export const config: PlasmoCSConfig = {
 const COLLECT_BUTTON_CONT = "xdaily-collect-button-cont"
 const QUOTE_BUTTON_CONT = "xdaily-quote-button-cont"
 const ROBOT_BUTTON_CONT = "xdaily-robot-chat-button-cont"
+const SCAN_POST_CONT = "xdaily-scan-button-cont"
 
 const loadingTweets = new Set<string>()
 
@@ -76,6 +78,9 @@ const observeTweets = () => {
     tweetObserver.disconnect()
   }
   tweetObserver = new MutationObserver(() => {
+    if (isTweetDetailPage(location.pathname)) {
+      injectScanButtonToMainTweet()
+    }
     // observe article
     document.querySelectorAll("article").forEach((tweet) => {
       injectButton(tweet)
@@ -222,7 +227,7 @@ const createQuoteButton = (tweet: HTMLElement) => {
         justify-content: center;
         align-items: center;
         height: 100%;
-        margin: 0px 8px;
+        margin: 0px 4px;
       }
       .button {
         display: flex;
@@ -320,6 +325,82 @@ const createQuoteButton = (tweet: HTMLElement) => {
       name: "relay-quote-tweet",
       body: { tweetInfo }
     })
+  })
+
+  return host
+}
+
+const createPostScanningButton = (tweet: HTMLElement) => {
+  const label = i18n.t("content_inject_tool.scan_tooltip")
+  const host = document.createElement("xdaily-scan-button")
+  host.className = SCAN_POST_CONT
+  const shadow = host.attachShadow({ mode: "open" })
+  shadow.innerHTML = `
+    <style>
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        margin: 0px 4px;
+      }
+      .button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 2em;
+        height: 2em;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        position: relative;
+        opacity: 1;
+        color: #AF52DE;
+      }
+      .tooltip {
+        position: absolute;
+        top: 100%;
+        margin-top: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #151717;
+        border: 1px solid #FFFFFF1A;
+        border-radius: 0.5rem;
+        padding: 10px 8px;
+        font-size: 12px;
+        color: white;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 9999;
+      }
+
+      .button:hover .tooltip {
+        opacity: 1;
+      }
+      .button > .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.3s ease;
+      }
+     .button:hover > .icon {
+        opacity: 0.8;
+      }
+      
+    </style>
+    <div class="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radar-icon lucide-radar"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/></svg>
+      <div class="tooltip">${label}</div>
+    </div>
+  `
+
+  const button = shadow.querySelector(".button")! as HTMLDivElement
+  button.addEventListener("click", async (e) => {
+    e.stopPropagation()
+    // TODO scan applies
   })
 
   return host
@@ -437,9 +518,10 @@ const injectButton = (tweet: Element) => {
     }
   }
 
+  const moreButton = findTweetButton("caret", tweet, false)
+
   // inject quote tweet button
   const hasQuoteButton = tweet.querySelector(`.${QUOTE_BUTTON_CONT}`)
-  const moreButton = findTweetButton("caret", tweet, false)
   if (!hasQuoteButton && moreButton) {
     const buttonEl = createQuoteButton(tweet as HTMLElement)
     if (moreButton?.parentElement) {
@@ -480,6 +562,21 @@ const injectPageHeaderButton = async (header: Element) => {
     const host = document.createElement("xdaily-profile-header-button")
     host.className = ROBOT_BUTTON_CONT
     header.appendChild(host)
+  }
+}
+
+const injectScanButtonToMainTweet = () => {
+  const mainTweet = document.querySelector("article")
+  if (!mainTweet) return
+  // // inject scan post button
+  const hasScanningButton = mainTweet.querySelector(`.${SCAN_POST_CONT}`)
+  const moreButton = findTweetButton("caret", mainTweet, false)
+
+  if (!hasScanningButton && moreButton) {
+    const buttonEl = createPostScanningButton(mainTweet as HTMLElement)
+    if (moreButton?.parentElement) {
+      moreButton.parentElement.insertBefore(buttonEl, moreButton)
+    }
   }
 }
 

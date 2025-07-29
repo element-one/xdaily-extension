@@ -104,6 +104,7 @@
   "content_inject_tool": {
     "collect_tooltip": "收藏推文",
     "quote_tooltip": "引用推文",
-    "robot_chat_tooltip": "对话"
+    "robot_chat_tooltip": "对话",
+    "scan_tooltip": "扫描推文评论"
   }
 }
