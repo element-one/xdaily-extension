@@ -12,13 +12,13 @@ export const onRouteChange = (callback) => {
   const originalPush = history.pushState
   history.pushState = function () {
     originalPush.apply(this, arguments)
-    check()
+    setTimeout(check, 0)
   }
 
   const originalReplace = history.replaceState
   history.replaceState = function () {
     originalReplace.apply(this, arguments)
-    check()
+    setTimeout(check, 0)
   }
 
   window.addEventListener("popstate", check)
