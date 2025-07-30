@@ -16,7 +16,8 @@ export enum NavbarItemKey {
   REMINDER = "reminder",
   ADD = "add",
   INVITE = "invite",
-  CHAT = "self_robot_chat"
+  CHAT = "self_robot_chat",
+  COLLECT_MEDIA = "collect_media"
 }
 
 export enum ChatStatus {

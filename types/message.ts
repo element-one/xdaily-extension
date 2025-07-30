@@ -11,7 +11,8 @@ export enum MessageType {
   ADD_USER_COLLECTION = "add_user_collection",
   QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
   CHAT_WITH_USER = "chat_with_user",
-  LANGUAGE_CHANGED = "language_changed"
+  LANGUAGE_CHANGED = "language_changed",
+  TOGGLE_COLLECT_MEDIA = "toggle_collect_media"
 }
 
 export type InpageToastPayload = {
@@ -47,6 +48,10 @@ export type LanguageChangedPayload = {
   type: MessageType.LANGUAGE_CHANGED
   language: string
 }
+export type ToggleCollectMediaPayload = {
+  type: MessageType.TOGGLE_COLLECT_MEDIA
+  enable: boolean
+}
 
 export type MessagePayload =
   | InpageToastPayload
@@ -55,5 +60,6 @@ export type MessagePayload =
   | QuoteTweetPayload
   | ChatWithUserPayload
   | LanguageChangedPayload
+  | ToggleCollectMediaPayload
 
 export const DASHBOARD_READY_KEY = "xdaily_dashboard_ready"

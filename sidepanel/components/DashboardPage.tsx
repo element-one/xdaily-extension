@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { AtomIcon } from "lucide-react"
+import { AtomIcon, ListVideoIcon } from "lucide-react"
 import { useEffect, useMemo, useRef, type FC, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import robotImg from "url:/assets/robot.png" // strange
@@ -28,6 +28,7 @@ import { ChatPanel } from "./panels/ChatPanel/ChatPanel"
 import { ExplorePanel } from "./panels/ExplorePanel/ExplorePanel"
 import { InvitePanel } from "./panels/InvitePanel/InvitePanel"
 import { KnowledgeBasePanel } from "./panels/KnowledgeBasePanel/KnowledgeBasePanel"
+import { MediaCollectPanel } from "./panels/MediaCollectPanel/MediaCollectPanel"
 import { MemoPanel } from "./panels/MemoPanel/MemoPanel"
 import { ReminderPanel } from "./panels/ReminderPanel/ReminderPanel"
 import { SheetPanel } from "./panels/SheetPanel/SheetPanel"
@@ -80,6 +81,12 @@ const NavbarItems: NavbarItem[] = [
     icon: ReminderIcon,
     tooltipI18nKey: "dashboard_page.reminder",
     component: <ReminderPanel />
+  },
+  {
+    key: NavbarItemKey.COLLECT_MEDIA,
+    icon: ListVideoIcon,
+    tooltipI18nKey: "",
+    component: <MediaCollectPanel />
   }
 ] as const
 
