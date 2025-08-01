@@ -85,7 +85,7 @@ const NavbarItems: NavbarItem[] = [
   {
     key: NavbarItemKey.COLLECT_MEDIA,
     icon: ListVideoIcon,
-    tooltipI18nKey: "",
+    tooltipI18nKey: "dashboard_page.scanning_media",
     component: <MediaCollectPanel />
   }
 ] as const

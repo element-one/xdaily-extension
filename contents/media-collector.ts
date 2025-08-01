@@ -1,10 +1,12 @@
 import type { PlasmoCSConfig } from "plasmo"
 
 import { onRouteChange } from "~libs/inject-tools/route"
+import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
+  // TODO: temporarily only show in these two sites
+  matches: ["https://twitter.com/*", "https://x.com/*"],
   run_at: "document_idle",
   all_frames: true
 }
@@ -14,28 +16,60 @@ let stopRouteWatcher: (() => void) | null = null
 let mutationObserver: MutationObserver | null = null
 const collectedSrcSet = new Set<string>()
 
-const getImageSources = () => {
-  return Array.from(document.querySelectorAll("img"))
-    .map((img) => img.getAttribute("src") || img.getAttribute("data-src"))
-    .filter((src): src is string => !!src && !collectedSrcSet.has(src))
+const getMediaWithTweetUrl = () => {
+  const results: ScanningMedia[] = []
+
+  const mediaElements: (HTMLImageElement | HTMLVideoElement)[] = [
+    ...Array.from(document.querySelectorAll("img")),
+    ...Array.from(document.querySelectorAll("video"))
+  ]
+
+  for (const el of mediaElements) {
+    const isImage = el.tagName.toLowerCase() === "img"
+    const src = isImage
+      ? el.getAttribute("src") || el.getAttribute("data-src")
+      : (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src
+
+    // can not find src
+    if (!src || collectedSrcSet.has(src)) continue
+    collectedSrcSet.add(src)
+
+    // to check if it is included in a tweet post
+    // TODO more precisely
+    const article = el.closest("article")
+    if (!article) {
+      results.push({
+        src,
+        type: isImage ? "img" : "video",
+        tweetUrl: ""
+      })
+      continue
+    }
+
+    const linkEl = article.querySelector('a[href*="/status/"]')
+    const href = linkEl?.getAttribute("href")
+    if (!href) {
+      results.push({
+        src,
+        type: isImage ? "img" : "video",
+        tweetUrl: ""
+      })
+      continue
+    }
+
+    const tweetUrl = new URL(href, location.origin).href
+
+    results.push({
+      src,
+      type: isImage ? "img" : "video",
+      tweetUrl
+    })
+  }
+
+  return results
 }
 
-const getVideoSources = () => {
-  return Array.from(document.querySelectorAll("video"))
-    .map((video) => video.currentSrc || video.src)
-    .filter((src): src is string => !!src && !collectedSrcSet.has(src))
-}
-
-const collectMedia = () => {
-  const imgs = getImageSources()
-  const videos = getVideoSources()
-
-  imgs.forEach((src) => collectedSrcSet.add(src))
-  videos.forEach((src) => collectedSrcSet.add(src))
-  return { imgs, videos }
-}
-
-const sendCollectedMedia = (media: { imgs: string[]; videos: string[] }) => {
+const sendCollectedMedia = (media: ScanningMedia[]) => {
   console.log("media", media)
 }
 
@@ -46,8 +80,8 @@ const observeMediaChanges = () => {
 
   mutationObserver = new MutationObserver(() => {
     if (!isCollecting) return
-    const media = collectMedia()
-    if (media.imgs.length > 0 || media.videos.length > 0) {
+    const media = getMediaWithTweetUrl()
+    if (media.length > 0) {
       sendCollectedMedia(media)
     }
   })
@@ -64,8 +98,8 @@ const startMediaCollection = () => {
   isCollecting = true
   collectedSrcSet.clear()
 
-  const initialMedia = collectMedia()
-  if (initialMedia.imgs.length > 0 || initialMedia.videos.length > 0) {
+  const initialMedia = getMediaWithTweetUrl()
+  if (initialMedia.length > 0) {
     sendCollectedMedia(initialMedia)
   }
 
@@ -73,8 +107,8 @@ const startMediaCollection = () => {
 
   stopRouteWatcher = onRouteChange(() => {
     collectedSrcSet.clear()
-    const media = collectMedia()
-    if (media.imgs.length > 0 || media.videos.length > 0) {
+    const media = getMediaWithTweetUrl()
+    if (media.length) {
       sendCollectedMedia(media)
     }
   })

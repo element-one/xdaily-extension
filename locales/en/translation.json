@@ -10,7 +10,8 @@
     "sheet": "Sheet",
     "reminder": "Reminder",
     "invite": "Invite User",
-    "my_account": "My Account"
+    "my_account": "My Account",
+    "scanning_media": "Scan media"
   },
   "explore_panel": {
     "title": "Explore",
