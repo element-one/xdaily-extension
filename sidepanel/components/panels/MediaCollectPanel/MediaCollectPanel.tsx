@@ -1,3 +1,4 @@
+import * as Dialog from "@radix-ui/react-dialog"
 import clsx from "clsx"
 import { AtomIcon } from "lucide-react"
 import { useEffect, useState, type FC } from "react"
@@ -8,98 +9,12 @@ import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
-// const MOCKING = [
-//   {
-//     src: "https://pbs.twimg.com/profile_images/872816390197067776/fGtCd3Du_x96.jpg",
-//     type: "img",
-//     tweetUrl: ""
-//   },
-//   {
-//     src: "https://pbs.twimg.com/profile_images/1919403571558088704/IsDv1zbW_x96.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/ohdeadshit/status/1950525249902248129"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/profile_images/1950810205123444737/-Ns8yFXG_x96.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/TheWildAnimal_/status/1950721852449726869"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/ext_tw_video_thumb/1950721820505608192/pu/img/Yn2RT-lJSxNIBAka.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/TheWildAnimal_/status/1950721852449726869"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/profile_images/1702393983937208321/LDgd70_f_x96.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/shitposts_mp4/status/1950843891718209541"
-//   },
-//   {
-//     src: "https://abs-0.twimg.com/emoji/v2/svg/1f39e.svg",
-//     type: "img",
-//     tweetUrl: "https://x.com/shitposts_mp4/status/1950843891718209541"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/amplify_video_thumb/1950694436368740352/img/pPjCg64TLiiIoALZ.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/shitposts_mp4/status/1950843891718209541"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/profile_images/1916806393358643200/UC69nrbY_x96.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/Onshitx/status/1950990712050491829"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/ext_tw_video_thumb/1950990580298686464/pu/img/bOlr0dxkesM0FpIA.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/Onshitx/status/1950990712050491829"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/profile_images/1915757825822703616/C5UJFVbv_x96.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/SuddenDeaIh/status/1951088154796236850"
-//   },
-//   {
-//     src: "https://abs-0.twimg.com/emoji/v2/svg/2620.svg",
-//     type: "img",
-//     tweetUrl: "https://x.com/SuddenDeaIh/status/1951088154796236850"
-//   },
-//   {
-//     src: "https://pbs.twimg.com/ext_tw_video_thumb/1951088094666485761/pu/img/XUZ9Z6RjX4MWIgsR.jpg",
-//     type: "img",
-//     tweetUrl: "https://x.com/SuddenDeaIh/status/1951088154796236850"
-//   },
-//   {
-//     src: "blob:https://x.com/ae53d933-8d79-4189-bf79-e977c69e7f20",
-//     type: "video",
-//     tweetUrl: "https://x.com/ohdeadshit/status/1950525249902248129"
-//   },
-//   {
-//     src: "blob:https://x.com/9a314cf8-b161-450e-8503-1b0d8f73545f",
-//     type: "video",
-//     tweetUrl: "https://x.com/TheWildAnimal_/status/1950721852449726869"
-//   },
-//   {
-//     src: "blob:https://x.com/453402c9-6769-4636-bf4c-b7f7599cff1d",
-//     type: "video",
-//     tweetUrl: "https://x.com/shitposts_mp4/status/1950843891718209541"
-//   },
-//   {
-//     src: "blob:https://x.com/6917128d-2676-4ded-bea2-02db44ac4cf5",
-//     type: "video",
-//     tweetUrl: "https://x.com/Onshitx/status/1950990712050491829"
-//   },
-//   {
-//     src: "blob:https://x.com/42a30456-8e26-42d5-ac71-df9c116d0da5",
-//     type: "video",
-//     tweetUrl: "https://x.com/SuddenDeaIh/status/1951088154796236850"
-//   }
-// ]
-
 export const MediaCollectPanel: FC = () => {
   // TODO a global status
   const [isEnable, setEnable] = useState(false)
   const [addedMedia, setAddedMedia] = useState<ScanningMedia[]>([])
+  const [open, onOpenChange] = useState(false)
+  const [editingMedia, setEditingMedia] = useState<ScanningMedia>()
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message: MessagePayload) => {
@@ -110,6 +25,10 @@ export const MediaCollectPanel: FC = () => {
   }, [])
 
   const toggleCollectorEnableStatus = () => {
+    if (!isEnable) {
+      // clean media before start again
+      setAddedMedia([])
+    }
     setEnable(!isEnable)
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
@@ -125,12 +44,13 @@ export const MediaCollectPanel: FC = () => {
     })
   }
 
+  const editMedia = (media: ScanningMedia) => {
+    setEditingMedia(media)
+    onOpenChange(true)
+  }
+
   // TODO i18n
   return (
-    // <div className="flex flex-col justify-center items-center gap-4 h-full w-full">
-    //   <Button onClick={() => notifyCollectorEnableStatus(true)}>START</Button>
-    //   <Button onClick={() => notifyCollectorEnableStatus(false)}>STOP</Button>
-    // </div>
     <div className="flex flex-col h-full gap-3">
       <PanelHeader
         title="Media"
@@ -153,10 +73,11 @@ export const MediaCollectPanel: FC = () => {
           if (media.type === "img") {
             return (
               <ImageWithFallback
+                onClick={() => editMedia(media)}
                 src={media.src}
                 key={index}
                 alt={`img-${index}`}
-                className="w-full rounded-md break-inside-avoid"
+                className="w-full rounded-md break-inside-avoid cursor-pointer"
                 fallbackClassName="w-full rounded-md"
               />
             )
@@ -164,13 +85,42 @@ export const MediaCollectPanel: FC = () => {
           return (
             <div
               key={index}
-              className="w-full pb-[100%] border border-purple rounded-md relative">
+              onClick={() => editMedia(media)}
+              className="w-full pb-[100%] border border-purple rounded-md relative cursor-pointer">
               <div className="absolute inset-0 flex items-center justify-center">
                 VIDEO
               </div>
             </div>
           )
         })}
+        {/* edit modal */}
+        <Dialog.Root open={open} onOpenChange={onOpenChange}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+            <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
+              <Dialog.Title className="text-base">Edit Media</Dialog.Title>
+              <div className="space-y-2">
+                {editingMedia && editingMedia.type === "img" && (
+                  <ImageWithFallback
+                    src={editingMedia.src}
+                    className="w-full rounded-md break-inside-avoid cursor-pointer"
+                    fallbackClassName="w-full rounded-md"
+                  />
+                )}
+                {editingMedia && editingMedia.type === "video" && (
+                  <div className="w-full pb-[100%] border border-purple rounded-md relative cursor-pointer">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      VIDEO
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button onClick={() => onOpenChange(false)}>close</Button>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
       </main>
     </div>
   )
