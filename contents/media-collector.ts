@@ -1,5 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo"
 
+import { sendToBackground } from "@plasmohq/messaging"
+
 import { onRouteChange } from "~libs/inject-tools/route"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
@@ -69,8 +71,15 @@ const getMediaWithTweetUrl = () => {
   return results
 }
 
-const sendCollectedMedia = (media: ScanningMedia[]) => {
-  console.log("media", media)
+const sendCollectedMedia = async (media: ScanningMedia[]) => {
+  try {
+    await sendToBackground({
+      name: "collect-media",
+      body: {
+        data: media
+      }
+    })
+  } catch (e) {}
 }
 
 const observeMediaChanges = () => {

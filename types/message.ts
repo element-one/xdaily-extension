@@ -1,6 +1,7 @@
 import type { ToastProps } from "~contents/toast"
 
 import type { TweetCollection, UserCollection } from "./collection"
+import type { ScanningMedia } from "./media"
 import type { TweetData } from "./tweet"
 
 export enum MessageType {
@@ -12,7 +13,8 @@ export enum MessageType {
   QUOTE_TWEET = "quote_tweet_to_chat_with_bot",
   CHAT_WITH_USER = "chat_with_user",
   LANGUAGE_CHANGED = "language_changed",
-  TOGGLE_COLLECT_MEDIA = "toggle_collect_media"
+  TOGGLE_COLLECT_MEDIA = "toggle_collect_media",
+  ADD_COLLECTING_MEDIA = "add_collecting_media"
 }
 
 export type InpageToastPayload = {
@@ -52,6 +54,10 @@ export type ToggleCollectMediaPayload = {
   type: MessageType.TOGGLE_COLLECT_MEDIA
   enable: boolean
 }
+export type AddCollectingMediaPayload = {
+  type: MessageType.ADD_COLLECTING_MEDIA
+  data: ScanningMedia[]
+}
 
 export type MessagePayload =
   | InpageToastPayload
@@ -61,5 +67,6 @@ export type MessagePayload =
   | ChatWithUserPayload
   | LanguageChangedPayload
   | ToggleCollectMediaPayload
+  | AddCollectingMediaPayload
 
 export const DASHBOARD_READY_KEY = "xdaily_dashboard_ready"
