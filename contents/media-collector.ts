@@ -3,6 +3,7 @@ import type { PlasmoCSConfig } from "plasmo"
 import { sendToBackground } from "@plasmohq/messaging"
 
 import { onRouteChange } from "~libs/inject-tools/route"
+import { getMediaInfoFromEl } from "~libs/media"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
@@ -27,45 +28,10 @@ const getMediaWithTweetUrl = () => {
   ]
 
   for (const el of mediaElements) {
-    const isImage = el.tagName.toLowerCase() === "img"
-    const src = isImage
-      ? el.getAttribute("src") || el.getAttribute("data-src")
-      : (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src
-
-    // can not find src
-    if (!src || collectedSrcSet.has(src)) continue
-    collectedSrcSet.add(src)
-
-    // to check if it is included in a tweet post
-    // TODO more precisely
-    const article = el.closest("article")
-    if (!article) {
-      results.push({
-        src,
-        type: isImage ? "img" : "video",
-        tweetUrl: ""
-      })
-      continue
-    }
-
-    const linkEl = article.querySelector('a[href*="/status/"]')
-    const href = linkEl?.getAttribute("href")
-    if (!href) {
-      results.push({
-        src,
-        type: isImage ? "img" : "video",
-        tweetUrl: ""
-      })
-      continue
-    }
-
-    const tweetUrl = new URL(href, location.origin).href
-
-    results.push({
-      src,
-      type: isImage ? "img" : "video",
-      tweetUrl
-    })
+    const info = getMediaInfoFromEl(el)
+    if (!info) continue
+    if (collectedSrcSet.has(info.src)) continue
+    results.push(info)
   }
 
   return results

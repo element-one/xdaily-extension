@@ -21,6 +21,14 @@ export const MediaCollectPanel: FC = () => {
       if (message.type === MessageType.ADD_COLLECTING_MEDIA) {
         setAddedMedia((prev) => [...message.data, ...prev])
       }
+      if (message.type === MessageType.DIRECT_EDIT_MEDIA) {
+        const media = message.data
+        setAddedMedia((prev) => [media, ...prev])
+        setEditingMedia(media)
+        setTimeout(() => {
+          onOpenChange(true)
+        }, 0)
+      }
     })
   }, [])
 

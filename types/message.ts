@@ -14,7 +14,8 @@ export enum MessageType {
   CHAT_WITH_USER = "chat_with_user",
   LANGUAGE_CHANGED = "language_changed",
   TOGGLE_COLLECT_MEDIA = "toggle_collect_media",
-  ADD_COLLECTING_MEDIA = "add_collecting_media"
+  ADD_COLLECTING_MEDIA = "add_collecting_media",
+  DIRECT_EDIT_MEDIA = "direct_edit_collectin_media"
 }
 
 export type InpageToastPayload = {
@@ -58,6 +59,10 @@ export type AddCollectingMediaPayload = {
   type: MessageType.ADD_COLLECTING_MEDIA
   data: ScanningMedia[]
 }
+export type DirectEditCollectingMediaPayload = {
+  type: MessageType.DIRECT_EDIT_MEDIA
+  data: ScanningMedia
+}
 
 export type MessagePayload =
   | InpageToastPayload
@@ -68,5 +73,6 @@ export type MessagePayload =
   | LanguageChangedPayload
   | ToggleCollectMediaPayload
   | AddCollectingMediaPayload
+  | DirectEditCollectingMediaPayload
 
 export const DASHBOARD_READY_KEY = "xdaily_dashboard_ready"
