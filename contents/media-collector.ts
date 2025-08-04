@@ -19,10 +19,10 @@ let stopRouteWatcher: (() => void) | null = null
 let mutationObserver: MutationObserver | null = null
 const collectedSrcSet = new Set<string>()
 
-const getMediaWithTweetUrl = () => {
+const getMediaWithTweetUrl = (el?: (HTMLImageElement | HTMLVideoElement)[]) => {
   const results: ScanningMedia[] = []
 
-  const mediaElements: (HTMLImageElement | HTMLVideoElement)[] = [
+  const mediaElements: (HTMLImageElement | HTMLVideoElement)[] = el ?? [
     ...Array.from(document.querySelectorAll("img")),
     ...Array.from(document.querySelectorAll("video"))
   ]
@@ -54,9 +54,24 @@ const observeMediaChanges = () => {
     mutationObserver.disconnect()
   }
 
-  mutationObserver = new MutationObserver(() => {
+  mutationObserver = new MutationObserver((mutations) => {
     if (!isCollecting) return
-    const media = getMediaWithTweetUrl()
+
+    const newElements = []
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof Element)) continue
+
+        if (node.tagName === "IMG" || node.tagName === "VIDEO") {
+          newElements.push(node)
+        }
+
+        // find subtree
+        newElements.push(...Array.from(node.querySelectorAll("img, video")))
+      }
+    }
+
+    const media = getMediaWithTweetUrl(newElements)
     if (media.length > 0) {
       sendCollectedMedia(media)
     }
