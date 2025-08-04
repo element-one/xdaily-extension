@@ -31,6 +31,7 @@ const getMediaWithTweetUrl = () => {
     const info = getMediaInfoFromEl(el)
     if (!info) continue
     if (collectedSrcSet.has(info.src)) continue
+    collectedSrcSet.add(info.src)
     results.push(info)
   }
 
@@ -38,7 +39,6 @@ const getMediaWithTweetUrl = () => {
 }
 
 const sendCollectedMedia = async (media: ScanningMedia[]) => {
-  console.log("testing", media)
   try {
     await sendToBackground({
       name: "collect-media",
