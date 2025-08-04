@@ -38,6 +38,7 @@ const getMediaWithTweetUrl = () => {
 }
 
 const sendCollectedMedia = async (media: ScanningMedia[]) => {
+  console.log("testing", media)
   try {
     await sendToBackground({
       name: "collect-media",

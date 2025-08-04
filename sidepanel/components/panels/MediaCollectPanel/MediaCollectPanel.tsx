@@ -9,6 +9,24 @@ import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
+const MediaCont: FC<{
+  media: ScanningMedia
+  handleClick?: () => void
+}> = ({ media, handleClick }) => {
+  return (
+    <div className="relative cursor-pointer" onClick={() => handleClick?.()}>
+      <ImageWithFallback
+        src={media.type === "img" ? media.src : media.poster}
+        alt={media.src}
+        className="w-full rounded-md break-inside-avoid"
+        fallbackClassName="w-full rounded-md h-24"
+      />
+      <div className="z-2 absolute top-2 right-2 text-text-default-primary bg-purple px-1 rounded-sm">
+        {media.type}
+      </div>
+    </div>
+  )
+}
 export const MediaCollectPanel: FC = () => {
   // TODO a global status
   const [isEnable, setEnable] = useState(false)
@@ -77,30 +95,13 @@ export const MediaCollectPanel: FC = () => {
         }
       />
       <main className="columns-2 gap-2 p-2 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
-        {addedMedia.map((media, index) => {
-          if (media.type === "img") {
-            return (
-              <ImageWithFallback
-                onClick={() => editMedia(media)}
-                src={media.src}
-                key={index}
-                alt={`img-${index}`}
-                className="w-full rounded-md break-inside-avoid cursor-pointer"
-                fallbackClassName="w-full rounded-md"
-              />
-            )
-          }
-          return (
-            <div
-              key={index}
-              onClick={() => editMedia(media)}
-              className="w-full pb-[100%] border border-purple rounded-md relative cursor-pointer">
-              <div className="absolute inset-0 flex items-center justify-center">
-                VIDEO
-              </div>
-            </div>
-          )
-        })}
+        {addedMedia.map((media, index) => (
+          <MediaCont
+            key={index}
+            handleClick={() => editMedia(media)}
+            media={media}
+          />
+        ))}
         {/* edit modal */}
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
           <Dialog.Portal>
@@ -108,20 +109,7 @@ export const MediaCollectPanel: FC = () => {
             <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
               <Dialog.Title className="text-base">Edit Media</Dialog.Title>
               <div className="space-y-2">
-                {editingMedia && editingMedia.type === "img" && (
-                  <ImageWithFallback
-                    src={editingMedia.src}
-                    className="w-full rounded-md break-inside-avoid cursor-pointer"
-                    fallbackClassName="w-full rounded-md"
-                  />
-                )}
-                {editingMedia && editingMedia.type === "video" && (
-                  <div className="w-full pb-[100%] border border-purple rounded-md relative cursor-pointer">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      VIDEO
-                    </div>
-                  </div>
-                )}
+                {editingMedia && <MediaCont media={editingMedia} />}
               </div>
               <div className="flex justify-end gap-2">
                 <Button onClick={() => onOpenChange(false)}>close</Button>
