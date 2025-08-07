@@ -119,6 +119,7 @@ const stopMediaCollection = () => {
 const initialize = () => {
   chrome.runtime.onMessage.addListener((message: MessagePayload) => {
     if (message.type === MessageType.TOGGLE_COLLECT_MEDIA) {
+      console.log("testing", message.enable)
       if (message.enable) {
         startMediaCollection()
       } else {

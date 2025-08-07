@@ -109,34 +109,33 @@ export const MediaCollectPanel: FC = () => {
           </Button>
         }
       />
-      <main className="columns-2 gap-2 p-2 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
-        {addedMedia.length > 0 &&
-          addedMedia.map((media, index) => (
+      {addedMedia.length > 0 && (
+        <main className="columns-2 gap-2 p-2 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
+          {addedMedia.map((media, index) => (
             <MediaCont
               key={`${media.src}${index}`}
               handleClick={() => editMedia(media)}
               media={media}
             />
           ))}
-        {!addedMedia.length && (
-          <EmptyContent content="Start Collecting Media from x.com" />
-        )}
-        {/* edit modal */}
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
-          <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 bg-black/40" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
-              <Dialog.Title className="text-base">Edit Media</Dialog.Title>
-              <div className="space-y-2">
-                {editingMedia && <MediaCont media={editingMedia} />}
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button onClick={() => onOpenChange(false)}>close</Button>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      </main>
+          {/* edit modal */}
+          <Dialog.Root open={open} onOpenChange={onOpenChange}>
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+              <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
+                <Dialog.Title className="text-base">Edit Media</Dialog.Title>
+                <div className="space-y-2">
+                  {editingMedia && <MediaCont media={editingMedia} />}
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button onClick={() => onOpenChange(false)}>close</Button>
+                </div>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </main>
+      )}
+      {!addedMedia.length && <EmptyContent content="Start Collecting..." />}
     </div>
   )
 }
