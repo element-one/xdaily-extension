@@ -4,29 +4,13 @@ import { AtomIcon } from "lucide-react"
 import { useEffect, useState, type FC } from "react"
 
 import { Button } from "~sidepanel/components/ui/Button"
-import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
+import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
-const MediaCont: FC<{
-  media: ScanningMedia
-  handleClick?: () => void
-}> = ({ media, handleClick }) => {
-  return (
-    <div className="relative cursor-pointer" onClick={() => handleClick?.()}>
-      <ImageWithFallback
-        src={media.type === "img" ? media.src : media.poster}
-        alt={media.src}
-        className="w-full rounded-md break-inside-avoid"
-        fallbackClassName="w-full rounded-md h-24"
-      />
-      <div className="z-2 absolute top-2 right-2 text-text-default-primary bg-purple px-1 rounded-sm">
-        {media.type}
-      </div>
-    </div>
-  )
-}
+import { MediaCont } from "./MediaCont"
+
 export const MediaCollectPanel: FC = () => {
   // TODO a global status
   const [isEnable, setEnable] = useState(false)
@@ -48,6 +32,37 @@ export const MediaCollectPanel: FC = () => {
         }, 0)
       }
     })
+    setAddedMedia([])
+    setEnable(true)
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (tab.id) {
+          chrome.tabs
+            .sendMessage(tab.id, {
+              type: MessageType.TOGGLE_COLLECT_MEDIA,
+              enable: true
+            })
+            .catch(() => {})
+        }
+      })
+    })
+    return () => {
+      // stop scanning when leave the panel
+      setAddedMedia([])
+      setEnable(false)
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id) {
+            chrome.tabs
+              .sendMessage(tab.id, {
+                type: MessageType.TOGGLE_COLLECT_MEDIA,
+                enable: false
+              })
+              .catch(() => {})
+          }
+        })
+      })
+    }
   }, [])
 
   const toggleCollectorEnableStatus = () => {
@@ -95,13 +110,17 @@ export const MediaCollectPanel: FC = () => {
         }
       />
       <main className="columns-2 gap-2 p-2 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
-        {addedMedia.map((media, index) => (
-          <MediaCont
-            key={`${media.src}${index}`}
-            handleClick={() => editMedia(media)}
-            media={media}
-          />
-        ))}
+        {addedMedia.length > 0 &&
+          addedMedia.map((media, index) => (
+            <MediaCont
+              key={`${media.src}${index}`}
+              handleClick={() => editMedia(media)}
+              media={media}
+            />
+          ))}
+        {!addedMedia.length && (
+          <EmptyContent content="Start Collecting Media from x.com" />
+        )}
         {/* edit modal */}
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
           <Dialog.Portal>

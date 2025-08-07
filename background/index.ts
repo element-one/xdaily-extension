@@ -14,11 +14,25 @@ chrome.cookies.onChanged.addListener((changeInfo) => {
   }
 })
 
+// deal with sidepanel disconnected/closed
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "sidepanel") {
     port.onDisconnect.addListener(() => {
-      //[background] sidepanel disconnected, clearing ready flag
+      // clearing ready flag
       chrome.storage.local.remove(DASHBOARD_READY_KEY)
+      // stop collecting media from twitter
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id) {
+            chrome.tabs
+              .sendMessage(tab.id, {
+                type: MessageType.TOGGLE_COLLECT_MEDIA,
+                enable: false
+              })
+              .catch(() => {})
+          }
+        })
+      })
     })
   }
 })
