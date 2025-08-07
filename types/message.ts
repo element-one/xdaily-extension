@@ -58,6 +58,7 @@ export type ToggleCollectMediaPayload = {
 export type AddCollectingMediaPayload = {
   type: MessageType.ADD_COLLECTING_MEDIA
   data: ScanningMedia[]
+  reset: boolean
 }
 export type DirectEditCollectingMediaPayload = {
   type: MessageType.DIRECT_EDIT_MEDIA

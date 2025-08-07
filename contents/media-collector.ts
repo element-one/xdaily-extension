@@ -38,12 +38,14 @@ const getMediaWithTweetUrl = (el?: (HTMLImageElement | HTMLVideoElement)[]) => {
   return results
 }
 
-const sendCollectedMedia = async (media: ScanningMedia[]) => {
+const sendCollectedMedia = async (media: ScanningMedia[], reset = false) => {
   try {
+    if (!isCollecting) return
     await sendToBackground({
       name: "collect-media",
       body: {
-        data: media
+        data: media,
+        reset
       }
     })
   } catch (e) {}
@@ -91,7 +93,7 @@ const startMediaCollection = () => {
 
   const initialMedia = getMediaWithTweetUrl()
   if (initialMedia.length > 0) {
-    sendCollectedMedia(initialMedia)
+    sendCollectedMedia(initialMedia, true)
   }
 
   observeMediaChanges()
@@ -100,7 +102,7 @@ const startMediaCollection = () => {
     collectedSrcSet.clear()
     const media = getMediaWithTweetUrl()
     if (media.length) {
-      sendCollectedMedia(media)
+      sendCollectedMedia(media, true)
     }
   })
 }
@@ -119,7 +121,6 @@ const stopMediaCollection = () => {
 const initialize = () => {
   chrome.runtime.onMessage.addListener((message: MessagePayload) => {
     if (message.type === MessageType.TOGGLE_COLLECT_MEDIA) {
-      console.log("testing", message.enable)
       if (message.enable) {
         startMediaCollection()
       } else {

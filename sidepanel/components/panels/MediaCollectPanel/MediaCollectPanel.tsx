@@ -40,7 +40,11 @@ export const MediaCollectPanel: FC = () => {
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message: MessagePayload) => {
       if (message.type === MessageType.ADD_COLLECTING_MEDIA) {
-        setAddedMedia((prev) => [...message.data, ...prev])
+        if (message.reset) {
+          setAddedMedia([...message.data])
+        } else {
+          setAddedMedia((prev) => [...message.data, ...prev])
+        }
       }
       if (message.type === MessageType.DIRECT_EDIT_MEDIA) {
         const media = message.data

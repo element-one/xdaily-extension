@@ -153,10 +153,7 @@ export const DashboardPage = () => {
           userName: message.data.kolUserName ?? screenName
         })
       }
-      if (
-        message.type === MessageType.ADD_COLLECTING_MEDIA ||
-        message.type === MessageType.DIRECT_EDIT_MEDIA
-      ) {
+      if (message.type === MessageType.DIRECT_EDIT_MEDIA) {
         toggleDrawer(NavbarItemKey.COLLECT_MEDIA)
       }
     }
