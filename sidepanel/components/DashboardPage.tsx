@@ -115,7 +115,8 @@ export const DashboardPage = () => {
     clearNavbar,
     setQuoteTweet,
     setKolScreenName,
-    setKolInfo
+    setKolInfo,
+    setEditingMedia
   } = useStore()
   const didInitRef = useRef(false)
 
@@ -129,6 +130,7 @@ export const DashboardPage = () => {
   }, [navbarItemKey])
 
   const toggleDrawer = (itemKey: NavbarItemKey) => {
+    setEditingMedia(null)
     setKolScreenName("")
     setKolInfo({ avatarUrl: "", userName: "" })
     setNavbarItemKey(itemKey)
@@ -155,6 +157,7 @@ export const DashboardPage = () => {
       }
       if (message.type === MessageType.DIRECT_EDIT_MEDIA) {
         toggleDrawer(NavbarItemKey.COLLECT_MEDIA)
+        setEditingMedia(message.data)
       }
     }
 

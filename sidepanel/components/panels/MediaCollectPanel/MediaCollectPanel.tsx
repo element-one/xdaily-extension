@@ -6,6 +6,7 @@ import { useEffect, useState, type FC } from "react"
 import { Button } from "~sidepanel/components/ui/Button"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
+import { useStore } from "~store/store"
 import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
@@ -34,8 +35,9 @@ export const MediaCollectPanel: FC = () => {
   const [isEnable, setEnable] = useState(false)
   const [addedMedia, setAddedMedia] = useState<ScanningMedia[]>([])
   const [open, onOpenChange] = useState(false)
-  const [editingMedia, setEditingMedia] = useState<ScanningMedia>()
   const [tabKey, setTabKey] = useState<TabKey>(TabKey.EXPLORE)
+  const { editingMedia, setEditingMedia } = useStore()
+  const [isEditingExistMedia, setIsEditingExistMedia] = useState(false)
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message: MessagePayload) => {
@@ -45,14 +47,6 @@ export const MediaCollectPanel: FC = () => {
         } else {
           setAddedMedia((prev) => [...message.data, ...prev])
         }
-      }
-      if (message.type === MessageType.DIRECT_EDIT_MEDIA) {
-        const media = message.data
-        setAddedMedia((prev) => [media, ...prev])
-        setEditingMedia(media)
-        setTimeout(() => {
-          onOpenChange(true)
-        }, 0)
       }
     })
     setAddedMedia([])
@@ -109,8 +103,21 @@ export const MediaCollectPanel: FC = () => {
   }
 
   const editMedia = (media: ScanningMedia) => {
+    setIsEditingExistMedia(true)
     setEditingMedia(media)
-    onOpenChange(true)
+  }
+
+  useEffect(() => {
+    if (editingMedia) {
+      onOpenChange(true)
+      !isEditingExistMedia && setAddedMedia((prev) => [editingMedia, ...prev])
+    }
+  }, [editingMedia, isEditingExistMedia])
+
+  const handleCancel = () => {
+    setEditingMedia(null)
+    setIsEditingExistMedia(false)
+    onOpenChange(false)
   }
 
   // TODO i18n
@@ -161,7 +168,11 @@ export const MediaCollectPanel: FC = () => {
                 />
               ))}
               {/* edit modal */}
-              <Dialog.Root open={open} onOpenChange={onOpenChange}>
+              <Dialog.Root
+                open={open}
+                onOpenChange={(open) => {
+                  open ? onOpenChange(true) : handleCancel()
+                }}>
                 <Dialog.Portal>
                   <Dialog.Overlay className="fixed inset-0 bg-black/40" />
                   <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-fill-bg-light rounded-lg p-6  border border-fill-bg-input space-y-4 text-text-default-primary">
@@ -172,7 +183,7 @@ export const MediaCollectPanel: FC = () => {
                       {editingMedia && <MediaCont media={editingMedia} />}
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button onClick={() => onOpenChange(false)}>close</Button>
+                      <Button onClick={handleCancel}>close</Button>
                     </div>
                   </Dialog.Content>
                 </Dialog.Portal>

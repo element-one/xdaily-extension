@@ -8,6 +8,7 @@ import {
 import { Storage } from "@plasmohq/storage"
 
 import { createChatSlice, type ChatSlice } from "./chatSlice"
+import { createMediaSlice, type MediaSlice } from "./mediaSlice"
 import { createNavigationSlice, type NavigationSlice } from "./navigationSlice"
 import { createUserSlice, type UserSlice } from "./userSlice"
 
@@ -34,14 +35,15 @@ const customStorage: StateStorage = {
   }
 }
 
-type StoreState = UserSlice & NavigationSlice & ChatSlice
+type StoreState = UserSlice & NavigationSlice & ChatSlice & MediaSlice
 
 export const useStore = create<StoreState>()(
   persist(
     (...a) => ({
       ...createUserSlice(...a),
       ...createNavigationSlice(...a),
-      ...createChatSlice(...a)
+      ...createChatSlice(...a),
+      ...createMediaSlice(...a)
     }),
     {
       name: "xdaily-extension-storage",
