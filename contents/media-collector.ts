@@ -98,13 +98,18 @@ const startMediaCollection = () => {
 
   observeMediaChanges()
 
-  stopRouteWatcher = onRouteChange(() => {
-    collectedSrcSet.clear()
-    const media = getMediaWithTweetUrl()
-    if (media.length) {
-      sendCollectedMedia(media, true)
+  stopRouteWatcher = onRouteChange(
+    () => {
+      collectedSrcSet.clear()
+      const media = getMediaWithTweetUrl()
+      if (media.length) {
+        sendCollectedMedia(media, true)
+      }
+    },
+    {
+      listenToTabChange: true
     }
-  })
+  )
 }
 
 const stopMediaCollection = () => {
