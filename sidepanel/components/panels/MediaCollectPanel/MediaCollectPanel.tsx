@@ -11,6 +11,7 @@ import type { ScanningMedia } from "~types/media"
 import { MessageType, type MessagePayload } from "~types/message"
 
 import { MediaCont } from "./MediaCont"
+import { MediaListCont } from "./MediaListCont"
 
 enum TabKey {
   EXPLORE = "explore",
@@ -45,7 +46,7 @@ export const MediaCollectPanel: FC = () => {
         if (message.reset) {
           setAddedMedia([...message.data])
         } else {
-          setAddedMedia((prev) => [...message.data, ...prev])
+          setAddedMedia((prev) => [...prev, ...message.data])
         }
       }
     })
@@ -195,11 +196,7 @@ export const MediaCollectPanel: FC = () => {
           )}
         </>
       )}
-      {tabKey === TabKey.LIST && (
-        <main className="w-full h-full flex items-center justify-center">
-          <EmptyContent hideImage content="Empty List" />
-        </main>
-      )}
+      {tabKey === TabKey.LIST && <MediaListCont />}
     </div>
   )
 }
