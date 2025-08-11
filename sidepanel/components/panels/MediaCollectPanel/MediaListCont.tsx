@@ -17,29 +17,28 @@ export const MediaListCont: FC = () => {
   const [open, onOpenChange] = useState(false)
 
   return (
-    <main className="w-full h-full flex flex-col">
-      <Button className="w-full mb-2" onClick={() => onOpenChange(true)}>
-        Create New List
-      </Button>
+    <main className="w-full h-full flex flex-col gap-2 flex-1 min-h-0">
       {data.length > 0 && (
-        <div className="grid grid-cols-2">
-          {data.map((item, index) => (
-            <div
-              className="col-span-1 h-36 rounded overflow-hidden p-1 flex flex-col gap-1 border border-fill-bg-input hover:border-primary-brand cursor-pointer"
-              key={index}>
-              <div className="flex-1 min-h-0 overflow-hidden">
-                <ImageWithFallback
-                  src={item.coverUrl}
-                  alt={item.title}
-                  className="size-full object-contain rounded"
-                  fallbackClassName="size-full rounded"
-                />
+        <div className="min-h-0 flex-1 overflow-scroll">
+          <div className="grid grid-cols-2 gap-2">
+            {data.map((item, index) => (
+              <div
+                className="col-span-1 h-36 rounded overflow-hidden p-1 flex flex-col gap-1 border border-fill-bg-input hover:border-primary-brand cursor-pointer"
+                key={index}>
+                <div className="flex-1 min-h-0 overflow-hidden">
+                  <ImageWithFallback
+                    src={item.coverUrl}
+                    alt={item.title}
+                    className="size-full object-contain rounded"
+                    fallbackClassName="size-full rounded"
+                  />
+                </div>
+                <div className="line-clamp-1 text-text-default-primary text-sm font-semibold">
+                  {item.title}
+                </div>
               </div>
-              <div className="line-clamp-1 text-text-default-primary text-sm font-semibold">
-                {item.title}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
       {!data.length && (
@@ -47,6 +46,11 @@ export const MediaListCont: FC = () => {
           <EmptyContent hideImage content="Empty List" />
         </div>
       )}
+      <div className="w-full h-fit">
+        <Button className="w-full" onClick={() => onOpenChange(true)}>
+          Create New List
+        </Button>
+      </div>
       {/* create new list modal */}
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
