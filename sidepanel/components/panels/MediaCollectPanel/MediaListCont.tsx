@@ -1,12 +1,10 @@
 import * as Dialog from "@radix-ui/react-dialog"
-import { ChevronLeftIcon } from "lucide-react"
 import { useState, type FC } from "react"
 
 import { Button } from "~sidepanel/components/ui/Button"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
 import { InputBox } from "~sidepanel/components/ui/InputBox"
-import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
 
 import { MediaListDetailPage } from "./MediaListDetailPage"
 
@@ -19,12 +17,15 @@ const data = [
 
 export const MediaListCont: FC = () => {
   const [open, onOpenChange] = useState(false)
+  const [isDetail, setIsDetail] = useState(false)
 
   const handleBack = () => {
-    console.log("back")
+    setIsDetail(false)
   }
 
-  return <MediaListDetailPage onBack={handleBack} />
+  if (isDetail) {
+    return <MediaListDetailPage onBack={handleBack} />
+  }
 
   return (
     <main className="w-full h-full flex flex-col gap-2 flex-1 min-h-0">
@@ -35,7 +36,9 @@ export const MediaListCont: FC = () => {
               <div
                 className="col-span-1 h-36 rounded overflow-hidden p-1 flex flex-col gap-1 border border-fill-bg-input hover:border-primary-brand cursor-pointer"
                 key={index}>
-                <div className="flex-1 min-h-0 overflow-hidden">
+                <div
+                  className="flex-1 min-h-0 overflow-hidden"
+                  onClick={() => setIsDetail(true)}>
                   <ImageWithFallback
                     src={item.coverUrl}
                     alt={item.title}
