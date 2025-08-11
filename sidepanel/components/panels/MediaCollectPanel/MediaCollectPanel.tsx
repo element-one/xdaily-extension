@@ -12,6 +12,7 @@ import { MessageType, type MessagePayload } from "~types/message"
 
 import { MediaCont } from "./MediaCont"
 import { MediaListCont } from "./MediaListCont"
+import { ResponsiveColumns } from "./ResponsiveColumns"
 
 enum TabKey {
   EXPLORE = "explore",
@@ -21,12 +22,10 @@ enum TabKey {
 const tabs = [
   {
     key: TabKey.EXPLORE,
-    labelI18nKey: "studio_panel.design",
     label: "Explore"
   },
   {
     key: TabKey.LIST,
-    labelI18nKey: "studio_panel.tools",
     label: "List"
   }
 ]
@@ -160,7 +159,7 @@ export const MediaCollectPanel: FC = () => {
       {tabKey === TabKey.EXPLORE && (
         <>
           {addedMedia.length > 0 && (
-            <main className="columns-2 gap-2 p-2 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 hide-scrollbar">
+            <ResponsiveColumns classNames="flex-1 min-h-0 overflow-y-auto overflow-x-hidden hide-scrollbar p-2 py-4">
               {addedMedia.map((media, index) => (
                 <MediaCont
                   key={`${media.src}${index}`}
@@ -189,7 +188,7 @@ export const MediaCollectPanel: FC = () => {
                   </Dialog.Content>
                 </Dialog.Portal>
               </Dialog.Root>
-            </main>
+            </ResponsiveColumns>
           )}
           {!addedMedia.length && (
             <EmptyContent hideImage content="Start Collecting..." />

@@ -92,7 +92,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={clsx(
-        "text-xs focus:bg-fill-bg-deep text-text-default-primary focus:text-text-default-primary relative flex cursor-pointer items-center gap-1 rounded p-1 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ",
+        "text-xs focus:bg-fill-bg-deep text-text-default-primary focus:text-text-default-primary relative flex cursor-pointer items-center gap-1 rounded p-1 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       onSelect={handleSelect}
@@ -187,7 +187,7 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={clsx("bg-border -mx-1 my-1 h-px", className)}
+      className={clsx("bg-fill-bg-input -mx-1 my-1 h-px", className)}
       {...props}
     />
   )
@@ -228,7 +228,7 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={clsx(
-        "focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8",
+        "text-xs focus:bg-fill-bg-deep data-[state=open]:bg-fill-bg-deep text-text-default-primary focus:text-text-default-primary relative flex cursor-pointer items-center gap-1 rounded p-1 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}>
@@ -246,7 +246,7 @@ function DropdownMenuSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={clsx(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg",
+        "bg-fill-bg-light rounded-lg border-[0.5px] border-fill-bg-grey p-1 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 shadow-xs max-h-(--radix-dropdown-menu-content-available-height)",
         className
       )}
       {...props}

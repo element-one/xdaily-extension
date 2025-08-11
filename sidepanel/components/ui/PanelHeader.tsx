@@ -29,7 +29,7 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
   }
   return (
     <header className="relative flex-none h-8 flex items-center justify-between">
-      <h1 className="text-base font-semibold flex gap-1 w-fit items-center">
+      <h1 className="text-base font-semibold flex gap-1 w-full items-center">
         {title}
       </h1>
       {/* {rightContent} */}

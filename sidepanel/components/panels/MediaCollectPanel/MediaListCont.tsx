@@ -1,10 +1,14 @@
 import * as Dialog from "@radix-ui/react-dialog"
+import { ChevronLeftIcon } from "lucide-react"
 import { useState, type FC } from "react"
 
 import { Button } from "~sidepanel/components/ui/Button"
 import { EmptyContent } from "~sidepanel/components/ui/EmptyContent"
 import { ImageWithFallback } from "~sidepanel/components/ui/ImageWithFallback"
 import { InputBox } from "~sidepanel/components/ui/InputBox"
+import { PanelHeader } from "~sidepanel/components/ui/PanelHeader"
+
+import { MediaListDetailPage } from "./MediaListDetailPage"
 
 const data = [
   {
@@ -15,6 +19,12 @@ const data = [
 
 export const MediaListCont: FC = () => {
   const [open, onOpenChange] = useState(false)
+
+  const handleBack = () => {
+    console.log("back")
+  }
+
+  return <MediaListDetailPage onBack={handleBack} />
 
   return (
     <main className="w-full h-full flex flex-col gap-2 flex-1 min-h-0">
