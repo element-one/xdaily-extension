@@ -1,3 +1,5 @@
+import { MessageType } from "~types/message"
+
 export const onRouteChange = (callback) => {
   let lastHref = location.href
 
@@ -23,8 +25,15 @@ export const onRouteChange = (callback) => {
 
   window.addEventListener("popstate", check)
 
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.type === MessageType.TAB_CHANGE) {
+      callback()
+    }
+  })
+
   // also poll as fallback
   const intervalId = setInterval(check, 1000)
+
   return () => {
     history.pushState = originalPush
     history.replaceState = originalReplace

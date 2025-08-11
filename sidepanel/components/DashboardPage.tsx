@@ -171,6 +171,7 @@ export const DashboardPage = () => {
           avatarUrl: "",
           userName: ""
         })
+        setEditingMedia(null)
       }
     })
 

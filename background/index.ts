@@ -36,3 +36,12 @@ chrome.runtime.onConnect.addListener((port) => {
     })
   }
 })
+
+// listen to the tab changing
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab.id && tab.url) {
+      chrome.tabs.sendMessage(tab.id, { type: MessageType.TAB_CHANGE })
+    }
+  })
+})

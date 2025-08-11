@@ -15,7 +15,8 @@ export enum MessageType {
   LANGUAGE_CHANGED = "language_changed",
   TOGGLE_COLLECT_MEDIA = "toggle_collect_media",
   ADD_COLLECTING_MEDIA = "add_collecting_media",
-  DIRECT_EDIT_MEDIA = "direct_edit_collectin_media"
+  DIRECT_EDIT_MEDIA = "direct_edit_collectin_media",
+  TAB_CHANGE = "tab_change"
 }
 
 export type InpageToastPayload = {

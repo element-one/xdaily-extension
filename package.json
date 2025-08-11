@@ -61,7 +61,9 @@
   "manifest": {
     "permissions": [
       "storage",
-      "cookies"
+      "cookies",
+      "tabs",
+      "activeTab"
     ],
     "host_permissions": [
       "$PLASMO_PUBLIC_SERVER_URL/*",
