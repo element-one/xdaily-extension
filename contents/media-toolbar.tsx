@@ -2,7 +2,7 @@ import clsx from "clsx"
 import cssText from "data-text:~/styles/global.css"
 import { BotIcon } from "lucide-react"
 import type { PlasmoCSConfig } from "plasmo"
-import React, { useEffect, useRef, useState, type FC } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 

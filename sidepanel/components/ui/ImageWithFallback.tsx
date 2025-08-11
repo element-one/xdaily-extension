@@ -12,6 +12,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   ...props
 }) => {
   const [hasError, setHasError] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   if (hasError || !props.src) {
     return (
@@ -25,11 +26,22 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   }
 
   return (
-    <img
-      loading="lazy"
-      {...props}
-      className={clsx("object-cover", className)}
-      onError={() => setHasError(true)}
-    />
+    <>
+      {isLoading && (
+        <div
+          className={clsx(
+            "bg-fill-bg-input flex items-center justify-center",
+            fallbackClassName ?? "h-20 w-20 rounded"
+          )}
+        />
+      )}
+      <img
+        loading="lazy"
+        {...props}
+        className={clsx("object-cover", className)}
+        onError={() => setHasError(true)}
+        onLoad={() => setIsLoading(false)}
+      />
+    </>
   )
 }
